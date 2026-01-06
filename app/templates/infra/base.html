@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Infra HelpDesk{% endblock %}</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brandBlue: "#074F74",
+              brandTeal: "#40C4A4",
+              brandText: "#01485E",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Custom CSS for toast + autocomplete -->
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+
+  <body
+    {%
+    block
+    body_attrs
+    %}{%
+    endblock
+    %}
+    class="min-h-screen bg-gradient-to-br from-slate-50 via-sky-50 to-emerald-50 text-slate-800"
+  >
+    <!-- NAVBAR -->
+    <header class="bg-brandBlue text-white shadow-lg sticky top-0 z-50">
+      <div
+        class="content-shell px-4 sm:px-6 py-3 flex items-center justify-between"
+      >
+        <!-- LEFT SIDE: Logo + Nav Links -->
+        <div class="flex items-center gap-6">
+          <!-- Logo with white pill background -->
+          <div
+            class="bg-white/95 border border-white/60 rounded-xl shadow-sm px-3 py-1 flex items-center"
+          >
+            <img
+              src="/static/logo.png"
+              alt="Dr Bhasin's Lab Logo"
+              class="h-10 w-auto object-contain"
+            />
+          </div>
+
+          <!-- Nav Links -->
+          {% set designation = (request.session.get("designation") or "").lower() %}
+          <nav class="flex flex-wrap items-center gap-4 text-[15px] font-semibold tracking-tight">
+            {% if designation in ['admin', 'it'] %}
+            <a
+              href="/infra/dashboard"
+              class="transition hover:text-white/80 {% if request.url.path.startswith('/infra/dashboard') %} border-b-2 border-white pb-0.5 font-semibold {% endif %}"
+            >
+              Dashboard
+            </a>
+            <a
+              href="/infra/all"
+              class="transition hover:text-white/80 {% if request.url.path.startswith('/infra/all') %} border-b-2 border-white pb-0.5 font-semibold {% endif %}"
+            >
+              All Tickets
+            </a>
+            {% endif %}
+
+            <a
+              href="/infra/create-form"
+              class="transition hover:text-white/80 {% if request.url.path.startswith('/infra/create') %} border-b-2 border-white pb-0.5 font-semibold {% endif %}"
+            >
+              Raise Ticket
+            </a>
+            <a
+              href="/my-tickets"
+              class="transition hover:text-white/80 {% if request.url.path.startswith('/my-tickets') %} border-b-2 border-white pb-0.5 font-semibold {% endif %}"
+            >
+              My Tickets
+            </a>
+          </nav>
+        </div>
+
+        <!-- RIGHT SIDE: User + Logout -->
+        <div class="flex items-center gap-3 text-sm">
+          {% if request.session.get("username") %}
+          <span class="text-white/90">
+            Hi,
+            <span class="font-semibold">
+              {{ request.session.get("username") }}
+            </span>
+          </span>
+
+          <a
+            href="/logout"
+            class="px-3 py-1 rounded-full border border-white/70 text-xs font-semibold hover:bg-white hover:text-brandBlue transition"
+          >
+            Logout
+          </a>
+
+          {% else %}
+          <a
+            href="/login"
+            class="px-3 py-1 rounded-full border border-white/70 text-xs font-semibold hover:bg-white hover:text-brandBlue transition"
+          >
+            Login
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="content-shell sm:px-6 lg:px-8 py-4 leading-relaxed">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Toast (unchanged) -->
+    <div id="toast" class="toast">
+      <div id="toast-content"></div>
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>

@@ -1,0 +1,156 @@
+﻿{% extends "base.html" %} {% block title %}Infra Dashboard{% endblock %} {%
+block content %}
+<div class="page-wrapper px-4 md:px-8">
+  <div class="space-y-6">
+    {% set total_safe = total or 1 %} {% set open_pct = (open / total_safe *
+    100) if total_safe else 0 %} {% set resolved_pct = (resolved / total_safe *
+    100) if total_safe else 0 %} {% set delayed_pct = (delayed / total_safe *
+    100) if total_safe else 0 %}
+
+    <!-- Hero -->
+    <section
+      class="dashboard-hero relative overflow-hidden rounded-3xl border border-slate-200 bg-white/95 shadow-2xl"
+    >
+      <div class="ticket-hero__bg floating-dots"></div>
+      <div
+        class="relative grid gap-6 md:grid-cols-2 items-center px-5 py-6 md:px-8 md:py-8"
+      >
+        <div class="space-y-3">
+          <span
+            class="inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-brandBlue ring-1 ring-slate-200/70"
+            >Infra Helpdesk</span
+          >
+          <h1
+            class="text-3xl md:text-4xl font-bold text-brandText leading-tight"
+          >
+            Infra Dashboard
+          </h1>
+          <p class="text-slate-600 max-w-xl">
+            Track ticket volume, SLA risks, and how work is spread across
+            Location in a clean snapshot.
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs text-slate-600">
+            <span class="pill">Live counts</span>
+            <span class="pill">SLA watch</span>
+            <span class="pill">Dept split</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="metric-card metric-primary">
+            <p class="label">Total</p>
+            <p class="value">{{ total }}</p>
+            <p class="muted">All tickets</p>
+          </div>
+          <div class="metric-card metric-warning">
+            <p class="label">Open</p>
+            <p class="value">{{ open }}</p>
+            <p class="muted">Need attention</p>
+          </div>
+          <div class="metric-card metric-success">
+            <p class="label">Resolved</p>
+            <p class="value">{{ resolved }}</p>
+            <p class="muted">Closed & done</p>
+          </div>
+          <div class="metric-card metric-danger">
+            <p class="label">Delayed</p>
+            <p class="value">{{ delayed }}</p>
+            <p class="muted">SLA breach risk</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Load summary -->
+    <section
+      class="glass-card rounded-2xl border border-slate-200/80 shadow-xl px-5 py-5 md:px-6"
+    >
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-brandText">Load snapshot</h3>
+          <p class="text-sm text-slate-600">
+            Share of open, resolved, and delayed tickets.
+          </p>
+        </div>
+        <div class="text-xs text-slate-500">Percentages of total</div>
+      </div>
+      <div class="grid md:grid-cols-3 gap-3">
+        <div class="progress-card">
+          <div class="progress-top">
+            <span class="label">Open</span>
+            <span class="value">{{ open_pct | round(0) }}%</span>
+          </div>
+          <div class="progress-bar">
+            <span
+              class="progress-fill bg-amber-400"
+              style="width: {{ open_pct if open_pct <= 100 else 100 }}%"
+            ></span>
+          </div>
+        </div>
+        <div class="progress-card">
+          <div class="progress-top">
+            <span class="label">Resolved</span>
+            <span class="value">{{ resolved_pct | round(0) }}%</span>
+          </div>
+          <div class="progress-bar">
+            <span
+              class="progress-fill bg-emerald-500"
+              style="width: {{ resolved_pct if resolved_pct <= 100 else 100 }}%"
+            ></span>
+          </div>
+        </div>
+        <div class="progress-card">
+          <div class="progress-top">
+            <span class="label">Delayed</span>
+            <span class="value">{{ delayed_pct | round(0) }}%</span>
+          </div>
+          <div class="progress-bar">
+            <span
+              class="progress-fill bg-rose-500"
+              style="width: {{ delayed_pct if delayed_pct <= 100 else 100 }}%"
+            ></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Location split -->
+    <section
+      class="glass-card rounded-2xl border border-slate-200/80 shadow-xl px-5 py-5 md:px-6"
+    >
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div>
+          <h3 class="text-lg font-semibold text-brandText">
+            Tickets by Location
+          </h3>
+          <p class="text-sm text-slate-600">See where the workload sits.</p>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="dept-table min-w-full">
+          <thead>
+            <tr>
+              <th>Location</th>
+              <th class="text-right">Tickets</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if dept_data and dept_data|length %} {% for dept, count in
+            dept_data %}
+            <tr>
+              <td>{{ dept or 'Unknown' }}</td>
+              <td class="text-right">{{ count }}</td>
+            </tr>
+            {% endfor %} {% else %}
+            <tr>
+              <td colspan="2" class="text-center text-slate-500">
+                No tickets found.
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}

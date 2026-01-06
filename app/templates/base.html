@@ -1,0 +1,549 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title if title else "Dr Bhasin's Hiccup Module" }}</title>
+    <script src="/static/js/tailwind.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              tealbrand: "#0db29c",
+              "tealbrand-dark": "#0a7f6f",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="stylesheet" href="/static/style.css" />
+    <script>
+      // Seed currentUser early from server context if available.
+      window.currentUser =
+        window.currentUser ||
+        {% if user is defined and user %}
+        {
+          user_id: {{ user.user_id }},
+          role: "{{ user.role }}",
+          name: "{{ user.name }}",
+          department_id: {{ user.department_id if user.department_id is not none else "null" }},
+          designation: "{{ user.designation or '' }}",
+        }
+        {% else %}
+        {}
+        {% endif %};
+      {% set _designation = (user.designation if user is defined and user else '')|lower %}
+      {% set _role = (user.role if user is defined and user else '')|lower %}
+      {% set _is_admin_like = 'admin' in _designation or 'it' in _designation or 'infra' in _designation or 'admin' in _role or 'it' in _role or 'infra' in _role %}
+      window.serverIsAdmin = {{ 'true' if _is_admin_like else 'false' }};
+    </script>
+    {% block head_extra %}{% endblock %}
+    <style>
+      html,
+      body {
+        color: #0f172a;
+        background: radial-gradient(
+            circle at top,
+            rgba(59, 130, 246, 0.15),
+            transparent 45%
+          ),
+          #f8fafc;
+        min-height: 100vh;
+        transition: opacity 0.25s ease;
+      }
+      body.page-exiting {
+        opacity: 0.6;
+        filter: blur(0.2px);
+      }
+      header {
+        background: linear-gradient(
+          90deg,
+          rgba(13, 178, 156, 0.15),
+          rgba(6, 95, 70, 0.15)
+        );
+      }
+      header nav a {
+        color: #0f172a;
+        font-weight: 600;
+      }
+      header nav a:hover {
+        color: #0db29c;
+      }
+      .nav-dropdown {
+        position: absolute;
+        left: 0;
+        margin-top: 10px;
+        min-width: 180px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+        padding: 6px;
+        z-index: 30;
+      }
+      .nav-dropdown__item {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: #0f172a;
+        font-weight: 600;
+      }
+      .nav-dropdown__item:hover {
+        background: #f8fafc;
+        color: #0db29c;
+      }
+      .mobile-nav-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+        font-weight: 700;
+      }
+      .mobile-nav-toggle span {
+        display: block;
+        width: 18px;
+        height: 2px;
+        background: #0f172a;
+        position: relative;
+      }
+      .mobile-nav-toggle span::before,
+      .mobile-nav-toggle span::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        width: 18px;
+        height: 2px;
+        background: #0f172a;
+      }
+      .mobile-nav-toggle span::before {
+        top: -6px;
+      }
+      .mobile-nav-toggle span::after {
+        top: 6px;
+      }
+      .mobile-nav-drawer .mobile-nav-toggle {
+        display: inline-flex;
+        border: 1px solid #e2e8f0;
+        box-shadow: none;
+        padding: 8px 10px;
+      }
+      .mobile-nav-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 60;
+      }
+      .mobile-nav-drawer {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(78vw, 320px);
+        background: #ffffff;
+        z-index: 70;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        display: flex;
+        flex-direction: column;
+        padding: 18px;
+        gap: 12px;
+      }
+      .mobile-nav-drawer.open {
+        transform: translateX(0);
+      }
+      .mobile-nav-link {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .mobile-nav-link:hover {
+        background: #f8fafc;
+        color: #0db29c;
+      }
+      .mobile-nav-section {
+        margin-top: 4px;
+      }
+      .mobile-nav-section-title {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        padding: 4px 12px;
+      }
+      @media (max-width: 900px) {
+        header nav.desktop-nav {
+          display: none;
+        }
+        .mobile-nav-toggle {
+          display: inline-flex;
+        }
+      }
+      #page-loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 50;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        display: grid;
+        place-items: center;
+      }
+      #page-loader.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .loader-ring {
+        width: 44px;
+        height: 44px;
+        border: 4px solid #0db29c;
+        border-top-color: transparent;
+        border-radius: 999px;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body {% block body_attrs %}class="text-slate-900 min-h-screen"{% endblock %}>
+    <div class="relative isolate min-h-screen">
+      <div id="page-loader" aria-hidden="true">
+        <div class="loader-ring" role="presentation"></div>
+      </div>
+      <header class="sticky top-0 z-20 backdrop-blur-xl bg-white/90 border-b border-slate-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-6">
+          <a href="/" class="flex items-center gap-3">
+            <img src="/static/img/Logoicon.png" alt="Dr Bhasin logo" class="h-10 w-10" />
+            <div>
+              <p class="text-lg font-semibold text-slate-900">Dr Bhasin's Lab</p>
+              <p class="text-xs tracking-[0.2em] uppercase text-tealbrand">Trusted Quality & Service</p>
+            </div>
+          </a>
+          <nav class="desktop-nav flex flex-wrap items-center gap-6 text-sm font-semibold text-slate-700">
+            <a href="/dashboard" class="hover:text-tealbrand transition-colors">Dashboard</a>
+
+            <div class="relative nav-dropdown-parent">
+              <button id="nav-hiccup-toggle" class="hover:text-tealbrand transition-colors font-semibold">Hiccup &#9662;</button>
+              <div id="nav-hiccup-menu" class="nav-dropdown hidden">
+                <a href="/raise" class="nav-dropdown__item">Create Hiccup</a>
+                <a href="/my-hiccups" class="nav-dropdown__item">My Hiccups</a>
+            {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+            <a id="nav-hic-all" href="/management" class="nav-dropdown__item">All Hiccups</a>
+            {% endif %}
+            <a href="/assigned" class="nav-dropdown__item">Assigned to Me</a>
+          </div>
+        </div>
+
+            <div class="relative nav-dropdown-parent">
+              <button id="nav-it-toggle" class="hover:text-tealbrand transition-colors font-semibold">IT Ticket &#9662;</button>
+              <div id="nav-it-menu" class="nav-dropdown hidden">
+                <a href="/infra/create-form" class="nav-dropdown__item">Create IT Ticket</a>
+                <a href="/my-tickets" class="nav-dropdown__item">My IT Tickets</a>
+            {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+            <a id="nav-it-all" href="/infra/all" class="nav-dropdown__item">All IT Tickets</a>
+            {% endif %}
+          </div>
+        </div>
+
+            <div id="nav-auth" class="flex items-center gap-4">
+              <span id="nav-user-label" class="hidden text-xs font-semibold text-slate-500 uppercase tracking-[0.3em]"></span>
+              <a id="nav-login" href="/login" class="hover:text-tealbrand transition-colors">Login</a>
+              <button id="nav-logout" class="hidden rounded-full bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800" type="button">
+                Logout
+              </button>
+            </div>
+          </nav>
+          <button id="mobile-nav-toggle" class="mobile-nav-toggle" type="button" aria-label="Toggle navigation">
+            <span></span>
+          </button>
+        </div>
+      </header>
+      <div id="mobile-nav-overlay" class="mobile-nav-overlay hidden"></div>
+      <div id="mobile-nav-drawer" class="mobile-nav-drawer hidden" aria-label="Mobile navigation">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-semibold text-slate-900">Menu</p>
+            <p class="text-xs text-slate-500">Quick access</p>
+          </div>
+          <button id="mobile-nav-close" class="mobile-nav-toggle" aria-label="Close navigation">
+            <span></span>
+          </button>
+        </div>
+        <div class="mobile-nav-section">
+          <div class="mobile-nav-section-title">Main</div>
+          <a href="/dashboard" class="mobile-nav-link">Dashboard</a>
+        </div>
+        <div class="mobile-nav-section">
+          <div class="mobile-nav-section-title">Hiccup</div>
+          <a href="/raise" class="mobile-nav-link">Create Hiccup</a>
+          <a href="/my-hiccups" class="mobile-nav-link">My Hiccups</a>
+          {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+          <a id="nav-hic-all-mobile" href="/management" class="mobile-nav-link">All Hiccups</a>
+          {% endif %}
+          <a href="/assigned" class="mobile-nav-link">Assigned to Me</a>
+        </div>
+        <div class="mobile-nav-section">
+          <div class="mobile-nav-section-title">IT Ticket</div>
+          <a href="/infra/create-form" class="mobile-nav-link">Create IT Ticket</a>
+          <a href="/my-tickets" class="mobile-nav-link">My IT Tickets</a>
+          {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+          <a id="nav-it-all-mobile" href="/infra/all" class="mobile-nav-link">All IT Tickets</a>
+          {% endif %}
+        </div>
+        <div class="mobile-nav-section">
+          <div class="mobile-nav-section-title">Account</div>
+          <div id="nav-user-mobile" class="mobile-nav-link hidden"></div>
+          <a id="nav-login-mobile" href="/login" class="mobile-nav-link">Login</a>
+          <button id="nav-logout-mobile" class="mobile-nav-link text-left hidden" type="button">Logout</button>
+        </div>
+      </div>
+      <div class="app-content-wrapper relative mx-auto mt-2">
+        <main class="app-shell">{% block body %}{% block content %}{% endblock %}{% endblock %}</main>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/static/js/main.js" defer></script>
+    <script>
+      const authLinks = {
+        login: document.getElementById("nav-login"),
+        logout: document.getElementById("nav-logout"),
+      };
+      const userLabel = document.getElementById("nav-user-label");
+      const navHicAll = document.getElementById("nav-hic-all");
+      const navItAll = document.getElementById("nav-it-all");
+      const mobileNav = {
+        toggle: document.getElementById("mobile-nav-toggle"),
+        close: document.getElementById("mobile-nav-close"),
+        overlay: document.getElementById("mobile-nav-overlay"),
+        drawer: document.getElementById("mobile-nav-drawer"),
+        login: document.getElementById("nav-login-mobile"),
+        logout: document.getElementById("nav-logout-mobile"),
+        user: document.getElementById("nav-user-mobile"),
+        hicAll: document.getElementById("nav-hic-all-mobile"),
+        itAll: document.getElementById("nav-it-all-mobile"),
+      };
+      const dropdowns = [
+        { toggle: document.getElementById("nav-hiccup-toggle"), menu: document.getElementById("nav-hiccup-menu") },
+        { toggle: document.getElementById("nav-it-toggle"), menu: document.getElementById("nav-it-menu") },
+      ];
+      const getCurrentUser = () => window.currentUser || {};
+      const isLoggedIn = () => Boolean(getCurrentUser().user_id);
+      const getDesignation = () => (getCurrentUser().designation || "").toString().toLowerCase();
+
+      function toggleAuthLinks() {
+        const loggedIn = isLoggedIn();
+        authLinks.login?.classList.toggle("hidden", loggedIn);
+        authLinks.logout?.classList.toggle("hidden", !loggedIn);
+        if (!userLabel) return;
+        if (!loggedIn) {
+          userLabel.classList.add("hidden");
+          userLabel.textContent = "";
+          return;
+        }
+        const { name: username } = getCurrentUser();
+        if (!username) {
+          userLabel.classList.add("hidden");
+          return;
+        }
+        userLabel.textContent = `${username}`;
+        userLabel.classList.remove("hidden");
+      }
+
+      function toggleManagementLinks() {
+        // no-op: hiccup links always visible
+      }
+
+      function toggleAssignedLink() {
+        // no-op: assigned link is inside hiccup dropdown
+      }
+
+      function isAdminLike() {
+        if (window.serverIsAdmin) return true;
+        if (!isLoggedIn()) return false;
+        const designation = getDesignation().trim();
+        const role = (getCurrentUser().role || "").toString().toLowerCase();
+        const keywords = ["admin", "it", "infra"];
+        return keywords.some((key) => designation.includes(key) || role.includes(key));
+      }
+
+      function toggleAllTickets() {
+        const admin = isAdminLike();
+        navHicAll?.classList.toggle("hidden", !admin);
+        mobileNav.hicAll?.classList.toggle("hidden", !admin);
+        navItAll?.classList.toggle("hidden", !admin);
+        mobileNav.itAll?.classList.toggle("hidden", !admin);
+      }
+
+      function toggleMobileAuthLinks() {
+        const loggedIn = isLoggedIn();
+        mobileNav.login?.classList.toggle("hidden", loggedIn);
+        mobileNav.logout?.classList.toggle("hidden", !loggedIn);
+        if (mobileNav.user) {
+          if (loggedIn) {
+            mobileNav.user.textContent = getCurrentUser().name || "";
+            mobileNav.user.classList.remove("hidden");
+          } else {
+            mobileNav.user.textContent = "";
+            mobileNav.user.classList.add("hidden");
+          }
+        }
+      }
+
+      function toggleMobileManagementLinks() {
+        const designation = getDesignation();
+        const keywords = ["management", "manager", "admin", "supervisor", "lead"];
+        const shouldShow = keywords.some((key) => designation.includes(key));
+        // no-op: hiccup links always visible
+      }
+
+      function toggleMobileAssignedLink() {
+        // handled in hiccup dropdown
+      }
+
+      function updateAllTicketsMenu() {
+        // simplified: handled per-item
+      }
+
+      function closeDropdowns(exceptMenu) {
+        dropdowns.forEach(({ menu }) => {
+          if (menu && menu !== exceptMenu) {
+            menu.classList.add("hidden");
+          }
+        });
+      }
+
+      dropdowns.forEach(({ toggle, menu }) => {
+        if (!toggle || !menu) return;
+        toggle.addEventListener("click", (event) => {
+          event.preventDefault();
+          const isHidden = menu.classList.contains("hidden");
+          closeDropdowns(menu);
+          menu.classList.toggle("hidden", !isHidden);
+        });
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".nav-dropdown-parent")) {
+          closeDropdowns();
+        }
+      });
+
+      authLinks.logout?.addEventListener("click", () => {
+        logout();
+      });
+      mobileNav.logout?.addEventListener("click", () => {
+        logout();
+        closeMobileNav();
+      });
+
+      async function hydrateUser() {
+        if (isLoggedIn()) return;
+        try {
+          const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+          if (res.ok) {
+            const data = await res.json();
+            window.currentUser = {
+              user_id: data.user_id,
+              role: data.role,
+              name: data.name,
+              department_id: data.department_id,
+              designation: data.designation || "",
+            };
+          }
+        } catch (err) {
+          console.warn("Failed to hydrate user", err);
+        }
+      }
+
+      const syncAuthState = () => {
+        toggleAuthLinks();
+        toggleManagementLinks();
+        toggleAssignedLink();
+        toggleAllTickets();
+        toggleMobileAuthLinks();
+        toggleMobileManagementLinks();
+        toggleMobileAssignedLink();
+        updateAllTicketsMenu();
+      };
+
+      function openMobileNav() {
+        mobileNav.drawer?.classList.remove("hidden");
+        mobileNav.drawer?.classList.add("open");
+        mobileNav.overlay?.classList.remove("hidden");
+      }
+
+      function closeMobileNav() {
+        mobileNav.drawer?.classList.remove("open");
+        mobileNav.overlay?.classList.add("hidden");
+        setTimeout(() => {
+          mobileNav.drawer?.classList.add("hidden");
+        }, 200);
+      }
+
+      mobileNav.toggle?.addEventListener("click", (event) => {
+        event.preventDefault();
+        openMobileNav();
+      });
+      mobileNav.close?.addEventListener("click", (event) => {
+        event.preventDefault();
+        closeMobileNav();
+      });
+      mobileNav.overlay?.addEventListener("click", closeMobileNav);
+      mobileNav.drawer?.querySelectorAll("a, button").forEach((el) => {
+        el.addEventListener("click", closeMobileNav);
+      });
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        await hydrateUser();
+        syncAuthState();
+      });
+
+      const loader = document.getElementById("page-loader");
+      const transitionDelay = 220;
+      function shouldIntercept(link) {
+        if (!link || !link.href) return false;
+        if (link.target && link.target !== "_self") return false;
+        if (link.hasAttribute("download") || link.getAttribute("rel") === "noopener") return false;
+        const url = new URL(link.href, window.location.origin);
+        if (url.origin !== window.location.origin) return false;
+        const hrefNoHash = url.href.split("#")[0];
+        const currentNoHash = window.location.href.split("#")[0];
+        if (hrefNoHash === currentNoHash) return false;
+        return true;
+      }
+      function startTransition(href) {
+        document.body.classList.add("page-exiting");
+        loader?.classList.add("active");
+        setTimeout(() => {
+          window.location.href = href;
+        }, transitionDelay);
+      }
+      document.addEventListener("click", (event) => {
+        if (event.defaultPrevented) return;
+        const link = event.target.closest("a");
+        if (!shouldIntercept(link)) return;
+        event.preventDefault();
+        startTransition(link.href);
+      });
+      window.addEventListener("pageshow", () => {
+        document.body.classList.remove("page-exiting");
+        loader?.classList.remove("active");
+      });
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
+
+
+

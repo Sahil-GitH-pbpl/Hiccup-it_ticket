@@ -1,0 +1,74 @@
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.orm import relationship
+
+from app.db.base import Base
+from app.utils.time_utils import now_local_naive
+
+
+class InfraTicket(Base):
+    __tablename__ = "infra_tickets"
+
+    ticket_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    created_by = Column(String(150), nullable=False)          # user name
+    department = Column(String(100), nullable=False)          # department/location
+    category = Column(String(50), nullable=False)             # Hardware/Software/Office Infra/Other
+    subcategory = Column(String(100), nullable=False)         # based on category
+    description = Column(Text, nullable=False)                # issue description
+    workstation = Column(String(50))                          # optional desk/workstation
+    status = Column(String(20), nullable=False, default="New")
+    assigned_to = Column(String(150))                         # IT staff (future)
+    commitment_time = Column(DateTime)                        # promise time
+    is_delayed_pick = Column(Boolean, nullable=False, default=False)
+    is_invalid = Column(Boolean, nullable=False, default=False)
+    invalid_reason = Column(Text)
+    image_path = Column(String(255))                          # uploaded photo path
+    contact = Column(String(20))                              # requester phone for WA updates
+    created_at = Column(DateTime, default=now_local_naive, nullable=False)
+    updated_at = Column(DateTime, default=now_local_naive, onupdate=now_local_naive, nullable=False)
+    reminder_sent = Column(Boolean, nullable=False, default=False)
+
+    images = relationship(
+        "InfraTicketImage",
+        back_populates="ticket",
+        cascade="all, delete-orphan",
+    )
+    updates = relationship(
+        "InfraUpdate",
+        back_populates="ticket",
+        cascade="all, delete-orphan",
+    )
+
+
+class InfraTicketImage(Base):
+    __tablename__ = "infra_ticket_images"
+
+    image_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    ticket_id = Column(
+        Integer, ForeignKey("infra_tickets.ticket_id"), nullable=False, index=True
+    )
+    image_path = Column(String(255), nullable=False)
+    created_at = Column(DateTime, default=now_local_naive, nullable=False)
+
+    ticket = relationship("InfraTicket", back_populates="images")
+
+
+class InfraUpdate(Base):
+    __tablename__ = "infra_updates"
+
+    update_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    ticket_id = Column(
+        Integer, ForeignKey("infra_tickets.ticket_id"), nullable=False, index=True
+    )
+    note = Column(Text, nullable=False)
+    created_by = Column(String(150), nullable=False)
+    created_at = Column(DateTime, default=now_local_naive, nullable=False)
+
+    ticket = relationship("InfraTicket", back_populates="updates")

@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block content %}
+<section class="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/40">
+    <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Insights</p>
+            <h2 class="text-3xl font-semibold text-slate-900">Agent Console</h2>
+        </div>
+        <span class="rounded-full border border-tealbrand px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Live updates</span>
+    </div>
+    <div id="dashboard-root" class="mt-8 dashboard-root"></div>
+</section>
+{% endblock %}
+
+{% block head_extra %}
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+{% endblock %}
+
+{% block scripts %}
+    <script src="/static/js/dashboard.js" defer></script>
+{% endblock %}

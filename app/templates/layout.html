@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block head_extra %}
+    <link rel="stylesheet" href="/static/css/tables.css">
+{% endblock %}
+{% block body %}
+<script>
+    window.currentUser = {{ ({
+        'user_id': user.user_id,
+        'role': user.role,
+        'name': user.name,
+        'department_id': user.department_id,
+        'designation': user.designation if user is defined and user.designation is not none else ''
+    }|tojson) if (user is defined) else '{}' }};
+    window.currentUserId = window.currentUser.user_id || null;
+    window.currentUserRole = window.currentUser.role || null;
+    window.currentUserDesignation = window.currentUser.designation || '';
+</script>
+<main class="w-full mx-auto px-6 py-10 space-y-6">
+    {% block content %}{% endblock %}
+</main>
+{% endblock %}

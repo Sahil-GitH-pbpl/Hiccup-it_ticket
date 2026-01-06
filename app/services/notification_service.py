@@ -1,0 +1,310 @@
+import logging
+from collections import Counter
+from datetime import datetime, timedelta
+from typing import List, Optional
+from urllib.parse import quote_plus
+
+from sqlalchemy.orm import Session
+
+from app.integrations.whatsapp_client import send_bulk
+from app.core.config import get_settings
+from app.services.report_service import recent_stats
+from app.services.hiccup_service import trend_alerts, low_reporters
+from app.models.department import Department
+from app.models.hiccup import Hiccup
+from app.models.staff import Staff
+from app.utils.time_utils import now_local
+from app.core.security import create_jwt
+from pytz import timezone
+
+logger = logging.getLogger(__name__)
+settings = get_settings()
+
+
+def _localize_timestamp(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is not None:
+        return value
+    tz = timezone(settings.timezone)
+    return tz.localize(value)
+
+
+def notify_on_creation(db: Session, hiccup: Hiccup):
+    numbers: List[str] = []
+    target_label = (
+        hiccup.raised_against_name or hiccup.raised_against or "Not specified"
+    )
+    public_token = None
+    if hiccup.hiccup_type == "Person Related" and hiccup.raised_against:
+        staff = _get_staff(db, hiccup.raised_against)
+        if staff and staff.contact:
+            numbers.append(staff.contact)
+            public_token = create_jwt(
+                {
+                    "user_id": staff.id,
+                    "role": "external",
+                    "department_id": staff.department_id,
+                    "name": staff.name,
+                    "hiccup_id": hiccup.hiccup_id,
+                    "purpose": "response_link",
+                },
+                expires_delta=timedelta(days=3),
+            )
+    else:
+        numbers.extend(
+            [
+                n.strip()
+                for n in settings.management_group_numbers.split(",")
+                if n.strip()
+            ]
+        )
+
+    if not numbers:
+        return
+
+    redirect_host = settings.whatsapp_response_base_url or settings.frontend_base_url
+    response_url = (
+        f"{redirect_host}/wa/redirect/{hiccup.hiccup_id}?public_token={quote_plus(public_token)}"
+        if public_token
+        else f"{settings.frontend_base_url}/hiccups/{hiccup.hiccup_id}"
+    )
+    if public_token:
+        response_url = f"{settings.frontend_base_url}/public/hiccups/{hiccup.hiccup_id}?public_token={quote_plus(public_token)}"
+
+    message_lines = [
+        "New Hiccup Raised!",
+        f"ID: {hiccup.hiccup_id}",
+        f"Raised By: {hiccup.raised_by_name} ({_resolve_department(db, hiccup.raised_by_department)})",
+        f"Raised Against: {target_label}",
+        f"Type: {hiccup.hiccup_type}",
+        f"Time: {hiccup.created_at.strftime('%Y-%m-%d %H:%M')}",
+        f"Summary: {(hiccup.description or '').strip()[:120] or 'N/A'}",
+        "Tap to respond:",
+        response_url,
+        "Copy-paste the text box, submit it, and you're done.",
+    ]
+
+    send_bulk(numbers, "\n".join(message_lines))
+
+
+def _build_response_token(staff: Staff, hiccup: Hiccup) -> str:
+    return create_jwt(
+        {
+            "user_id": staff.id,
+            "role": "external",
+            "department_id": staff.department_id,
+            "name": staff.name,
+            "hiccup_id": hiccup.hiccup_id,
+            "purpose": "response_link",
+        },
+        expires_delta=timedelta(days=3),
+    )
+
+
+def _build_response_url(hiccup: Hiccup, token: str) -> str:
+    redirect_host = settings.whatsapp_response_base_url or settings.frontend_base_url
+    params = quote_plus(token)
+    return f"{redirect_host}/public/hiccups/{hiccup.hiccup_id}?public_token={params}"
+
+
+def send_daily_summary(db: Session):
+    today_start = now_local().replace(hour=0, minute=0, second=0, microsecond=0)
+    stats = recent_stats(db)
+    dept_counts = _department_counts(db, today_start)
+    trend_list = trend_alerts(db)
+    trend_lines = [
+        f"{alert['label']} has {alert['count']} hiccups in last 7 days"
+        for alert in trend_list
+    ]
+    low = low_reporters(db)
+    samples = _fetch_samples(db, today_start, limit=2)
+    dept_lines = [f"{dept}: {count}" for dept, count in dept_counts.items()]
+    sample_lines = [_format_sample(sample) for sample in samples]
+    message_lines = [
+        "Daily Hiccup Summary",
+        f"Date: {today_start.strftime('%Y-%m-%d')}",
+        "",
+        "Today's summary:",
+        f"- Raised: {stats['raised_today']}",
+        f"- Responded: {stats['responded_today']}",
+        f"- Closed: {stats['closed_today']}",
+        f"- Escalated to NC: {stats['escalated_today']}",
+        "",
+        "Per-department counts:",
+        *(dept_lines if dept_lines else ["None registered today"]),
+        "",
+        "Trend alerts:",
+        *(trend_lines if trend_lines else ["No trend alerts today"]),
+        "",
+        "Low reporters:",
+        *(low if low else ["No low reporters identified"]),
+        "",
+        "Sample hiccups:",
+        *(sample_lines if sample_lines else ["None yet today"]),
+    ]
+    numbers = [
+        n.strip() for n in settings.management_group_numbers.split(",") if n.strip()
+    ]
+    if numbers:
+        send_bulk(numbers, "\n".join(message_lines))
+
+
+def _resolve_department(db: Session, department_id: Optional[int]) -> str:
+    if not department_id:
+        return "Unassigned"
+    dept = db.query(Department).filter(Department.id == department_id).first()
+    return dept.name if dept else f"Dept {department_id}"
+
+
+def _get_staff(db: Session, raised_against: str | None) -> Optional[Staff]:
+    if not raised_against:
+        return None
+    try:
+        staff_id = int(raised_against)
+    except ValueError:
+        return None
+    return db.query(Staff).filter(Staff.id == staff_id).first()
+
+
+def _department_counts(db: Session, since: datetime) -> Counter:
+    departments = {d.id: d.name for d in db.query(Department).all()}
+    counts: Counter = Counter()
+    rows = db.query(Hiccup).filter(Hiccup.created_at >= since).all()
+    for hiccup in rows:
+        label = departments.get(hiccup.raised_by_department, "Unassigned")
+        counts[label] += 1
+    return counts
+
+
+def _fetch_samples(db: Session, since: datetime, limit: int = 2) -> List[Hiccup]:
+    return (
+        db.query(Hiccup)
+        .filter(Hiccup.created_at >= since)
+        .order_by(Hiccup.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+
+
+def _format_sample(hiccup: Hiccup) -> str:
+    target = hiccup.raised_against_name or hiccup.raised_against or "N/A"
+    summary = (hiccup.description or "").strip()
+    if len(summary) > 80:
+        summary = f"{summary[:77].rstrip()}..."
+    return f"{hiccup.hiccup_id} ({hiccup.status}) - {target}: {summary or 'No description'}"
+
+
+def send_nc_assignment_notice(db: Session, hiccup: Hiccup):
+    """
+    Notify the staff member when a hiccup is escalated to NC and assigned to them.
+    """
+    staff_id = getattr(hiccup, "nc_assigned_staff_id", None)
+    if not staff_id:
+        return
+    staff = db.query(Staff).filter(Staff.id == staff_id).first()
+    if not staff or not staff.contact:
+        logger.info(
+            "NC assignment notice skipped: no contact for staff_id=%s", staff_id
+        )
+        return
+    summary = (hiccup.description or "").strip()
+    if len(summary) > 140:
+        summary = f"{summary[:137].rstrip()}..."
+    assigned_link = f"{settings.frontend_base_url}/assigned"
+    hiccup_link = f"{settings.frontend_base_url}/hiccups/{hiccup.hiccup_id}"
+    message_lines = [
+        "Hiccup escalated to NC and assigned to you.",
+        f"ID: {hiccup.hiccup_id}",
+        f"Type: {hiccup.hiccup_type or 'N/A'}",
+        f"Raised by: {hiccup.raised_by_name or 'Unknown'}",
+        f"Summary: {summary or 'N/A'}",
+        "",
+        "Steps:",
+        "- Login to the portal.",
+        "- Open 'Assigned to Me' and use the Hiccup ID above.",
+        f"Assigned list: {assigned_link}",
+        f"Hiccup page: {hiccup_link}",
+    ]
+    logger.info(
+        "Sending NC assignment notice for %s to %s", hiccup.hiccup_id, staff.contact
+    )
+    send_bulk([staff.contact], "\n".join(message_lines))
+
+
+def send_response_reminders(db: Session):
+    now = now_local()
+    hinges = db.query(Hiccup).filter(Hiccup.status == "Open").all()
+    logger.info("send_response_reminders triggered for %d open hiccups", len(hinges))
+    management_numbers = [
+        n.strip() for n in settings.management_group_numbers.split(",") if n.strip()
+    ]
+    for hiccup in hinges:
+        if not hiccup.raised_against:
+            continue
+        staff = _get_staff(db, hiccup.raised_against)
+        if not staff or not staff.contact:
+            continue
+        created_at = _localize_timestamp(hiccup.created_at)
+        if not created_at:
+            continue
+        age = now - created_at
+        reminder_delta = timedelta(minutes=settings.response_reminder_minutes)
+        overdue_delta = timedelta(minutes=settings.response_overdue_minutes)
+        escalate_delta = timedelta(minutes=settings.response_escalate_minutes)
+        numbers = [staff.contact]
+        message = None
+        if age >= escalate_delta and not hiccup.escalate_msg_sent:
+            token = _build_response_token(staff, hiccup)
+            url = _build_response_url(hiccup, token)
+            message = "\n".join(
+                [
+                    f"Hiccup {hiccup.hiccup_id} is 60+ hours old.",
+                    "Management will escalate to NC soon.",
+                    f"Overdue flag: {hiccup.is_response_overdue}",
+                    f"Respond here: {url}",
+                ]
+            )
+            hiccup.escalate_msg_sent = True
+            if management_numbers:
+                logger.info(
+                    "Escalation notice for %s -> %s",
+                    hiccup.hiccup_id,
+                    management_numbers,
+                )
+                send_bulk(management_numbers, message)
+        elif age >= overdue_delta and not hiccup.overdue_msg_sent:
+            token = _build_response_token(staff, hiccup)
+            url = _build_response_url(hiccup, token)
+            message = "\n".join(
+                [
+                    f"Hiccup {hiccup.hiccup_id} is overdue (24h).",
+                    "This hiccup is now marked response_overdue.",
+                    f"Please respond here: {url}",
+                ]
+            )
+            hiccup.overdue_msg_sent = True
+            logger.info(
+                "Overdue reminder for %s -> %s", hiccup.hiccup_id, staff.contact
+            )
+        elif age >= reminder_delta and not hiccup.reminder_sent:
+            token = _build_response_token(staff, hiccup)
+            url = _build_response_url(hiccup, token)
+            message = "\n".join(
+                [
+                    f"Reminder: Hiccup {hiccup.hiccup_id} needs response soon.",
+                    "Submit within 24 hours to avoid overdue flag.",
+                    f"Respond here: {url}",
+                ]
+            )
+            hiccup.reminder_sent = True
+            logger.info(
+                "Reminder message queued for %s -> %s", hiccup.hiccup_id, staff.contact
+            )
+        if message:
+            logger.info(
+                "Sending WhatsApp message for hiccup %s to %s",
+                hiccup.hiccup_id,
+                numbers,
+            )
+            send_bulk(numbers, message)

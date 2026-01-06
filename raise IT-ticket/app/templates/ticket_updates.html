@@ -1,0 +1,165 @@
+{% extends "base.html" %} {% block title %}Ticket #{{ ticket.ticket_id }}
+Updates{% endblock %} {% block body_attrs %}{% endblock %} {% block content %}
+<div class="page-wrapper px-4 md:px-8">
+  <div class="max-w-5xl mx-auto">
+  <div
+    class="bg-white/95 border border-slate-200 rounded-2xl shadow-lg p-6 md:p-8"
+  >
+    <!-- Header -->
+    <div class="mb-4">
+      <h2 class="text-2xl font-semibold text-brandText">
+        Ticket #{{ ticket.ticket_id }} – {{ ticket.category }} / {{
+        ticket.subcategory }}
+      </h2>
+
+      <p class="text-sm text-slate-600">
+        {{ ticket.department }} • Raised by
+        <span class="font-medium">{{ ticket.created_by }}</span>
+      </p>
+
+      <p class="mt-3 text-base text-slate-700 leading-relaxed">
+        {{ ticket.description }}
+      </p>
+
+      {% set attachments = ticket.images or [] %}
+      {% if attachments or ticket.image_path %}
+      <div class="mt-3 text-sm text-slate-700">
+        <span class="font-semibold text-slate-600">Photos:</span>
+        {% if attachments %}
+        <span class="inline-flex flex-wrap gap-2">
+          {% for image in attachments %}
+          <a
+            href="/{{ image.image_path }}"
+            target="_blank"
+            class="text-brandBlue hover:underline"
+          >
+            Photo {{ loop.index }}
+          </a>
+          {% endfor %}
+        </span>
+        {% elif ticket.image_path %}
+        <a
+          href="/{{ ticket.image_path }}"
+          target="_blank"
+          class="text-brandBlue hover:underline"
+        >
+          View photo
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Status + invalid info -->
+      <div class="mt-3 text-sm">
+        <span class="font-semibold">Status:</span>
+
+        {% if ticket.status == 'Resolved' %}
+        <span
+          class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100"
+        >
+          Resolved
+        </span>
+        {% elif ticket.is_invalid %}
+        <span
+          class="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 border border-red-100"
+        >
+          Invalid
+        </span>
+        {% else %}
+        <span
+          class="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 border border-sky-100"
+        >
+          {{ ticket.status }}
+        </span>
+        {% endif %} {% if ticket.is_invalid and ticket.invalid_reason %}
+        <span class="ml-3 text-sm text-red-600">
+          Reason: {{ ticket.invalid_reason }}
+        </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="h-px bg-slate-200 mb-5"></div>
+
+    <!-- Existing updates -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-slate-700 mb-3">IT Updates</h3>
+
+      {% if updates and updates|length %}
+      <ul class="space-y-3">
+        {% for u in updates %}
+        <li
+          class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700"
+        >
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-semibold text-base">{{ u.created_by }}</span>
+            <span class="text-xs text-slate-500">
+              {% if u.created_at %}{{ u.created_at.strftime('%d-%m-%Y %H:%M')
+              }}{% endif %}
+            </span>
+          </div>
+
+          <div class="text-sm leading-relaxed">{{ u.note }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-sm text-slate-500">No updates added yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Add new update -->
+    {% if ticket.status != 'Resolved' and not ticket.is_invalid %}
+    <div>
+      <h3 class="text-lg font-semibold text-slate-700 mb-3">Add Update</h3>
+
+      <form
+        method="post"
+        action="/infra/update/{{ ticket.ticket_id }}"
+        class="space-y-4"
+      >
+        <textarea
+          name="note"
+          rows="4"
+          required
+          class="w-full rounded-md border border-slate-300 bg-slate-50 px-4 py-3 text-base outline-none focus:border-brandTeal focus:ring-1 focus:ring-brandTeal"
+          placeholder="Write a clear IT update for this ticket..."
+        ></textarea>
+
+        <div class="flex items-center justify-between">
+          <a
+            href="/infra/all"
+            class="text-sm text-slate-600 hover:text-brandBlue hover:underline"
+          >
+            ← Back to All Tickets
+          </a>
+
+          <button
+            type="submit"
+            class="inline-flex items-center rounded-lg bg-gradient-to-r from-brandTeal to-brandBlue px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-lg hover:from-emerald-400 hover:to-brandBlue transition"
+          >
+            Save Update
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% else %}
+    <!-- Locked message -->
+    <div class="mt-6 flex items-center justify-between">
+      <a
+        href="/infra/all"
+        class="text-sm text-slate-600 hover:text-brandBlue hover:underline"
+      >
+        ← Back to All Tickets
+      </a>
+
+      <p class="text-sm text-slate-500 italic">
+        No further updates allowed because this ticket is {% if
+        ticket.is_invalid %}marked invalid{% else %}resolved{% endif %}.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

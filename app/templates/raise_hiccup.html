@@ -1,0 +1,283 @@
+{% extends 'layout.html' %}
+{% block content %}
+<section class="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/60">
+    <div class="flex flex-col gap-2 md:flex-row md:justify-between md:items-center">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Create Hiccup</p>
+            <h2 class="text-3xl font-semibold text-slate-900">Capture issues instantly</h2>
+            <p class="text-sm text-slate-500">Log quality or system concerns with context, attachments, and root-cause tagging.</p>
+            <p class="text-xs text-slate-500">Fields marked <span class="text-rose-500">*</span> are required.</p>
+        </div>
+        <span class="rounded-full border border-tealbrand px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Quick Create</span>
+    </div>
+    <form id="hiccup-form" class="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3" enctype="multipart/form-data">
+        <div class="space-y-2">
+            <label for="type-select" class="text-sm font-semibold text-slate-700">Hiccup Type <span class="text-rose-500">*</span></label>
+            <select required id="type-select" name="hiccup_type" class="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                <option>Person Related</option>
+                <option>System Related</option>
+            </select>
+        </div>
+        <div class="space-y-2">
+            <label for="raised-against-name" class="text-sm font-semibold text-slate-700">Created Against <span class="text-rose-500">*</span></label>
+            <div class="relative">
+                <input id="raised-against-name" name="raised_against_name" type="text" placeholder="Type staff name or system tag" autocomplete="off" class="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                <input id="raised-against-hidden" name="raised_against" type="hidden" value="">
+                <div id="raised-against-suggestions" class="absolute left-0 right-0 z-10 mt-1 hidden max-h-60 overflow-y-auto rounded-2xl border border-slate-200 bg-white text-sm text-slate-800 shadow-lg"></div>
+            </div>
+            <p class="text-xs text-slate-500">Use the staff name to get matching IDs, or enter a system tag when needed.</p>
+        </div>
+        <div class="space-y-2">
+            <label for="raised-dept-select" class="text-sm font-semibold text-slate-700">Created Against Department</label>
+            <select
+                id="raised-dept-select"
+                class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40"
+            >
+                <option value="">Select department from master</option>
+            </select>
+            <input id="raised-dept-id" name="raised_against_department" type="hidden" value="">
+            <input id="raised-dept-name" name="raised_against_department_name" type="hidden" value="">
+            <p class="text-xs text-slate-500">Only master departments may be selected; the hidden fields capture ID and name.</p>
+        </div>
+        <div class="space-y-2 md:col-span-2 lg:col-span-3">
+            <label for="description" class="text-sm font-semibold text-slate-700">Description <span class="text-rose-500">*</span></label>
+            <textarea id="description" name="description" rows="3" required class="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40"></textarea>
+        </div>
+        <div class="space-y-2 md:col-span-2">
+            <label for="effect" class="text-sm font-semibold text-slate-700">Immediate Effect</label>
+            <textarea id="effect" name="immediate_effect" rows="3" class="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40"></textarea>
+        </div>
+        <div class="space-y-2">
+            <label for="root-cause" class="text-sm font-semibold text-slate-700"> Cause Category</label>
+            <select id="root-cause" name="root_cause_category" class="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                <option value="">-- select --</option>
+                <option>Training Need</option>
+                <option>Process Gap</option>
+                <option>Negligence</option>
+                <option>System Error</option>
+                <option>Resource Shortage</option>
+            </select>
+        </div>
+
+        <div class="space-y-2">
+            <label for="attachments" class="text-sm font-semibold text-slate-700">Attachments</label>
+            <input
+                id="attachments"
+                type="file"
+                name="attachments"
+                multiple
+                class="w-full rounded-2xl border border-dashed border-slate-300 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40"
+            >
+            <p class="text-xs text-slate-500">You can select multiple files (screenshots, logs, etc.).</p>
+        </div>
+        <div class="md:col-span-3">
+            <button type="submit" class="w-full rounded-2xl bg-tealbrand px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-lg shadow-tealbrand/30 transition hover:bg-tealbrand-dark hover:-translate-y-0.5">Submit Hiccup</button>
+        </div>
+    </form>
+    <div id="hiccup-message" class="mt-4 text-sm font-medium text-tealbrand"></div>
+</section>
+    <script src="/static/js/hiccups-helpers.js" defer></script>
+    <script src="/static/js/hiccups.js" defer></script>
+{% block scripts %}
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const nameInput = document.getElementById('raised-against-name');
+    const hiddenInput = document.getElementById('raised-against-hidden');
+    const suggestionsEl = document.getElementById('raised-against-suggestions');
+    const departmentSelect = document.getElementById('raised-dept-select');
+    const raisedDeptIdField = document.getElementById('raised-dept-id');
+    const raisedDeptNameField = document.getElementById('raised-dept-name');
+    if (!nameInput || !hiddenInput || !suggestionsEl) {
+        return;
+    }
+    let suggestionTimer;
+    let requestId = 0;
+
+    const clearSuggestions = () => {
+        suggestionsEl.innerHTML = '';
+        suggestionsEl.classList.add('hidden');
+    };
+
+    const departmentsById = new Map();
+
+    function updateHiddenDepartmentFields(selectedId, selectedName) {
+        if (raisedDeptIdField) {
+            raisedDeptIdField.value = selectedId ? String(selectedId) : '';
+        }
+        if (raisedDeptNameField) {
+            raisedDeptNameField.value = selectedName ? String(selectedName) : '';
+        }
+    }
+
+    function normalizeLabel(text) {
+        return (text || '')
+            .toString()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim();
+    }
+
+    function applyDesignationToDepartment(designation) {
+        const label = (designation || '').trim();
+        let matchedId = '';
+        let matchedName = '';
+        if (departmentSelect) {
+            const normLabel = normalizeLabel(label);
+            departmentSelect.querySelectorAll('option').forEach((opt) => {
+                const raw = (opt.textContent || '').trim();
+                const optNorm = normalizeLabel(raw);
+                if (optNorm && (optNorm === normLabel || optNorm.includes(normLabel) || normLabel.includes(optNorm))) {
+                    matchedId = opt.value;
+                    matchedName = raw;
+                }
+            });
+            departmentSelect.value = matchedId || '';
+        }
+        // Always store designation text; set ID/name only for display when matched
+        updateHiddenDepartmentFields(matchedId, label || matchedName);
+    }
+
+    async function loadDepartments() {
+        if (!departmentSelect) {
+            return;
+        }
+        try {
+            const res = await fetch('/api/staff/departments', {
+                headers: authHeaders(),
+            });
+            if (!res.ok) {
+                throw new Error('Unable to load departments');
+            }
+            const list = await res.json();
+            departmentsById.clear();
+            departmentSelect.innerHTML = '<option value="">Select department from master</option>';
+            list.forEach((dept) => {
+                if (!dept?.id || !dept?.name) {
+                    return;
+                }
+                const option = document.createElement('option');
+                option.value = String(dept.id);
+                option.textContent = dept.name;
+                departmentSelect.appendChild(option);
+                departmentsById.set(String(dept.id), dept);
+            });
+            const deptOption = departmentsById.get(String(departmentSelect.value));
+            updateHiddenDepartmentFields(departmentSelect.value, deptOption ? deptOption.name : '');
+        } catch (err) {
+            console.error('Failed to load departments', err);
+        }
+    }
+
+    async function fetchSuggestions(query, currentId) {
+        const params = new URLSearchParams();
+        params.set('limit', '6');
+        if (query) {
+            params.set('q', query);
+        }
+        try {
+            const res = await fetch(`/api/staff/suggest?${params.toString()}`, {
+                headers: authHeaders(),
+            });
+            if (!res.ok) {
+                throw new Error('Failed to load staff suggestions');
+            }
+            if (currentId !== requestId) {
+                return;
+            }
+            const staffList = await res.json();
+            if (!staffList.length) {
+                clearSuggestions();
+                return;
+            }
+            suggestionsEl.innerHTML = '';
+            staffList.forEach((staff) => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'w-full text-left px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50';
+                button.textContent = staff.name;
+                button.dataset.id = staff.id;
+                if (staff.department_id) {
+                    button.dataset.departmentId = String(staff.department_id);
+                }
+                if (staff.department_name) {
+                    button.dataset.departmentName = staff.department_name;
+                }
+                if (staff.designation) {
+                    button.dataset.designation = staff.designation;
+                }
+                button.addEventListener('click', () => {
+                    nameInput.value = staff.name;
+                    hiddenInput.value = String(staff.id);
+                    // Map department purely by designation text
+                    applyDesignationToDepartment(button.dataset.designation || staff.department_name || staff.name);
+                    clearSuggestions();
+                    nameInput.focus();
+                });
+                suggestionsEl.appendChild(button);
+            });
+            suggestionsEl.classList.remove('hidden');
+        } catch (err) {
+            console.error(err);
+            clearSuggestions();
+        }
+    }
+
+    nameInput.addEventListener('input', () => {
+        hiddenInput.value = nameInput.value.trim();
+        requestId += 1;
+        const current = requestId;
+        const searchValue = nameInput.value.trim();
+        if (!searchValue) {
+            clearSuggestions();
+            return;
+        }
+        clearTimeout(suggestionTimer);
+        suggestionTimer = setTimeout(() => {
+            fetchSuggestions(searchValue, current);
+        }, 250);
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!suggestionsEl.contains(event.target) && event.target !== nameInput) {
+            clearSuggestions();
+        }
+    });
+
+    if (departmentSelect) {
+        departmentSelect.addEventListener('change', () => {
+            const deptOption = departmentsById.get(String(departmentSelect.value));
+            updateHiddenDepartmentFields(departmentSelect.value, deptOption ? deptOption.name : '');
+        });
+    }
+
+    const typeSelect = document.getElementById('type-select');
+
+    const enforceTypeRules = () => {
+        const typeValue = typeSelect?.value;
+        const isSystem = typeValue === 'System Related';
+        const isPerson = typeValue === 'Person Related';
+        // department is enforced via master select now
+        if (nameInput) {
+            nameInput.required = isPerson;
+            nameInput.disabled = isSystem;
+            if (isSystem) {
+                nameInput.value = '';
+                hiddenInput.value = '';
+                nameInput.placeholder = 'System hiccups do not use a person';
+                clearSuggestions();
+            } else {
+                nameInput.placeholder = 'Type staff name or system tag';
+            }
+        }
+        if (hiddenInput && isSystem) {
+            hiddenInput.value = '';
+        }
+    };
+
+    typeSelect?.addEventListener('change', enforceTypeRules);
+    enforceTypeRules();
+    loadDepartments();
+});
+</script>
+{% endblock %}
+{% endblock %}

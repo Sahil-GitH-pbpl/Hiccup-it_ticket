@@ -1,0 +1,596 @@
+{% extends "base.html" %}
+
+{% block title %}All Infra Tickets{% endblock %}
+
+{% block content %}
+
+<div class="page-wrapper px-4 md:px-8">
+
+    <!-- CARD -->
+    <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+
+        <!-- HEADER -->
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="space-y-2">
+                <div class="pill inline-flex items-center gap-2 text-xs text-slate-600 bg-white">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                    Admin / IT view
+                </div>
+                <h2 class="text-3xl font-semibold text-brandText leading-tight">All Infra Tickets</h2>
+                <p class="text-sm text-slate-600">
+                    Filter, pick SLAs, resolve, or mark invalid. Mobile cards below + desktop grid.
+                </p>
+            </div>
+            <div class="hidden sm:flex flex-col items-end text-sm text-slate-500">
+                <span class="font-semibold text-brandBlue">Tip:</span>
+                <span>Auto-submits on every change for faster triage.</span>
+            </div>
+        </div>
+
+        <div class="flex gap-2 text-sm">
+            {% set current_view = filters.view or 'active' %}
+            <button type="button"
+                    class="js-view-btn px-4 py-2 rounded-full border transition {{ 'bg-tealbrand text-white border-tealbrand' if current_view == 'active' else 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100' }}"
+                    data-view="active">
+                Active Tickets
+            </button>
+            <button type="button"
+                    class="js-view-btn px-4 py-2 rounded-full border transition {{ 'bg-tealbrand text-white border-tealbrand' if current_view == 'completed' else 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100' }}"
+                    data-view="completed">
+                Completed Tickets
+            </button>
+        </div>
+
+        <!-- FILTERS -->
+        <form id="filterForm" method="get"
+              class="flex flex-wrap gap-4 items-end bg-slate-50/80 p-4 rounded-2xl border border-slate-200 shadow-inner">
+            <input type="hidden" name="page" id="pageInput" value="{{ pagination.page if pagination else 1 }}">
+            <input type="hidden" name="view" id="viewInput" value="{{ filters.view or 'active' }}">
+
+            <!-- STATUS -->
+            <div class="w-full sm:w-auto">
+                <label class="block text-xs text-slate-600 mb-1 font-semibold">Status</label>
+                {% set s = filters.status %}
+                <select name="status"
+                        class="w-full sm:w-44 px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm shadow-sm focus:border-brandTeal focus:ring-1 focus:ring-brandTeal/50">
+                    <option value="">All</option>
+                    <option value="New"      {% if s == 'New' %}selected{% endif %} >New</option>
+                    <option value="In Progress"{% if s == 'In Progress' %}selected{% endif %}>In Progress</option>
+                    <option value="On Hold"     {% if s == 'On Hold' %}selected{% endif %}>On Hold</option>
+                    <option value="Resolved"    {% if s == 'Resolved' %}selected{% endif %}>Resolved</option>
+                </select>
+            </div>
+
+            <!-- DEPARTMENT -->
+            <div class="w-full sm:w-auto">
+                <label class="block text-xs text-slate-600 mb-1 font-semibold">Location</label>
+                {% set d = filters.department %}
+                <select name="department"
+                        class="w-full sm:w-48 px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm shadow-sm focus:border-brandTeal focus:ring-1 focus:ring-brandTeal/50">
+                    <option value="">All</option>
+                    {% for dep in [
+                        'Technical','Customer Care','Admin','House Keeping',
+                        'Home Collection','Center Phlebo','Marketing','Field','Other'
+                    ] %}
+                    <option value="{{ dep }}" {% if d == dep %}selected{% endif %}>{{ dep }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- CATEGORY -->
+            <div class="w-full sm:w-auto">
+                <label class="block text-xs text-slate-600 mb-1 font-semibold">Category</label>
+                {% set c = filters.category %}
+                <select name="category"
+                        class="w-full sm:w-44 px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm shadow-sm focus:border-brandTeal focus:ring-1 focus:ring-brandTeal/50">
+                    <option value="">All</option>
+                    {% for cat in ['Hardware','Software','Office Infra','Other'] %}
+                    <option value="{{ cat }}" {% if c == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- SEARCH -->
+            <div class="w-full sm:w-72">
+                <label class="block text-xs text-slate-600 mb-1 font-semibold">Search</label>
+                <input type="search"
+                       name="search"
+                       value="{{ filters.search | default('') }}"
+                       placeholder="Ticket ID, description, assignee..."
+                       class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm shadow-sm focus:border-brandTeal focus:ring-1 focus:ring-brandTeal/50"
+                       autocomplete="off" />
+            </div>
+
+            <!-- ASSIGNED TO ME -->
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-semibold mt-2 sm:mt-7 bg-white rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
+                <input type="checkbox"
+                    name="assigned_me"
+                    value="true"
+                    {% if filters.assigned_me %}checked{% endif %}
+                    class="accent-brandBlue h-4 w-4">
+                For Me
+            </label>
+
+            <!-- DELAYED -->
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-semibold mt-2 sm:mt-7 bg-white rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
+                <input type="checkbox"
+                    name="only_delayed"
+                    value="true"
+                    {% if filters.only_delayed %}checked{% endif %}
+                    class="accent-brandBlue h-4 w-4">
+                Delayed only
+            </label>
+
+        </form>
+
+        <div class="h-px bg-slate-200"></div>
+
+        <div id="ticketsContainer">
+            {% include "infra/partials/tickets_block.html" %}
+        </div>
+
+
+                <!-- PICK/SLA MODAL - CUSTOM ONLY -->
+<div id="pickModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-brandText mb-4">Set Commitment Time (SLA)</h3>
+            <form id="pickForm" method="post" class="space-y-4">
+
+                <!-- CUSTOM COMMITMENT ONLY -->
+                <div id="custom" class="tab-section">
+                    <div class="row-inline flex gap-3">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Commitment Date</label>
+                            <input type="date" id="p-commit-date" name="commitment_date" 
+                                   class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-brandTeal focus:ring-2 focus:ring-brandTeal/20" />
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Call Back Time (24h)</label>
+                            <div class="time-picker relative">
+                                <input type="text" id="callbackTimeDisplay" readonly placeholder="Select time" 
+                                       class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-brandTeal focus:ring-2 focus:ring-brandTeal/20 cursor-pointer" />
+                                <input type="hidden" id="callbackTime" name="callback_time" />
+                                <div class="dropdown-panel hidden absolute z-20 top-full left-0 right-0 mt-1 max-h-48 overflow-auto bg-white border border-slate-300 rounded-lg shadow-lg"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hint text-xs text-slate-500 mt-1">Select an exact future commitment date and time</div>
+                </div>
+
+                <!-- HIDDEN FIELDS FOR BACKEND (kept in case backend expects them) -->
+                <input type="hidden" id="commitment_at" name="commitment_at" />
+                <input type="hidden" id="preset_hours" name="preset_hours" value="" />
+
+                <div class="flex gap-3 pt-4">
+                    <button type="button"
+                            class="p-2 rounded-2xl text-white bg-cyan-600 flex-1 js-close-pick-modal">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class=" p-2 rounded-2xl text-white bg-blue-600 hover:bg-blue-700 flex-1">
+                        Confirm Pick
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- RESOLVE MODAL -->
+<div id="resolveModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-brandText mb-4">Resolve Ticket</h3>
+            <p class="text-sm text-slate-600 mb-6">Are you sure you want to mark this ticket as resolved?</p>
+            <form id="resolveForm" method="post" class="space-y-4">
+                <div class="flex gap-3">
+                    <button type="button"
+                            class="p-2 rounded-2xl text-white bg-cyan-600 flex-1 js-close-resolve-modal">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="p-2 rounded-2xl text-white bg-green-600 flex-1">
+                        Confirm Resolve
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- INVALID MODAL -->
+<div id="invalidModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-brandText mb-4">Mark Ticket as Silly</h3>
+            <form id="invalidForm" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Reason
+                    </label>
+                    <input type="text" name="invalid_reason"
+                           placeholder="Enter reason (e.g., Duplicate, Wrong department...)"
+                           class="w-full rounded-lg border border-red-300 bg-white px-3 py-2 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
+                           required />
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button"
+                            class="p-2 rounded-2xl text-white bg-cyan-600 flex-1 js-close-invalid-modal">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class=" p-2 rounded-2xl text-white bg-red-600 flex-1">
+                        Confirm Silly
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- SILLY REASON MODAL -->
+<div id="sillyReasonModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+        <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-brandText">Silly Reason</h3>
+                <button type="button" class="silly-reason-close text-slate-500 hover:text-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <p id="sillyReasonText" class="text-sm text-slate-700 whitespace-pre-line"></p>
+            <div class="flex justify-end pt-2">
+                <button type="button" class="silly-reason-close px-4 py-2 rounded-lg bg-brandBlue text-white text-sm">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- JS WITH DEBUG -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Auto-submit filters
+    const filterForm = document.getElementById('filterForm');
+    const pageInput = document.getElementById('pageInput');
+    const viewInput = document.getElementById('viewInput');
+    const ticketsContainer = document.getElementById('ticketsContainer');
+    if (filterForm) {
+        document.querySelectorAll('#filterForm select, #filterForm input[type=checkbox]')
+            .forEach(el => el.addEventListener('change', () => {
+                if (pageInput) pageInput.value = 1;
+                filterForm.submit();
+            }));
+
+        document.querySelectorAll('.js-view-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const newView = btn.dataset.view || 'active';
+                if (viewInput) viewInput.value = newView;
+                if (pageInput) pageInput.value = 1;
+                filterForm.submit();
+            });
+        });
+    }
+
+    const searchInput = document.querySelector('#filterForm input[name="search"]');
+    if (searchInput && filterForm) {
+        let emptyTimer;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(emptyTimer);
+            if (searchInput.value.trim() === '') {
+                emptyTimer = setTimeout(() => {
+                    if (pageInput) pageInput.value = 1;
+                    filterForm.submit();
+                }, 150);
+            }
+        });
+    }
+
+
+    // Modal elements
+    const pickModal = document.getElementById('pickModal');
+    const resolveModal = document.getElementById('resolveModal');
+    const invalidModal = document.getElementById('invalidModal');
+    const sillyReasonModal = document.getElementById('sillyReasonModal');
+    const sillyReasonText = document.getElementById('sillyReasonText');
+    
+    const pickForm = document.getElementById('pickForm');
+    const resolveForm = document.getElementById('resolveForm');
+    const invalidForm = document.getElementById('invalidForm');
+
+    let currentTicketId = null;
+
+    function openPickModalFor(ticketId) {
+        currentTicketId = ticketId;
+        if (pickModal) {
+            const dateEl = pickModal.querySelector('#p-commit-date');
+            const timeEl = pickModal.querySelector('#callbackTime');
+            const timeDisplay = pickModal.querySelector('#callbackTimeDisplay');
+            if (dateEl) dateEl.value = '';
+            if (timeEl) timeEl.value = '';
+            if (timeDisplay) timeDisplay.value = '';
+
+            const commitmentAtField = pickModal.querySelector('#commitment_at');
+            const presetHoursField = pickModal.querySelector('#preset_hours');
+            if (commitmentAtField) commitmentAtField.value = '';
+            if (presetHoursField) presetHoursField.value = '';
+
+            initCustomTimeDefaults(true);
+        }
+
+        if (pickForm) {
+            pickForm.action = `/infra/pick/${currentTicketId}`;
+        }
+        if (pickModal) pickModal.classList.remove('hidden');
+    }
+
+    function openResolveModalFor(ticketId) {
+        currentTicketId = ticketId;
+        if (resolveForm) resolveForm.action = `/infra/resolve/${currentTicketId}`;
+        if (resolveModal) resolveModal.classList.remove('hidden');
+    }
+
+    function openInvalidModalFor(ticketId) {
+        currentTicketId = ticketId;
+        if (invalidForm) invalidForm.action = `/infra/invalid/${currentTicketId}`;
+        if (invalidModal) invalidModal.classList.remove('hidden');
+    }
+
+    function showSillyReason(reason) {
+        if (sillyReasonText) {
+            sillyReasonText.textContent = reason || 'Invalid';
+        }
+        if (sillyReasonModal) {
+            sillyReasonModal.classList.remove('hidden');
+        }
+    }
+
+    async function loadTickets(targetPage) {
+        if (!filterForm || !ticketsContainer) return;
+        const formData = new FormData(filterForm);
+        formData.set('page', targetPage);
+        const params = new URLSearchParams(formData);
+        try {
+            const response = await fetch(`${window.location.pathname}?${params.toString()}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            if (!response.ok) throw new Error('Failed to fetch tickets');
+            const data = await response.json();
+            ticketsContainer.innerHTML = data.html || '';
+            if (pageInput) pageInput.value = targetPage;
+            attachTicketButtons(ticketsContainer);
+        } catch (err) {
+            console.error('Pagination request failed', err);
+            filterForm.submit();
+        }
+    }
+
+    function attachTicketButtons(container) {
+        if (!container) return;
+        container.querySelectorAll('.js-open-pick-modal').forEach(btn => {
+            btn.addEventListener('click', () => openPickModalFor(btn.dataset.ticket));
+        });
+        container.querySelectorAll('.js-open-resolve-modal').forEach(btn => {
+            btn.addEventListener('click', () => openResolveModalFor(btn.dataset.ticket));
+        });
+        container.querySelectorAll('.js-open-invalid-modal').forEach(btn => {
+            btn.addEventListener('click', () => openInvalidModalFor(btn.dataset.ticket));
+        });
+        container.querySelectorAll('.silly-info-btn').forEach(btn => {
+            btn.addEventListener('click', () => showSillyReason(btn.dataset.reason));
+        });
+        container.querySelectorAll('.js-page-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (btn.disabled) return;
+                const targetPage = parseInt(btn.dataset.page, 10);
+                if (!targetPage || targetPage < 1) return;
+                loadTickets(targetPage);
+            });
+        });
+    }
+
+    // ===== TIME HELPERS & CUSTOM MODE ONLY =====
+    const pad = (n) => String(n).padStart(2, '0');
+
+    function populateTimeOptions(container) {
+        if (!container) return;
+        container.innerHTML = '';
+        for (let h = 0; h <= 23; h++) {
+            for (let m of [0, 15, 30, 45]) {
+                const value = `${pad(h)}:${pad(m)}`;
+                const div = document.createElement('div');
+                div.className = 'time-option px-3 py-2 text-sm hover:bg-slate-100 cursor-pointer border-b border-slate-100 last:border-b-0';
+                div.textContent = value;
+                div.dataset.value = value;
+                div.addEventListener('click', () => {
+                    const disp = pickModal.querySelector('#callbackTimeDisplay');
+                    const hid = pickModal.querySelector('#callbackTime');
+                    if (hid) {
+                        hid.value = value;
+                    }
+                    if (disp) disp.value = value;
+                    const dd = pickModal.querySelector('.dropdown-panel');
+                    if (dd) dd.classList.add('hidden');
+                });
+                container.appendChild(div);
+            }
+        }
+    }
+
+    function nextQuarterHHMM() {
+        const now = new Date();
+        const q = Math.ceil((now.getMinutes() + 1) / 15) * 15;
+        if (q >= 60) { 
+            now.setHours(now.getHours() + 1, 0, 0, 0); 
+        } else { 
+            now.setMinutes(q, 0, 0); 
+        }
+        return `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    }
+
+    function todayYMD() {
+        const now = new Date();
+        return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    }
+
+    function initCustomTimeDefaults(reset = false) {
+        const dateEl = pickModal.querySelector('#p-commit-date');
+        const disp = pickModal.querySelector('#callbackTimeDisplay');
+        const hid = pickModal.querySelector('#callbackTime');
+        const dd = pickModal.querySelector('.dropdown-panel');
+        
+        if (dd && !dd.dataset.populated) {
+            populateTimeOptions(dd);
+            dd.dataset.populated = '1';
+        }
+        
+        const today = todayYMD();
+        if (dateEl) {
+            if (reset || !dateEl.value) dateEl.value = today;
+            dateEl.min = today;
+        }
+        
+        const def = nextQuarterHHMM();
+        if (hid && (reset || !hid.value)) hid.value = def;
+        if (disp && (reset || !disp.value)) disp.value = def;
+        
+    }
+
+    // Time picker dropdown toggle
+    if (pickModal) {
+        pickModal.addEventListener('click', (e) => {
+            const picker = pickModal.querySelector('.time-picker');
+            const dd = pickModal.querySelector('.dropdown-panel');
+            if (!picker || !dd) return;
+            
+            if (picker.contains(e.target)) {
+                if (e.target.id === 'callbackTimeDisplay') {
+                    dd.classList.toggle('hidden');
+                    const hid = pickModal.querySelector('#callbackTime');
+                    const sel = Array.from(dd.children).find(c => c.dataset.value === (hid ? hid.value : ''));
+                    if (sel) sel.scrollIntoView({ block: 'nearest' });
+                }
+            } else {
+                dd.classList.add('hidden');
+            }
+        });
+    }
+
+    // Form submission handler for commitment modal - CUSTOM ONLY
+    if (pickForm) {
+        pickForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+           
+
+            // Always custom mode
+            const dateEl = pickModal.querySelector('#p-commit-date');
+            const timeEl = pickModal.querySelector('#callbackTime');
+
+            let date = dateEl ? dateEl.value : '';
+            let time = timeEl ? timeEl.value : '';
+
+            if (!date) {
+                date = todayYMD();
+                if (dateEl) dateEl.value = date;
+            }
+
+            if (!time) {
+                time = nextQuarterHHMM();
+                if (timeEl) timeEl.value = time;
+            }
+
+
+            let commitmentTimeValue = `${date}T${time}`;
+
+            // Add commitment_time field to form
+            if (commitmentTimeValue) {
+                let commitmentTimeInput = this.querySelector('input[name="commitment_time"]');
+                if (!commitmentTimeInput) {
+                    commitmentTimeInput = document.createElement('input');
+                    commitmentTimeInput.type = 'hidden';
+                    commitmentTimeInput.name = 'commitment_time';
+                    this.appendChild(commitmentTimeInput);
+                }
+                commitmentTimeInput.value = commitmentTimeValue;
+            }
+
+            const finalFormData = new FormData(this);
+           
+            this.submit();
+        });
+    }
+
+    // ===== MODAL MANAGEMENT =====
+
+    // Attach initial ticket events
+    attachTicketButtons(ticketsContainer);
+
+    // Close Modal Functions
+    document.querySelectorAll('.js-close-pick-modal').forEach(btn => {
+        btn.addEventListener('click', () => pickModal.classList.add('hidden'));
+    });
+
+    document.querySelectorAll('.js-close-resolve-modal').forEach(btn => {
+        btn.addEventListener('click', () => resolveModal.classList.add('hidden'));
+    });
+
+    document.querySelectorAll('.js-close-invalid-modal').forEach(btn => {
+        btn.addEventListener('click', () => invalidModal.classList.add('hidden'));
+    });
+    document.querySelectorAll('.silly-reason-close').forEach(btn => {
+        btn.addEventListener('click', () => sillyReasonModal.classList.add('hidden'));
+    });
+
+    // Close modals on background click
+    [pickModal, resolveModal, invalidModal, sillyReasonModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        }
+    });
+
+    // Escape key to close modals
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (pickModal) pickModal.classList.add('hidden');
+            if (resolveModal) resolveModal.classList.add('hidden');
+            if (invalidModal) invalidModal.classList.add('hidden');
+            if (sillyReasonModal) sillyReasonModal.classList.add('hidden');
+        }
+    });
+
+    // Silly reason modal has close buttons above; pagination handled via attachTicketButtons
+
+    // Close time dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.time-picker')) {
+            const dd = document.querySelector('.dropdown-panel');
+            if (dd) dd.classList.add('hidden');
+        }
+    });
+
+    // Initialize time dropdown on page load (so it's ready even before first open)
+    const timeDropdown = document.querySelector('.dropdown-panel');
+    if (timeDropdown && !timeDropdown.dataset.populated) {
+        populateTimeOptions(timeDropdown);
+        timeDropdown.dataset.populated = '1';
+    }
+
+});
+</script>
+
+{% endblock %}
+
+

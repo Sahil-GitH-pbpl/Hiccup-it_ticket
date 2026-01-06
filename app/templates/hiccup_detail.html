@@ -1,0 +1,334 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <section class="mx-auto max-w-xl space-y-4">
+        <input type="hidden" id="public-token-field" value="{{ public_token | default('') }}">
+    <div  class="{% if not hiccup_data %}hidden{% endif %} rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-lg shadow-slate-200/40">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-[10px] uppercase tracking-[0.5em] text-tealbrand">Hiccup Snapshot</p>
+                <h2 class="text-2xl font-semibold text-slate-900">Accepted Response</h2>
+            </div>
+            <span id="public-status" class="rounded-full border border-tealbrand px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">—</span>
+        </div>
+        <div id="public-summary" class="mt-4 grid gap-3 sm:grid-cols-2 text-base text-slate-900">
+            {% if hiccup_data %}
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Hiccup ID</p>
+                    <p >{{ hiccup_data.hiccup_id or '-' }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Status</p>
+                    <p >{{ hiccup_data.status or '-' }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Type</p>
+                    <p >{{ hiccup_data.hiccup_type or '-' }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Created By</p>
+                    <h5 class="text-[15px] mt-1 font-semibold text-slate-900">{{ hiccup_data.raised_by_name or '-' }}</h5>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Department</p>
+                    <p >{{ hiccup_data.raised_against_department_name or hiccup_data.raised_against_department or '-' }}</p>
+                </div>
+                <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-3">
+                    <p class="text-[10px] uppercase tracking-[0.25em] text-slate-500">Created</p>
+                    <p  >{{ hiccup_data.created_at or '-' }}</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-base text-slate-900">
+            <p class="text-[10px] uppercase tracking-[0.4em] text-slate-500">Description</p>
+            <p id="public-description" class="mt-2">
+                {% if hiccup_data %}{{ hiccup_data.description or 'No description provided.' }}{% else %}Loading...{% endif %}
+            </p>
+        </div>
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-base text-slate-900">
+            <p class="text-[10px] uppercase tracking-[0.4em] text-slate-500">Immediate Effect</p>
+            <p id="public-immediate" class="mt-2">
+                {% if hiccup_data %}{{ hiccup_data.immediate_effect or 'No effect noted.' }}{% else %}Loading...{% endif %}
+            </p>
+        </div>
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-base text-slate-900">
+            <p class="text-[10px] uppercase tracking-[0.4em] text-slate-500">Attachments</p>
+            {% set attachments_list = hiccup_attachments if hiccup_attachments is defined else [] %}
+            {% if attachments_list %}
+                <div id="public-attachments" class="mt-2 text-sm text-slate-900 attachment-stack">
+                    <div class="attachment-grid">
+                        {% for path in attachments_list %}
+                            {% set href = path.startswith('/') and path or '/' ~ path %}
+                            {% set filename = path.split('/')[-1] %}
+                            {% set lower = path|lower %}
+                            {% set is_image = lower.endswith('.png') or lower.endswith('.jpg') or lower.endswith('.jpeg') or lower.endswith('.gif') or lower.endswith('.bmp') or lower.endswith('.webp') %}
+                            {% if is_image %}
+                                <figure class="attachment-card">
+                                    <a href="{{ href }}" target="_blank" rel="noreferrer">
+                                        <img src="{{ href }}" alt="{{ filename }}" loading="lazy" class="attachment-thumb" />
+                                    </a>
+                                    <figcaption class="attachment-label">{{ filename }}</figcaption>
+                                </figure>
+                            {% else %}
+                                <a href="{{ href }}" target="_blank" rel="noreferrer" class="text-tealbrand underline">{{ filename }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div id="public-attachments" class="mt-2 text-sm text-slate-400">No attachments</div>
+            {% endif %}
+        </div>
+    </div>
+    <div id="internal-detail-section">
+        <div class="rounded-3xl border border-slate-200 bg-white/95 p-8 shadow-2xl shadow-slate-200/40">
+            <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Investigation</p>
+                    <h2 class="text-3xl font-semibold text-slate-900">Hiccup Detail</h2>
+                </div>
+            </div>
+            <div id="hiccup-detail" class="mt-6 space-y-3 text-sm text-slate-600"></div>
+        </div>
+      
+    </div>
+    <style>
+        #response-form {
+            font-size: 17px;
+            border: 1px solid #d7e3f3;
+            border-radius: 16px;
+            background: radial-gradient(circle at 18% 18%, #e9f7ff 0, #ffffff 38%);
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .response-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        #response-form h3 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 800;
+        }
+        .response-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .response-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: #0db29c10;
+            border: 1px solid #0db29c30;
+            font-size: 13px;
+            color: #0f172a;
+        }
+        #response-status {
+            margin: 0;
+            font-size: 15px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+        #response-note {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #b45309;
+        }
+        .attachments-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: #f7fafc;
+            border: 1px dashed #cbd5e1;
+        }
+        .attachments-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+        .attachments-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            font-size: 14px;
+        }
+        .attachments-list a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #0db29c12;
+            border: 1px solid #0db29c30;
+            color: #0a7f6f;
+            text-decoration: none;
+        }
+        .attachments-list a:hover {
+            background: #0db29c18;
+            border-color: #0db29c55;
+        }
+        #response-form-body {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+            gap: 12px;
+            align-items: start;
+        }
+        .response-input {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .response-input-label {
+            font-size: 12px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #0f172a;
+        }
+        #response-text {
+            width: 100%;
+            min-height: 140px;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 2px solid #0db29c33;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f8ff 100%);
+            font-size: 16px;
+            color: #111827;
+            outline: none;
+            resize: vertical;
+            box-shadow: 0 6px 14px rgba(13, 178, 156, 0.10);
+        }
+        #response-text:focus {
+            border-color: #0db29c;
+            box-shadow: 0 0 0 2px rgba(13, 178, 156, 0.22);
+            background: #ffffff;
+        }
+        .response-helper-inline {
+            margin: 0;
+            font-size: 13px;
+            color: #374151;
+        }
+        .response-side {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f8fbff;
+            border: 1px solid #e5edf6;
+        }
+        .response-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        #response-char-count {
+            font-size: 13px;
+            color: #4b5563;
+        }
+        #response-submit {
+            flex: 1;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0db29c, #0a7f6f);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 10px 18px rgba(13, 178, 156, 0.28);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        #response-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 22px rgba(13, 178, 156, 0.35);
+        }
+        #response-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        @media (max-width: 768px) {
+            #response-form-body {
+                grid-template-columns: 1fr;
+            }
+            .response-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            #response-submit {
+                width: 100%;
+            }
+        }
+    </style>
+    <div id="response-form">
+        <div class="response-head">
+            <div>
+                <h3>Response</h3>
+                <p id="response-status">Waiting for response...</p>
+            </div>
+            <div class="response-badges">
+                <span class="response-badge">⏳ <strong>24h</strong> to avoid overdue</span>
+                <span class="response-badge">⚡ Keep it crisp</span>
+            </div>
+        </div>
+        <p id="response-note">Reply fast, add proof, hit submit.</p>
+       
+        <div id="response-context" class="hidden"></div>
+        <form id="response-form-body" onsubmit="return false;">
+            <div class="response-input">
+                <div class="response-input-label">Your Response</div>
+                <textarea id="response-text" name="response_text" rows="4" placeholder="Type your response here..."></textarea>
+                <p class="response-helper-inline">Be clear and concise. This text is sent as your official reply.</p>
+            </div>
+            <div class="response-side">
+                <div class="response-actions">
+                    <span id="response-char-count">0 / 600</span>
+                    <button id="response-submit" type="button" onclick="submitHiccupResponse(event);">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="followup-card" class="rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-lg shadow-slate-200/40 hidden">
+        <h3 class="text-lg font-semibold text-slate-900">Follow-up Verification</h3>
+        <p id="followup-status" class="mt-3 text-sm text-slate-700"></p>
+        <form id="followup-form" class="mt-4 space-y-3 hidden">
+            <label class="block text-sm font-semibold text-slate-700" for="followup-state">Issue resolved?</label>
+            <select id="followup-state" name="followup_state" class="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                <option value="">-- select status --</option>
+                <option value="Resolved">Yes, resolved</option>
+                <option value="Unresolved">No, still open</option>
+            </select>
+            <label class="block text-sm font-semibold text-slate-700" for="followup-comment">Comments</label>
+            <textarea id="followup-comment" name="followup_comment" rows="3" class="w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40" placeholder="Share any updates or evidence"></textarea>
+            <button id="followup-submit" type="submit" class="w-full rounded-2xl bg-tealbrand px-4 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white shadow-lg shadow-tealbrand/30 transition hover:bg-tealbrand-dark hover:-translate-y-0.5">Submit follow-up</button>
+        </form>
+    </div>
+</section>
+<script>
+    window.currentHiccupId = "{{ hiccup_id }}";
+    window.PUBLIC_TOKEN = "{{ public_token | default('') }}";
+    window.initialHiccupData = {% if hiccup_data is defined %}{{ hiccup_data | tojson }}{% else %}null{% endif %};
+</script>
+<script src="/static/js/hiccups-helpers.js"></script>
+<script src="/static/js/hiccups.js"></script>
+<script src="/static/js/hiccup_detail.js" defer></script>
+{% endblock %}

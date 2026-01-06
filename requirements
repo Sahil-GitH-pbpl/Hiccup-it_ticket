@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+mysql-connector-python
+python-jose
+apscheduler
+httpx
+jinja2
+python-dotenv
+pydantic
+pytz
+gunicorn
+pydantic-settings
+requests
+python-multipart

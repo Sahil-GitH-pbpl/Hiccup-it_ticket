@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+{% block content %}
+{% set _designation = (user.designation | default('', true) | lower) if user is defined else '' %}
+{% set _role = (user.role | default('', true) | lower) if user is defined else '' %}
+{% set management_actions_allowed = ('management' in _designation) or ('manager' in _designation) or ('admin' in _designation) or ('supervisor' in _designation) or ('lead' in _designation) or (_role in ['admin', 'management']) %}
+<section class="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/60">
+    <div class="flex flex-col gap-2">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Management</p>
+        <h2 class="text-2xl font-semibold text-slate-900">Management View</h2>
+    </div>
+    <div class="table-gradient-heading mt-6">
+        <div class="flex flex-wrap items-center gap-4">
+            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                Status
+                <select id="mgmt-filter-status" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                    <option value="">All</option>
+                    <option>Open</option>
+                    <option>Responded</option>
+                    <option>Under Review</option>
+                    <option>Closed</option>
+                    <option>Escalated to NC</option>
+                </select>
+            </label>
+            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                Type
+                <select id="mgmt-filter-type" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                    <option value="">All</option>
+                    <option>Person Related</option>
+                    <option>System Related</option>
+                </select>
+            </label>
+            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                Cause
+                <select id="mgmt-filter-root" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                    <option value="">All</option>
+                    <option>Training Need</option>
+                    <option>Process Gap</option>
+                    <option>Negligence</option>
+                    <option>System Error</option>
+                    <option>External Factor</option>
+                    <option>Resource Shortage</option>
+                </select>
+            </label>
+            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                Search
+                <input id="mgmt-global-hiccup-search" type="search" placeholder="Search hiccups" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+            </label>
+            <button id="mgmt-reset-filters" class="ml-auto rounded-2xl border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600 shadow-sm transition hover:border-tealbrand hover:text-tealbrand">Reset</button>
+        </div>
+    </div>
+    <div class="table-scroll mt-4">
+        <table id="management-table" class="enhanced-table">
+            <thead class="bg-slate-50 text-xs uppercase tracking-[0.3em] text-slate-400">
+                <tr>
+                    <th class="px-4 py-3 text-left">ID</th>
+                    <th class="px-4 py-3 text-left">Type</th>
+                    <th class="px-4 py-3 text-left">Status</th>
+                    <th class="px-4 py-3 text-left">Created Against</th>
+                    <th class="px-4 py-3 text-left">Created</th>
+                    <th class="px-4 py-3 text-left">Updated</th>
+                    {% if management_actions_allowed %}
+                        <th class="px-4 py-3 text-left">Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white text-sm text-slate-600"></tbody>
+        </table>
+    </div>
+    <script>
+        window.managementActionsEnabled = {{ 'true' if management_actions_allowed else 'false' }};
+        window.managementView = true;
+    </script>
+</section>
+<script src="/static/js/hiccups-helpers.js"></script>
+<script src="/static/js/hiccups.js"></script>
+{% endblock %}

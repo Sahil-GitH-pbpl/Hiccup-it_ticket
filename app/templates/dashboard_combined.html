@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+{% block head_extra %}
+<link rel="stylesheet" href="/static/css/dashboard.css">
+{% endblock %}
+
+{% block content %}
+<section class="rounded-3xl border border-slate-200 bg-white/95 p-8 shadow-2xl shadow-slate-200/40 space-y-6">
+  <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Overview</p>
+      <h2 class="text-3xl font-semibold text-slate-900">Hiccup Overview</h2>
+      <p class="text-sm text-slate-600">Quick stats and shortcuts for hiccups.</p>
+    </div>
+    <div class="flex gap-2">
+      <a href="/raise" class="rounded-xl border border-tealbrand px-4 py-2 text-sm font-semibold text-tealbrand hover:bg-tealbrand hover:text-white transition">Create Hiccup</a>
+    </div>
+  </div>
+
+  <div class="grid gap-4">
+    <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">Hiccups</p>
+          <h3 class="text-xl font-semibold text-slate-900">Quality incidents</h3>
+        </div>
+        <a class="text-sm font-semibold text-tealbrand hover:text-tealbrand-dark" href="/management">View all</a>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="dash-card">
+          <p class="label">Total</p>
+          <p class="value">{{ hiccup.total }}</p>
+        </div>
+        <div class="dash-card">
+          <p class="label">Open</p>
+          <p class="value text-amber-700">{{ hiccup.open }}</p>
+        </div>
+        <div class="dash-card">
+          <p class="label">Responded</p>
+          <p class="value text-sky-700">{{ hiccup.responded }}</p>
+        </div>
+        <div class="dash-card">
+          <p class="label">Closed</p>
+          <p class="value text-emerald-700">{{ hiccup.closed }}</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <a class="chip" href="/raise">Create hiccup</a>
+        <a class="chip" href="/my-hiccups">My hiccups</a>
+        <a class="chip" href="/assigned">Assigned to me</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
