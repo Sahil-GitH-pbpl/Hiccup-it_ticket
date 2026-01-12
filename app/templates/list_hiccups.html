@@ -1,6 +1,20 @@
 {% extends 'layout.html' %}
 {% block content %}
 <section class="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/50">
+    <style>
+      @media (max-width: 767px) {
+        #raised-by-section,
+        #against-me-section {
+          display: none !important;
+        }
+      }
+      @media (min-width: 768px) {
+        #raised-by-cards,
+        #against-me-cards {
+          display: none !important;
+        }
+      }
+    </style>
     <div class="flex flex-col gap-2">
         <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">My workbench</p>
         <h2 class="text-2xl font-semibold text-slate-900">My Hiccups</h2>
@@ -37,7 +51,8 @@
             <button id="reset-filters" class="ml-auto rounded-2xl border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600 shadow-sm transition hover:border-tealbrand hover:text-tealbrand">Reset</button>
         </div>
     </div>
-    <div id="raised-by-section" class="table-scroll mt-4">
+    <div id="raised-by-cards" class="space-y-3 mt-4 hidden"></div>
+    <div id="raised-by-section" class="table-scroll mt-4 hidden">
         <table id="my-hiccups-table" class="enhanced-table">
             <thead class="bg-slate-50 text-xs uppercase tracking-[0.3em] text-slate-400">
                 <tr>
@@ -53,6 +68,7 @@
             <tbody class="divide-y divide-slate-100 bg-white text-sm text-slate-600"></tbody>
         </table>
     </div>
+    <div id="against-me-cards" class="space-y-3 mt-4 hidden"></div>
     <div id="against-me-section" class="table-scroll mt-4 hidden">
         <table id="assigned-table" class="enhanced-table">
             <thead class="bg-slate-50 text-xs uppercase tracking-[0.3em] text-slate-400">

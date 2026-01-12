@@ -16,6 +16,7 @@ const showManagementActions = Boolean(window.managementActionsEnabled);
 const managementColumnCount = summaryColumnCount + (showManagementActions ? actionsColumnCount : 0);
 const assignedViewMode = Boolean(window.assignedView);
 const currentUserId = window.currentUserId || (window.currentUser && window.currentUser.user_id) || null;
+const currentUserName = (window.currentUser && window.currentUser.name) || '';
 let departmentCache = null;
 const hasHiccupTables =
     Boolean(document.querySelector('#my-hiccups-table')) ||
@@ -286,14 +287,112 @@ function summaryRowHtml(h, includeActions = true, includeMgmtActions = false, op
     </tr>`;
 }
 
+function matchesCurrentUser(value, fallbackName) {
+    const userIdStr = currentUserId ? String(currentUserId).trim() : '';
+    const valueStr = value !== undefined && value !== null ? String(value).trim() : '';
+    if (userIdStr && valueStr && userIdStr === valueStr) {
+        return true;
+    }
+    const userNameNorm = currentUserName ? currentUserName.trim().toLowerCase() : '';
+    const nameNorm = fallbackName ? String(fallbackName).trim().toLowerCase() : '';
+    return Boolean(userNameNorm && nameNorm && userNameNorm === nameNorm);
+}
+
+function resolveOptionValue(option, hiccup) {
+    if (typeof option === 'function') {
+        try {
+            return Boolean(option(hiccup));
+        } catch (err) {
+            return false;
+        }
+    }
+    return Boolean(option);
+}
+
+function hiccupCardHtml(h, options = {}) {
+    const {
+        displayRaisedAgainst = true,
+        includeMgmtActions = false,
+        allowNcView = false,
+        ncReadonly = false,
+        allowRespond = false,
+    } = options;
+    const targetPerson = displayRaisedAgainst
+        ? formatPersonDisplay(h.raised_against_name, h.raised_against)
+        : formatPersonDisplay(h.raised_by_name, h.raised_by);
+    const attachments = Array.isArray(h.attachments)
+        ? h.attachments
+        : h.attachment_path
+        ? [h.attachment_path]
+        : [];
+    const attachmentLabel = attachments.length
+        ? `${attachments.length} attachment${attachments.length > 1 ? 's' : ''}`
+        : 'No attachments';
+    const allowNcViewForCard = resolveOptionValue(allowNcView, h);
+    const allowRespondForCard = resolveOptionValue(allowRespond, h);
+    const ncViewButton =
+        allowNcViewForCard && (h.status === 'Escalated to NC' || h.escalated_by)
+            ? `<button type="button" class="detail-btn" data-behavior="view-nc" data-nc-readonly="${ncReadonly}" data-hiccup="${h.hiccup_id}">View NC Form</button>`
+            : '';
+    const respondButton =
+        allowRespondForCard && h.status !== 'Closed'
+            ? `<button type="button" class="detail-btn" data-behavior="respond" data-hiccup="${h.hiccup_id}">Respond</button>`
+            : '';
+    const detailButton = `<button type="button" data-hiccup-detail="${h.hiccup_id}" class="detail-btn">View details</button>`;
+    const mgmtButtons = includeMgmtActions ? managementActionButtons(h) : '';
+    const mgmtSection = mgmtButtons
+        ? `<div class="mgmt-action-group mt-2" data-hiccup-actions="${h.hiccup_id}">
+                <button type="button" class="mgmt-toggle" aria-haspopup="true" aria-expanded="false">Actions</button>
+                <div class="mgmt-actions-stack">
+                    ${mgmtButtons}
+                </div>
+           </div>`
+        : '';
+    return `
+        <article class="rounded-2xl border border-slate-200 bg-white shadow-sm p-4 space-y-2">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Hiccup</p>
+                    <p class="text-lg font-semibold text-slate-900">#${escapeHtml(h.hiccup_id)}</p>
+                </div>
+                <div class="text-right text-xs">${statusWithBadges(h)}</div>
+            </div>
+            <p class="text-sm font-semibold text-slate-800">${normalizeText(h.hiccup_type)}</p>
+            <p class="text-sm text-slate-600">${displayRaisedAgainst ? 'Against' : 'By'} ${targetPerson}</p>
+            <p class="text-xs text-slate-500">Created ${formatDate(h.created_at)} | Updated ${formatDate(h.updated_at)}</p>
+            <p class="text-sm text-slate-700">${truncatedText(h.description, 120)}</p>
+            <div class="flex flex-wrap gap-2 text-xs text-slate-500">
+                ${formatOverdueBadges(h)}
+                <span class="rounded-full bg-slate-100 px-2 py-1">${attachmentLabel}</span>
+            </div>
+            <div class="flex flex-wrap gap-2 pt-2">
+                ${detailButton}
+                ${respondButton}
+                ${ncViewButton}
+            </div>
+            ${mgmtSection}
+        </article>
+    `;
+}
+
+function renderHiccupCards(containerId, data, options = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const rows = Array.isArray(data) ? data : [];
+    if (!rows.length) {
+        container.innerHTML = `<div class="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-xs uppercase tracking-[0.3em] text-slate-500">No hiccups yet.</div>`;
+        return;
+    }
+    container.innerHTML = rows.map((h) => hiccupCardHtml(h, options)).join('');
+}
+
 function renderMyHiccupsTable() {
     const tbody = document.querySelector('#my-hiccups-table tbody');
-    if (!tbody) return;
+    if (!tbody && !document.getElementById('raised-by-cards')) return;
     let filtered = myHiccupsData;
-    const userId = currentUserId;
-    if (userId) {
-        filtered = filtered.filter((entry) => String(entry.raised_by) === String(userId));
-    }
+    filtered = filtered.filter((entry) =>
+        matchesCurrentUser(entry.raised_by, entry.raised_by_name)
+    );
     const statusValue = statusFilter?.value;
     const typeValue = typeFilter?.value;
     if (statusValue) {
@@ -306,40 +405,58 @@ function renderMyHiccupsTable() {
     if (searchValue) {
         filtered = filtered.filter((entry) => matchesGlobalSearch(entry, searchValue));
     }
-    if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
-        return;
+    renderHiccupCards('raised-by-cards', filtered, { displayRaisedAgainst: true });
+    if (tbody) {
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
+        } else {
+            tbody.innerHTML = filtered.map((h) => summaryRowHtml(h, true, false)).join('');
+        }
     }
-    tbody.innerHTML = filtered.map((h) => summaryRowHtml(h, true, false)).join('');
 }
 
 function renderAssignedTable(data) {
     const assignedBody = document.querySelector('#assigned-table tbody');
-    if (!assignedBody) return;
+    if (!assignedBody && !document.getElementById('against-me-cards')) return;
     const rows = Array.isArray(data) ? data : [];
-    const userId = currentUserId;
-    const assigned = userId ? rows.filter((h) => String(h.raised_against) === String(userId)) : [];
+    const assigned = rows.filter((h) =>
+        matchesCurrentUser(h.raised_against, h.raised_against_name)
+    );
     if (assigned.length === 0) {
         assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
+        renderHiccupCards('against-me-cards', [], {
+            displayRaisedAgainst: false,
+        });
         return;
     }
     const searchValue = globalSearchInput?.value?.trim();
     const filteredAssigned = searchValue ? assigned.filter((entry) => matchesGlobalSearch(entry, searchValue)) : assigned;
     if (filteredAssigned.length === 0) {
         assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
+        renderHiccupCards('against-me-cards', [], {
+            displayRaisedAgainst: false,
+        });
         return;
     }
-    assignedBody.innerHTML = filteredAssigned
-        .map((h) => {
-            const canRespond = h.status !== 'Closed' && !h.response_text;
-            return summaryRowHtml(h, true, false, {
-                displayRaisedAgainst: false,
-                allowNcView: h.status === 'Escalated to NC' || h.escalated_by,
-                ncReadonly: true,
-                allowRespond: canRespond,
-            });
-        })
-        .join('');
+    renderHiccupCards('against-me-cards', filteredAssigned, {
+        displayRaisedAgainst: false,
+        allowRespond: (h) => h.status !== 'Closed' && !h.response_text,
+        allowNcView: (h) => h.status === 'Escalated to NC' || h.escalated_by,
+        ncReadonly: true,
+    });
+    if (assignedBody) {
+        assignedBody.innerHTML = filteredAssigned
+            .map((h) => {
+                const canRespond = h.status !== 'Closed' && !h.response_text;
+                return summaryRowHtml(h, true, false, {
+                    displayRaisedAgainst: false,
+                    allowNcView: h.status === 'Escalated to NC' || h.escalated_by,
+                    ncReadonly: true,
+                    allowRespond: canRespond,
+                });
+            })
+            .join('');
+    }
 }
 
 function applyManagementFilters(rows) {
@@ -376,6 +493,12 @@ function renderManagementTable(data) {
     const finalFiltered = mgmtSearchValue
         ? assignedFiltered.filter((entry) => matchesGlobalSearch(entry, mgmtSearchValue))
         : assignedFiltered;
+    renderHiccupCards('assigned-nc-cards', assignedViewMode ? finalFiltered : [], {
+        displayRaisedAgainst: true,
+        includeMgmtActions: showManagementActions,
+        allowNcView: (h) => h.status === 'Escalated to NC' || h.escalated_by,
+        ncReadonly: true,
+    });
     if (finalFiltered.length === 0) {
         mgmtBody.innerHTML = `<tr><td colspan="${managementColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
         return;
@@ -429,11 +552,15 @@ mgmtResetFilters?.addEventListener('click', () => {
 function toggleHiccupTab(target) {
     const raisedSection = document.getElementById('raised-by-section');
     const againstSection = document.getElementById('against-me-section');
+    const raisedCards = document.getElementById('raised-by-cards');
+    const againstCards = document.getElementById('against-me-cards');
     const raisedTab = document.getElementById('tab-raised-by');
     const againstTab = document.getElementById('tab-against-me');
     const isRaised = target === 'raised';
     if (raisedSection) raisedSection.classList.toggle('hidden', !isRaised);
     if (againstSection) againstSection.classList.toggle('hidden', isRaised);
+    if (raisedCards) raisedCards.classList.toggle('hidden', !isRaised);
+    if (againstCards) againstCards.classList.toggle('hidden', isRaised);
     const updateTabStyles = (tabEl, active) => {
         if (!tabEl) return;
         tabEl.classList.toggle('bg-tealbrand', active);

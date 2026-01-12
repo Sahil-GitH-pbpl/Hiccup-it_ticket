@@ -9,7 +9,8 @@ jinja2
 python-dotenv
 pydantic
 pytz
-gunicorn
 pydantic-settings
 requests
 python-multipart
+wfastcgi
+itsdangerous

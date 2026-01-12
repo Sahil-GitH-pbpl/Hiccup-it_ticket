@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     whatsapp_response_base_url: str = Field(
         "http://192.168.0.71:4001", env="WHATSAPP_RESPONSE_BASE_URL"
     )
+    external_whatsapp_response_base_url: str = Field(
+        "https://labmate.bhasinpathlabs.com:4666", env="EXTERNAL_WHATSAPP_RESPONSE_BASE_URL"
+    )
     timezone: str = Field("Asia/Kolkata", env="TIMEZONE")
     response_reminder_minutes: int = Field(20 * 60, env="RESPONSE_REMINDER_MINUTES")
     response_overdue_minutes: int = Field(24 * 60, env="RESPONSE_OVERDUE_MINUTES")

@@ -244,6 +244,7 @@ data-message="{{ message or '' }}" {% endblock %} {% block content %}
                 multiple
                 class="text-sm text-slate-700"
               />
+              <div id="selectedPhotos" class="space-y-1 text-sm text-slate-600"></div>
               <small class="text-sm text-slate-500"
                 >Attach multiple images if needed (errors screens, damaged
                 items, etc.).</small
@@ -425,6 +426,39 @@ data-message="{{ message or '' }}" {% endblock %} {% block content %}
           }
         }
       });
+    }
+
+    // Multiple photo selection helper
+    const photosInput = document.getElementById("photos");
+    const selectedPhotos = document.getElementById("selectedPhotos");
+    if (photosInput && selectedPhotos) {
+      const renderFiles = (files) => {
+        selectedPhotos.innerHTML = "";
+        if (!files || !files.length) return;
+        const list = document.createElement("div");
+        list.className = "flex flex-wrap gap-2";
+        Array.from(files).forEach((file, idx) => {
+          const item = document.createElement("div");
+          item.className = "inline-flex items-center gap-2 px-2 py-1 rounded-md bg-slate-100 text-xs text-slate-700 border border-slate-200";
+          item.innerHTML = `<span class="truncate max-w-[160px]" title="${file.name}">${file.name}</span>`;
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "text-red-600 hover:text-red-800 font-semibold";
+          btn.textContent = "×";
+          btn.addEventListener("click", () => {
+            const dt = new DataTransfer();
+            Array.from(files).forEach((f, i) => {
+              if (i !== idx) dt.items.add(f);
+            });
+            photosInput.files = dt.files;
+            renderFiles(dt.files);
+          });
+          item.appendChild(btn);
+          list.appendChild(item);
+        });
+        selectedPhotos.appendChild(list);
+      };
+      photosInput.addEventListener("change", (e) => renderFiles(e.target.files));
     }
   });
 </script>

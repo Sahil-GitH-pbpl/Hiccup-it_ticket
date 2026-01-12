@@ -82,6 +82,17 @@
         padding: 6px;
         z-index: 30;
       }
+      /* Show desktop dropdowns on hover as well as click */
+      .nav-dropdown-parent:hover .nav-dropdown.hidden {
+        display: block !important;
+      }
+      .nav-dropdown-parent:hover .nav-dropdown {
+        display: block;
+      }
+      /* Keep dropdown visible while hovering menu itself (prevents flicker when moving cursor) */
+      .nav-dropdown:hover {
+        display: block !important;
+      }
       .nav-dropdown__item {
         display: block;
         padding: 10px 12px;
@@ -431,6 +442,23 @@
           closeDropdowns(menu);
           menu.classList.toggle("hidden", !isHidden);
         });
+
+        // Hover support: keep menu open while hovering toggle or menu
+        const showMenu = () => {
+          closeDropdowns(menu);
+          menu.classList.remove("hidden");
+        };
+        const maybeHideMenu = () => {
+          setTimeout(() => {
+            const stillHovering =
+              toggle.matches(":hover") || menu.matches(":hover");
+            if (!stillHovering) menu.classList.add("hidden");
+          }, 80);
+        };
+        toggle.addEventListener("mouseenter", showMenu);
+        menu.addEventListener("mouseenter", showMenu);
+        toggle.addEventListener("mouseleave", maybeHideMenu);
+        menu.addEventListener("mouseleave", maybeHideMenu);
       });
 
       document.addEventListener("click", (event) => {

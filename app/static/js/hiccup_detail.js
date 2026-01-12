@@ -90,11 +90,8 @@ function buildDetailHTML(hiccup) {
         ['Type', hiccup.hiccup_type],
         ['Status', hiccup.status],
         ['Created By', hiccup.raised_by_name || '-'],
-        ['Created Against', hiccup.raised_against_name || hiccup.raised_against || '-'],
         ['Department', hiccup.raised_by_department || '-'],
-        ['Against Dept', hiccup.raised_against_department_name || hiccup.raised_against_department || '-'],
         ['Created', hiccup.created_at ? new Date(hiccup.created_at).toLocaleString() : '-'],
-        ['Updated', hiccup.updated_at ? new Date(hiccup.updated_at).toLocaleString() : '-'],
     ];
     return `
         <div class="grid gap-3 sm:grid-cols-2">

@@ -16,6 +16,7 @@ from app.models.staff import Staff
 from app.utils.time_utils import now_local
 from app.core.security import create_jwt
 from pytz import timezone
+from urllib.parse import quote_plus
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -62,15 +63,16 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
 
     if not numbers:
         return
+    internal_host = settings.whatsapp_response_base_url or settings.frontend_base_url
+    external_host = settings.external_whatsapp_response_base_url or internal_host
 
-    redirect_host = settings.whatsapp_response_base_url or settings.frontend_base_url
-    response_url = (
-        f"{redirect_host}/wa/redirect/{hiccup.hiccup_id}?public_token={quote_plus(public_token)}"
-        if public_token
-        else f"{settings.frontend_base_url}/hiccups/{hiccup.hiccup_id}"
-    )
     if public_token:
-        response_url = f"{settings.frontend_base_url}/public/hiccups/{hiccup.hiccup_id}?public_token={quote_plus(public_token)}"
+        token_param = quote_plus(public_token)
+        internal_url = f"{internal_host}/wa/redirect/{hiccup.hiccup_id}?public_token={token_param}"
+        external_url = f"{external_host}/wa/redirect/{hiccup.hiccup_id}?public_token={token_param}"
+    else:
+        internal_url = f"{internal_host}/hiccups/{hiccup.hiccup_id}"
+        external_url = f"{external_host}/hiccups/{hiccup.hiccup_id}"
 
     message_lines = [
         "New Hiccup Raised!",
@@ -80,8 +82,9 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
         f"Type: {hiccup.hiccup_type}",
         f"Time: {hiccup.created_at.strftime('%Y-%m-%d %H:%M')}",
         f"Summary: {(hiccup.description or '').strip()[:120] or 'N/A'}",
-        "Tap to respond:",
-        response_url,
+        "Tap to respond (choose link based on location):",
+        f"- In office (192.168.0.71): {internal_url}",
+        f"- Outside office (internet): {external_url}",
         "Copy-paste the text box, submit it, and you're done.",
     ]
 
@@ -102,10 +105,16 @@ def _build_response_token(staff: Staff, hiccup: Hiccup) -> str:
     )
 
 
-def _build_response_url(hiccup: Hiccup, token: str) -> str:
-    redirect_host = settings.whatsapp_response_base_url or settings.frontend_base_url
+def _build_response_urls(hiccup: Hiccup, token: str) -> tuple[str, str]:
+    """
+    Build both internal (office) and external (internet) response links for a hiccup.
+    """
+    internal_host = settings.whatsapp_response_base_url or settings.frontend_base_url
+    external_host = settings.external_whatsapp_response_base_url or internal_host
     params = quote_plus(token)
-    return f"{redirect_host}/public/hiccups/{hiccup.hiccup_id}?public_token={params}"
+    internal_url = f"{internal_host}/public/hiccups/{hiccup.hiccup_id}?public_token={params}"
+    external_url = f"{external_host}/public/hiccups/{hiccup.hiccup_id}?public_token={params}"
+    return internal_url, external_url
 
 
 def send_daily_summary(db: Session):
@@ -256,13 +265,15 @@ def send_response_reminders(db: Session):
         message = None
         if age >= escalate_delta and not hiccup.escalate_msg_sent:
             token = _build_response_token(staff, hiccup)
-            url = _build_response_url(hiccup, token)
+            internal_url, external_url = _build_response_urls(hiccup, token)
             message = "\n".join(
                 [
                     f"Hiccup {hiccup.hiccup_id} is 60+ hours old.",
                     "Management will escalate to NC soon.",
                     f"Overdue flag: {hiccup.is_response_overdue}",
-                    f"Respond here: {url}",
+                    "Respond here (choose based on location):",
+                    f"- In office (192.168.0.71): {internal_url}",
+                    f"- Outside office (internet): {external_url}",
                 ]
             )
             hiccup.escalate_msg_sent = True
@@ -275,12 +286,14 @@ def send_response_reminders(db: Session):
                 send_bulk(management_numbers, message)
         elif age >= overdue_delta and not hiccup.overdue_msg_sent:
             token = _build_response_token(staff, hiccup)
-            url = _build_response_url(hiccup, token)
+            internal_url, external_url = _build_response_urls(hiccup, token)
             message = "\n".join(
                 [
                     f"Hiccup {hiccup.hiccup_id} is overdue (24h).",
                     "This hiccup is now marked response_overdue.",
-                    f"Please respond here: {url}",
+                    "Please respond (choose based on location):",
+                    f"- In office (192.168.0.71): {internal_url}",
+                    f"- Outside office (internet): {external_url}",
                 ]
             )
             hiccup.overdue_msg_sent = True
@@ -289,12 +302,14 @@ def send_response_reminders(db: Session):
             )
         elif age >= reminder_delta and not hiccup.reminder_sent:
             token = _build_response_token(staff, hiccup)
-            url = _build_response_url(hiccup, token)
+            internal_url, external_url = _build_response_urls(hiccup, token)
             message = "\n".join(
                 [
                     f"Reminder: Hiccup {hiccup.hiccup_id} needs response soon.",
                     "Submit within 24 hours to avoid overdue flag.",
-                    f"Respond here: {url}",
+                    "Respond here (choose based on location):",
+                    f"- In office (192.168.0.71): {internal_url}",
+                    f"- Outside office (internet): {external_url}",
                 ]
             )
             hiccup.reminder_sent = True

@@ -56,6 +56,7 @@
     <!-- Meta -->
     <div class="text-sm text-slate-700 space-y-1 mb-3">
       <div><span class="font-semibold">Department:</span> {{ t.department }}</div>
+      <div><span class="font-semibold">Workstation:</span> {{ t.workstation or 'NA' }}</div>
       <div>
         <span class="font-semibold">Category:</span> {{ t.category }}
         {% if t.subcategory %}
@@ -87,20 +88,21 @@
     <div class="mb-3">
       <div class="text-xs font-semibold text-slate-500 mb-1">Photos</div>
       {% set attachments = t.images or [] %}
+      {% set ns = namespace(photos=[]) %}
       {% if attachments %}
-        <div class="flex flex-wrap gap-2">
-          {% for image in attachments %}
-            <a href="/{{ image.image_path }}" target="_blank"
+        {% set ns.photos = attachments | map(attribute='image_path') | map('replace','\\\\','/') | list %}
+      {% elif t.image_path %}
+        {% set ns.photos = [t.image_path | replace('\\','/')] %}
+      {% endif %}
+      {% if ns.photos %}
+        <div class="flex flex-wrap gap-2 items-center">
+          {% for p in ns.photos %}
+            <a href="/{{ p }}" target="_blank"
               class="text-sm text-brandBlue hover:underline">
               Photo {{ loop.index }}
             </a>
           {% endfor %}
         </div>
-      {% elif t.image_path %}
-        <a href="/{{ t.image_path }}" target="_blank"
-          class="text-sm text-brandBlue hover:underline">
-          View photo
-        </a>
       {% else %}
         <span class="text-xs text-slate-400">No photo attached</span>
       {% endif %}
@@ -200,7 +202,10 @@
             </td>
 
             <!-- Department -->
-            <td class="px-3 py-2 border-b border-slate-200">{{ t.department }}</td>
+            <td class="px-3 py-2 border-b border-slate-200">
+                {{ t.department }}
+                <div class="text-[11px] text-slate-500">Workstation: {{ t.workstation or 'NA' }}</div>
+            </td>
 
             <!-- Created By -->
             <td class="px-3 py-2 border-b border-slate-200">{{ t.created_by }}</td>
@@ -267,22 +272,22 @@
             <!-- Photo -->
             <td class="px-3 py-2 border-b border-slate-200">
                 {% set attachments = t.images or [] %}
+                {% set ns = namespace(photos=[]) %}
                 {% if attachments %}
-                <div class="flex flex-wrap gap-1">
-                    {% for image in attachments %}
-                    <a href="/{{ image.image_path }}"
+                  {% set ns.photos = attachments | map(attribute='image_path') | map('replace','\\\\','/') | list %}
+                {% elif t.image_path %}
+                  {% set ns.photos = [t.image_path | replace('\\','/')] %}
+                {% endif %}
+                {% if ns.photos %}
+                <div class="flex flex-wrap gap-1 items-center">
+                    {% for p in ns.photos %}
+                    <a href="/{{ p }}"
                        target="_blank"
                        class="text-[11px] text-brandBlue hover:underline">
                         Photo {{ loop.index }}
                     </a>
                     {% endfor %}
                 </div>
-                {% elif t.image_path %}
-                <a href="/{{ t.image_path }}"
-                   target="_blank"
-                   class="text-[11px] text-brandBlue hover:underline">
-                    View
-                </a>
                 {% else %}
                 <span class="text-[11px] text-slate-400">None</span>
                 {% endif %}

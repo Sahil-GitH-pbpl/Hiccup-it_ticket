@@ -28,6 +28,7 @@ from app.core.config import get_settings
 from urllib.parse import quote_plus
 import json
 from app.models.hiccup import Hiccup
+from app.models.infra import InfraTicket
 from app.schemas.hiccup import HiccupResponse
 
 import app.models  # ensure all models register before metadata creation
@@ -147,6 +148,52 @@ def _ensure_infra_ticket_autoincrement(engine):
 
 _ensure_infra_ticket_autoincrement(engine)
 
+
+def _ensure_infra_ticket_images_autoincrement(engine):
+    inspector = inspect(engine)
+    try:
+        cols = inspector.get_columns("infra_ticket_images")
+    except NoSuchTableError:
+        return
+    img_col = next((c for c in cols if c.get("name") == "image_id"), None)
+    if not img_col:
+        return
+    is_auto = str(img_col.get("autoincrement", "")).lower() in {"true", "auto"}
+    if is_auto:
+        return
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "ALTER TABLE infra_ticket_images MODIFY COLUMN image_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY"
+            )
+        )
+
+
+_ensure_infra_ticket_images_autoincrement(engine)
+
+
+def _ensure_infra_updates_autoincrement(engine):      
+    inspector = inspect(engine)
+    try:
+        cols = inspector.get_columns("infra_updates")
+    except NoSuchTableError:
+        return
+    upd_col = next((c for c in cols if c.get("name") == "update_id"), None)
+    if not upd_col:
+        return
+    is_auto = str(upd_col.get("autoincrement", "")).lower() in {"true", "auto"}
+    if is_auto:
+        return
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "ALTER TABLE infra_updates MODIFY COLUMN update_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY"
+            )
+        )
+
+
+_ensure_infra_updates_autoincrement(engine)
+
 settings = get_settings()
 
 
@@ -226,6 +273,35 @@ def create_app() -> FastAPI:
         hiccup_responded = db.query(Hiccup).filter(Hiccup.status == "Responded").count()
         hiccup_closed = db.query(Hiccup).filter(Hiccup.status == "Closed").count()
 
+        infra_total = db.query(InfraTicket).count()
+        infra_open = (
+            db.query(InfraTicket)
+            .filter(InfraTicket.status.notin_(["Resolved", "Rejected"]))
+            .count()
+        )
+        infra_resolved = (
+            db.query(InfraTicket).filter(InfraTicket.status == "Resolved").count()
+        )
+        infra_delayed = (
+            db.query(InfraTicket).filter(InfraTicket.is_delayed_pick == True).count()
+        )
+        infra_invalid = (
+            db.query(InfraTicket).filter(InfraTicket.is_invalid == True).count()
+        )
+
+        latest_infra = (
+            db.query(InfraTicket)
+            .order_by(InfraTicket.ticket_id.desc(), InfraTicket.created_at.desc())
+            .limit(5)
+            .all()
+        )
+        latest_hiccups = (
+            db.query(Hiccup)
+            .order_by(Hiccup.created_at.desc())
+            .limit(5)
+            .all()
+        )
+
         return templates.TemplateResponse(
             "dashboard_combined.html",
             {
@@ -237,6 +313,15 @@ def create_app() -> FastAPI:
                     "responded": hiccup_responded,
                     "closed": hiccup_closed,
                 },
+                "infra": {
+                    "total": infra_total,
+                    "open": infra_open,
+                    "resolved": infra_resolved,
+                    "delayed": infra_delayed,
+                    "invalid": infra_invalid,
+                },
+                "latest_infra": latest_infra,
+                "latest_hiccups": latest_hiccups,
             },
         )
 

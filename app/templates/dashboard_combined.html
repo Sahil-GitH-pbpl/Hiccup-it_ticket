@@ -8,15 +8,17 @@
   <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
     <div>
       <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Overview</p>
-      <h2 class="text-3xl font-semibold text-slate-900">Hiccup Overview</h2>
-      <p class="text-sm text-slate-600">Quick stats and shortcuts for hiccups.</p>
+      <h2 class="text-3xl font-semibold text-slate-900">Operational Dashboard</h2>
+      <p class="text-sm text-slate-600">One view for hiccups and infra tickets.</p>
     </div>
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <a href="/raise" class="rounded-xl border border-tealbrand px-4 py-2 text-sm font-semibold text-tealbrand hover:bg-tealbrand hover:text-white transition">Create Hiccup</a>
+      <a href="/infra/create-form" class="rounded-xl border border-tealbrand px-4 py-2 text-sm font-semibold text-tealbrand hover:bg-tealbrand hover:text-white transition">Create IT Ticket</a>
     </div>
   </div>
 
-  <div class="grid gap-4">
+  <div class="grid gap-4 md:grid-cols-2">
+    <!-- Hiccup block -->
     <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 space-y-4">
       <div class="flex items-center justify-between">
         <div>
@@ -47,6 +49,100 @@
         <a class="chip" href="/raise">Create hiccup</a>
         <a class="chip" href="/my-hiccups">My hiccups</a>
         <a class="chip" href="/assigned">Assigned to me</a>
+      </div>
+    </div>
+
+    <!-- Infra block -->
+    <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">IT Tickets</p>
+          <h3 class="text-xl font-semibold text-slate-900">Infra & IT support</h3>
+        </div>
+        <a class="text-sm font-semibold text-tealbrand hover:text-tealbrand-dark" href="/infra/all">View all</a>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="dash-card">
+          <p class="label">Total</p>
+          <p class="value">{{ infra.total }}</p>
+        </div>
+        <div class="dash-card">
+          <p class="label">Open</p>
+          <p class="value text-amber-700">{{ infra.open }}</p>
+        </div>
+        <div class="dash-card">
+          <p class="label">Resolved</p>
+          <p class="value text-emerald-700">{{ infra.resolved }}</p>
+        </div>
+        <div class="dash-card">
+          <p class="label">Delayed / Invalid</p>
+          <p class="value text-rose-700">{{ infra.delayed }} / {{ infra.invalid }}</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <a class="chip" href="/infra/create-form">Create IT ticket</a>
+        <a class="chip" href="/my-tickets">My IT tickets</a>
+        <a class="chip" href="/infra/dashboard">IT dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent activity -->
+  <div class="grid gap-4 md:grid-cols-2">
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 space-y-3 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">Latest IT tickets</p>
+          <h4 class="text-lg font-semibold text-slate-900">Recent picks</h4>
+        </div>
+        <a class="text-xs font-semibold text-tealbrand hover:text-tealbrand-dark" href="/infra/all">See all</a>
+      </div>
+      <div class="divide-y divide-slate-200">
+        {% for t in latest_infra %}
+        <div class="py-3 flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-semibold text-brandText">#{{ t.ticket_id }} · {{ t.category }}{% if t.subcategory %} / {{ t.subcategory }}{% endif %}</p>
+            <p class="text-xs text-slate-600">{{ t.description[:110] ~ ('…' if t.description|length > 110 else '') }}</p>
+            <p class="text-xs text-slate-500 mt-1">
+              {{ t.department }} · {% if t.commitment_time %}Commitment {{ t.commitment_time.strftime('%d-%m %H:%M') }}{% else %}No commitment{% endif %}
+            </p>
+          </div>
+          <div class="text-right space-y-1">
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-slate-100 text-slate-700">{{ t.status }}</span>
+            {% if t.is_delayed_pick %}<div class="text-[11px] font-semibold text-rose-600">Delayed</div>{% endif %}
+          </div>
+        </div>
+        {% else %}
+        <div class="py-6 text-sm text-slate-500 text-center">No tickets yet.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-5 space-y-3 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-[0.2em] text-slate-500 font-semibold">Latest Hiccups</p>
+          <h4 class="text-lg font-semibold text-slate-900">Recent submissions</h4>
+        </div>
+        <a class="text-xs font-semibold text-tealbrand hover:text-tealbrand-dark" href="/management">See all</a>
+      </div>
+      <div class="divide-y divide-slate-200">
+        {% for h in latest_hiccups %}
+        <div class="py-3 flex items-start justify-between gap-3">
+          <div>
+            <p class="text-sm font-semibold text-brandText">{{ h.hiccup_id }} · {{ h.hiccup_type }}</p>
+            <p class="text-xs text-slate-600">{{ h.description[:110] ~ ('…' if h.description|length > 110 else '') }}</p>
+            <p class="text-xs text-slate-500 mt-1">
+              Raised by {{ h.raised_by_name or 'User' }} · {{ h.created_at.strftime('%d-%m %H:%M') if h.created_at else '-' }}
+            </p>
+          </div>
+          <div class="text-right space-y-1">
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold bg-slate-100 text-slate-700">{{ h.status }}</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="py-6 text-sm text-slate-500 text-center">No hiccups yet.</div>
+        {% endfor %}
       </div>
     </div>
   </div>

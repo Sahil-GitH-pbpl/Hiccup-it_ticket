@@ -339,3 +339,755 @@ sqlalchemy.exc.InvalidRequestError: Mapper 'Mapper[InfraTicket(infra_tickets)]' 
 2026-01-06 17:27:26,490 [INFO] app.api.routes_infra: WA[ac4a1892] -> sendMessage | target=918126382045 | len=200
 2026-01-06 17:27:26,586 [INFO] app.api.routes_infra: WA[ac4a1892] <- status=200 | body={"success":true}
 2026-01-06 17:27:26,586 [INFO] app.api.routes_infra: InvalidNotify sent | ticket_id=5 contact=8126382045
+2026-01-06 18:04:05,559 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=6 created_by=Rohit Bisht dept=Other category=Other
+2026-01-06 18:04:05,561 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=6 | msg_len=194
+2026-01-06 18:04:05,562 [INFO] app.api.routes_infra: WA[6a6a2199] -> sendMessage | target=120363141953100908@g.us | len=194
+2026-01-06 18:04:05,796 [INFO] app.api.routes_infra: WA[6a6a2199] <- status=200 | body={"success":true}
+2026-01-06 18:04:05,801 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-06 18:12:19,074 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=1 created_by=Rohit Bisht dept=Other category=Other
+2026-01-06 18:12:19,076 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=1 | msg_len=200
+2026-01-06 18:12:19,077 [INFO] app.api.routes_infra: WA[b9f5b19f] -> sendMessage | target=120363141953100908@g.us | len=200
+2026-01-06 18:12:19,312 [INFO] app.api.routes_infra: WA[b9f5b19f] <- status=200 | body={"success":true}
+2026-01-06 18:12:19,316 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-06 18:23:57,915 [INFO] app.api.routes_infra: WA[4d9ec034] -> sendMessage | target=918126382045 | len=119
+2026-01-06 18:23:58,038 [INFO] app.api.routes_infra: WA[4d9ec034] <- status=200 | body={"success":true}
+2026-01-06 18:23:58,040 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=1
+2026-01-06 18:25:43,436 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=2 created_by=Rohit Bisht dept=Other category=Other
+2026-01-06 18:25:43,436 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=2 | msg_len=204
+2026-01-06 18:25:43,436 [INFO] app.api.routes_infra: WA[4d40bbb6] -> sendMessage | target=120363141953100908@g.us | len=204
+2026-01-06 18:25:43,639 [INFO] app.api.routes_infra: WA[4d40bbb6] <- status=200 | body={"success":true}
+2026-01-06 18:25:43,641 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-06 18:26:31,753 [INFO] app.api.routes_infra: WA[bf99eba8] -> sendMessage | target=918126382045 | len=119
+2026-01-06 18:26:31,834 [INFO] app.api.routes_infra: WA[bf99eba8] <- status=200 | body={"success":true}
+2026-01-06 18:26:31,835 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=2
+2026-01-07 12:18:50,380 [INFO] app.api.routes_infra: WA[1a37ed65] -> sendMessage | target=918126382045 | len=157
+2026-01-07 12:18:50,455 [INFO] app.api.routes_infra: WA[1a37ed65] <- status=200 | body={"success":true}
+2026-01-07 12:18:50,462 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=1 contact=8126382045
+2026-01-07 19:30:59,780 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 19:30:59,882 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 19:31:00,019 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 19:31:21,560 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 19:31:22,433 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 20:30:59,672 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 20:31:21,259 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 20:31:22,164 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 21:30:59,368 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 21:31:20,935 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 21:31:21,840 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 22:30:59,121 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 22:31:20,686 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 22:31:21,592 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 23:30:58,886 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 23:31:20,449 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-07 23:31:21,359 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 00:30:58,651 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 00:31:20,209 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 00:31:21,111 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 01:30:58,423 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 01:31:19,977 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 01:31:20,887 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 02:30:58,144 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 02:31:19,695 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 02:31:20,603 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 03:30:57,898 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 03:31:19,448 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 03:31:20,358 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 04:30:57,585 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 04:31:19,132 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 04:31:20,042 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 05:30:57,278 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 05:31:18,812 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 05:31:19,721 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 06:30:56,967 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 06:31:18,498 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 06:31:19,411 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 07:30:56,638 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 07:31:18,167 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 07:31:19,083 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 08:30:56,339 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 08:31:17,848 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 08:31:18,764 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 09:30:56,007 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 09:31:17,514 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 09:31:18,429 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 10:30:55,717 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 10:31:17,223 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 10:31:18,137 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 11:30:55,337 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 11:31:16,841 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 11:31:17,756 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 12:30:55,055 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 12:31:16,557 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 12:31:17,473 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 13:30:54,815 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 13:31:16,315 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 13:31:17,232 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 14:30:54,468 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 14:31:15,974 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 14:31:16,883 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 15:30:54,169 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 15:31:15,678 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 15:31:16,580 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 16:30:53,875 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 16:31:15,375 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 16:31:16,274 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 17:30:53,587 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 17:31:15,088 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 17:31:15,987 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 18:30:53,346 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 18:31:14,848 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 18:31:15,746 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 19:30:53,031 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 19:31:14,528 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 19:31:15,429 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 20:30:52,799 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 20:31:14,283 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 20:31:15,183 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 21:30:52,554 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 21:31:14,027 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 21:31:14,930 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 22:30:52,166 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 22:31:13,639 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 22:31:14,542 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 23:30:51,841 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 23:31:13,315 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-08 23:31:14,217 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 00:30:51,564 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 00:31:13,038 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 00:31:13,939 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 01:30:51,169 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 01:31:12,639 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 01:31:13,541 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 02:30:50,853 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 02:31:12,327 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 02:31:13,228 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 03:30:50,624 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 03:31:12,097 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 03:31:12,999 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 04:30:50,388 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 04:31:11,861 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 04:31:12,763 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 05:30:50,024 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 05:31:11,495 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 05:31:12,397 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 06:30:49,635 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 06:31:11,107 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 06:31:12,007 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 07:30:49,132 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 07:31:10,604 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 07:31:11,504 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 08:30:48,539 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 08:31:10,010 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 08:31:10,910 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 09:30:48,086 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 09:31:09,556 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 09:31:10,456 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 10:30:47,565 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 10:31:09,036 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 10:31:09,936 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 11:30:47,064 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 11:31:08,528 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-09 11:31:09,423 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:02:32,116 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:02:32,163 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:02:32,192 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:02:56,348 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:02:56,983 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:02:56,990 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:03:11,890 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:03:12,218 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:03:15,034 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:06:11,886 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=1 created_by=Rohit Bisht dept=Other category=Other
+2026-01-10 20:06:11,895 [WARNING] app.api.routes_infra: WA notify skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:06:15,128 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:06:31,052 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:06:34,070 [INFO] app.api.routes_infra: WA[540984dc] -> sendMessage | target=918126382045 | len=119
+2026-01-10 20:06:34,217 [INFO] app.api.routes_infra: WA[540984dc] <- status=200 | body={"success":true}
+2026-01-10 20:06:34,219 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=1
+2026-01-10 20:06:34,262 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 20:37:52,046 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 21:03:11,372 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 21:03:11,686 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 21:03:14,637 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 22:03:10,705 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 22:03:11,044 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 22:03:13,966 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 23:03:10,029 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 23:03:10,369 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-10 23:03:13,306 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 00:03:09,128 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 00:03:09,467 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 00:03:12,405 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 00:14:48,196 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 00:14:52,839 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 00:14:55,869 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 01:03:08,464 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 01:03:08,785 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 01:03:11,723 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 02:03:07,855 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 02:03:08,175 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 02:03:11,113 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 03:03:06,960 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 03:03:07,278 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 03:03:10,216 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 04:03:06,156 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 04:03:06,473 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 04:03:09,412 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 05:03:05,617 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 05:03:05,935 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 05:03:08,873 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 06:03:05,051 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 06:03:05,366 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 06:03:08,303 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 07:03:04,499 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 07:03:04,814 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 07:03:07,751 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 08:03:03,891 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 08:03:04,205 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 08:03:07,144 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 09:03:03,189 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 09:03:03,507 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 09:03:06,444 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 10:03:02,526 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 10:03:02,842 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 10:03:05,778 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 11:03:01,825 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 11:03:02,140 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 11:03:05,076 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 11:36:49,535 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 12:03:01,087 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 12:03:01,403 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 12:03:04,338 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 13:03:00,595 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 13:03:00,910 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 13:03:03,843 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 14:02:59,875 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 14:03:00,191 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 14:03:03,124 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 15:02:59,320 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 15:02:59,632 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 15:03:02,560 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 16:02:58,687 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 16:02:58,996 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 16:03:01,922 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 17:02:58,105 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 17:02:58,412 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 17:03:01,342 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 18:02:57,480 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 18:02:57,787 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 18:03:00,718 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 19:02:56,785 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 19:02:57,091 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 19:03:00,026 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 20:02:56,070 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 20:02:56,376 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 20:02:59,312 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 21:02:55,349 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 21:02:55,651 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 21:02:58,588 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 22:02:54,375 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 22:02:54,676 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 22:02:57,613 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 23:02:53,522 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 23:02:53,821 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-11 23:02:56,758 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 00:02:52,599 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 00:02:52,898 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 00:02:55,836 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 01:02:51,644 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 01:02:51,944 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 01:02:54,882 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 02:02:50,151 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 02:02:50,452 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 02:02:53,389 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 03:02:49,305 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 03:02:49,593 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 03:02:52,530 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 04:02:48,786 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 04:02:49,064 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 04:02:52,002 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 05:02:48,181 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 05:02:48,458 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 05:02:51,396 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 06:02:47,419 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 06:02:47,695 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 06:02:50,632 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 07:02:46,634 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 07:02:46,910 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 07:02:49,847 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 08:02:45,910 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 08:02:46,186 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 08:02:49,122 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 09:02:45,072 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 09:02:45,348 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 09:02:48,284 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 10:02:44,186 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 10:02:44,461 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 10:02:47,397 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 11:02:43,307 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 11:02:43,582 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 11:02:46,517 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 11:32:50,405 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=2 created_by=Rohit Bisht dept=Other category=Other
+2026-01-12 11:32:50,407 [WARNING] app.api.routes_infra: WA notify skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 11:37:05,058 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 11:37:16,885 [INFO] app.api.routes_infra: WA[13cb20e9] -> sendMessage | target=918126382045 | len=157
+2026-01-12 11:37:17,882 [INFO] app.api.routes_infra: WA[13cb20e9] <- status=200 | body={"success":true}
+2026-01-12 11:37:17,886 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=1 contact=8126382045
+2026-01-12 11:37:18,727 [WARNING] app.api.routes_infra: WA reminder skipped: WHATSAPP_GROUP_TARGET missing
+2026-01-12 11:47:34,581 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=3 created_by=Rohit Bisht dept=Other category=Other
+2026-01-12 11:47:34,585 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=3 | msg_len=213
+2026-01-12 11:47:34,587 [INFO] app.api.routes_infra: WA[6e175b80] -> sendMessage | target=120363141953100908@g.us | len=213
+2026-01-12 11:47:35,095 [INFO] app.api.routes_infra: WA[6e175b80] <- status=200 | body={"success":true}
+2026-01-12 11:47:35,096 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-12 12:16:29,939 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 297, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 258, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-12 12:16:29,907 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 297, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 258, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-12 12:16:29,902 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 297, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 258, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-12 12:24:48,932 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=1 created_by=Rohit Bisht dept=Other category=Other
+2026-01-12 12:24:48,936 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=1 | msg_len=209
+2026-01-12 12:24:48,937 [INFO] app.api.routes_infra: WA[677b2785] -> sendMessage | target=120363141953100908@g.us | len=209
+2026-01-12 12:24:49,099 [INFO] app.api.routes_infra: WA[677b2785] <- status=200 | body={"success":true}
+2026-01-12 12:24:49,100 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}

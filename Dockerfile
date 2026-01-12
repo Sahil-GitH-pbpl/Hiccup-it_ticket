@@ -14,4 +14,4 @@ RUN mkdir -p /app/logs /app/uploads
 
 EXPOSE 7410
 
-CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:7410", "--workers", "3"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7410", "--workers", "3"]
