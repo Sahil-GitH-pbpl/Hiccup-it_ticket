@@ -7,6 +7,7 @@ from app.core.security import (
     require_management,
     TokenData,
     decode_public_token,
+    is_allowlisted_hiccup_admin,
 )
 from app.db.session import SessionLocal
 from app.schemas.hiccup import (
@@ -21,6 +22,7 @@ from app.schemas.hiccup import (
 )
 from app.services import hiccup_service
 from app.services.notification_service import notify_on_creation
+from app.models.staff import Staff
 
 router = APIRouter(prefix="/api/hiccups", tags=["hiccups"])
 
@@ -124,11 +126,21 @@ def public_respond(
     hiccup = hiccup_service.get_hiccup(db, hiccup_id)
     if hiccup.response_text:
         raise HTTPException(status_code=400, detail="Response already submitted")
+    if not token_data.get("user_id"):
+        raise HTTPException(status_code=422, detail="public token missing user")
+    dept_id = token_data.get("department_id")
+    resolved_name = token_data.get("name") or "External"
+    if not token_data.get("name") and token_data.get("user_id"):
+        staff = db.query(Staff).filter(Staff.id == token_data["user_id"]).first()
+        if staff:
+            resolved_name = staff.name or resolved_name
+            if not dept_id:
+                dept_id = staff.department_id
     user = TokenData(
         user_id=int(token_data["user_id"]),
         role=token_data.get("role", "external"),
-        department_id=token_data.get("department_id"),
-        name=token_data.get("name", "External"),
+        department_id=dept_id,
+        name=resolved_name,
     )
     return hiccup_service.respond(db, user, hiccup_id, payload.response_text, allow_public=True)
 
@@ -138,8 +150,20 @@ def update_status(
     hiccup_id: str,
     payload: StatusUpdateRequest,
     db: Session = Depends(get_db),
-    user=Depends(require_management),
+    user=Depends(get_current_user),
 ):
+    hiccup = hiccup_service.get_hiccup(db, hiccup_id)
+    is_mgmt = is_allowlisted_hiccup_admin(getattr(user, "user_id", None)) or str(
+        getattr(user, "role", "")
+    ).lower() in {"admin", "management"} or getattr(user, "is_admin_like", False)
+    is_assigned_nc = (
+        hiccup.status == "Escalated to NC"
+        and hiccup.nc_assigned_staff_id
+        and str(hiccup.nc_assigned_staff_id) == str(user.user_id)
+    )
+    if not is_mgmt:
+        if not (payload.status == "Closed" and is_assigned_nc):
+            raise HTTPException(status_code=403, detail="Management designation required")
     return hiccup_service.update_status(
         db,
         user,

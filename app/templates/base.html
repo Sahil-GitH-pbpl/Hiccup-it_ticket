@@ -29,13 +29,19 @@
           name: "{{ user.name }}",
           department_id: {{ user.department_id if user.department_id is not none else "null" }},
           designation: "{{ user.designation or '' }}",
+          is_admin_like: {{ 'true' if (is_admin_like if is_admin_like is defined else user.is_admin_like if user.is_admin_like is defined else False) else 'false' }},
+          is_infra_admin: {{ 'true' if (user.is_infra_admin if user.is_infra_admin is defined else False) else 'false' }},
         }
         {% else %}
         {}
         {% endif %};
       {% set _designation = (user.designation if user is defined and user else '')|lower %}
       {% set _role = (user.role if user is defined and user else '')|lower %}
-      {% set _is_admin_like = 'admin' in _designation or 'it' in _designation or 'infra' in _designation or 'admin' in _role or 'it' in _role or 'infra' in _role %}
+      {% if is_admin_like is defined %}
+        {% set _is_admin_like = is_admin_like %}
+      {% else %}
+        {% set _is_admin_like = 'admin' in _designation or 'it' in _designation or 'infra' in _designation or 'admin' in _role or 'it' in _role or 'infra' in _role %}
+      {% endif %}
       window.serverIsAdmin = {{ 'true' if _is_admin_like else 'false' }};
     </script>
     {% block head_extra %}{% endblock %}
@@ -69,6 +75,12 @@
       }
       header nav a:hover {
         color: #0db29c;
+      }
+      body.no-nav header {
+        display: none;
+      }
+      body.no-nav .app-content-wrapper {
+        margin-top: 0;
       }
       .nav-dropdown {
         position: absolute;
@@ -242,14 +254,19 @@
             </div>
           </a>
           <nav class="desktop-nav flex flex-wrap items-center gap-6 text-sm font-semibold text-slate-700">
+            {% if not is_admin_like %}
+            <a href="/home" class="hover:text-tealbrand transition-colors">My Desk</a>
+            {% endif %}
+            {% if _is_admin_like %}
             <a href="/dashboard" class="hover:text-tealbrand transition-colors">Dashboard</a>
+            {% endif %}
 
             <div class="relative nav-dropdown-parent">
               <button id="nav-hiccup-toggle" class="hover:text-tealbrand transition-colors font-semibold">Hiccup &#9662;</button>
               <div id="nav-hiccup-menu" class="nav-dropdown hidden">
                 <a href="/raise" class="nav-dropdown__item">Create Hiccup</a>
                 <a href="/my-hiccups" class="nav-dropdown__item">My Hiccups</a>
-            {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+            {% if user is defined and user and (user.is_admin_like if user.is_admin_like is defined else false) %}
             <a id="nav-hic-all" href="/management" class="nav-dropdown__item">All Hiccups</a>
             {% endif %}
             <a href="/assigned" class="nav-dropdown__item">Assigned to Me</a>
@@ -260,10 +277,18 @@
               <button id="nav-it-toggle" class="hover:text-tealbrand transition-colors font-semibold">IT Ticket &#9662;</button>
               <div id="nav-it-menu" class="nav-dropdown hidden">
                 <a href="/infra/create-form" class="nav-dropdown__item">Create IT Ticket</a>
-                <a href="/my-tickets" class="nav-dropdown__item">My IT Tickets</a>
-            {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+              <a href="/my-tickets" class="nav-dropdown__item">My IT Tickets</a>
+          {% if user is defined and user and (
+              (user.is_infra_admin if user.is_infra_admin is defined else false)
+              or ('admin' in (user.designation or '')|lower)
+              or ('it' in (user.designation or '')|lower)
+              or ('infra' in (user.designation or '')|lower)
+              or ('admin' in (user.role or '')|lower)
+              or ('it' in (user.role or '')|lower)
+              or ('infra' in (user.role or '')|lower)
+            ) %}
             <a id="nav-it-all" href="/infra/all" class="nav-dropdown__item">All IT Tickets</a>
-            {% endif %}
+          {% endif %}
           </div>
         </div>
 
@@ -293,13 +318,18 @@
         </div>
         <div class="mobile-nav-section">
           <div class="mobile-nav-section-title">Main</div>
+         {% if not is_admin_like %}
+         <a href="/home" class="mobile-nav-link">My Desk</a>
+         {% endif %}
+          {% if _is_admin_like %}
           <a href="/dashboard" class="mobile-nav-link">Dashboard</a>
+          {% endif %}
         </div>
         <div class="mobile-nav-section">
           <div class="mobile-nav-section-title">Hiccup</div>
           <a href="/raise" class="mobile-nav-link">Create Hiccup</a>
           <a href="/my-hiccups" class="mobile-nav-link">My Hiccups</a>
-          {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+          {% if user is defined and user and (user.is_admin_like if user.is_admin_like is defined else false) %}
           <a id="nav-hic-all-mobile" href="/management" class="mobile-nav-link">All Hiccups</a>
           {% endif %}
           <a href="/assigned" class="mobile-nav-link">Assigned to Me</a>
@@ -308,7 +338,15 @@
           <div class="mobile-nav-section-title">IT Ticket</div>
           <a href="/infra/create-form" class="mobile-nav-link">Create IT Ticket</a>
           <a href="/my-tickets" class="mobile-nav-link">My IT Tickets</a>
-          {% if user is defined and user and (('admin' in (user.designation or '')|lower) or ('it' in (user.designation or '')|lower) or ('infra' in (user.designation or '')|lower) or ('admin' in (user.role or '')|lower) or ('it' in (user.role or '')|lower) or ('infra' in (user.role or '')|lower)) %}
+          {% if user is defined and user and (
+              (user.is_infra_admin if user.is_infra_admin is defined else false)
+              or ('admin' in (user.designation or '')|lower)
+              or ('it' in (user.designation or '')|lower)
+              or ('infra' in (user.designation or '')|lower)
+              or ('admin' in (user.role or '')|lower)
+              or ('it' in (user.role or '')|lower)
+              or ('infra' in (user.role or '')|lower)
+            ) %}
           <a id="nav-it-all-mobile" href="/infra/all" class="mobile-nav-link">All IT Tickets</a>
           {% endif %}
         </div>

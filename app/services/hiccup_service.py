@@ -8,6 +8,7 @@ from typing import Dict, List, Optional
 from fastapi import HTTPException, UploadFile
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from pytz import timezone
 
 from app.models.department import Department
@@ -16,6 +17,7 @@ from app.models.escalation import NCEscalationForm
 from app.models.staff import Staff
 from app.utils.id_generator import generate_hiccup_id
 from app.core.config import get_settings
+from app.core.security import is_allowlisted_hiccup_admin
 from app.utils.time_utils import now_local
 
 settings = get_settings()
@@ -30,6 +32,16 @@ ROOT_CAUSE_LABELS = {
     "repeated_feedback": "Repeated mistake after feedback",
     "other": "Other",
 }
+
+
+def _is_management_user(user) -> bool:
+    user_id = getattr(user, "user_id", None)
+    role = str(getattr(user, "role", "") or "").lower()
+    return bool(
+        is_allowlisted_hiccup_admin(user_id)
+        or getattr(user, "is_admin_like", False)
+        or role in {"admin", "management"}
+    )
 
 
 def _parse_date(value: Optional[str]) -> Optional[date]:
@@ -432,8 +444,10 @@ def list_nc_escalations_for_assigned(db: Session, user):
     rows = (
         db.query(Hiccup)
         .filter(
-            Hiccup.status == "Escalated to NC",
-            Hiccup.nc_assigned_staff_id == user.user_id,
+            or_(
+                Hiccup.nc_assigned_staff_id == user.user_id,
+                Hiccup.raised_against == str(user.user_id),
+            )
         )
         .order_by(Hiccup.created_at.desc())
         .all()
@@ -464,6 +478,9 @@ def _can_view_nc_form(hiccup: Hiccup, user) -> bool:
         return True
     if hiccup.raised_against and str(hiccup.raised_against) == str(user.user_id):
         return True
+    if hiccup.raised_by and str(hiccup.raised_by) == str(user.user_id):
+        if hiccup.status in {"Escalated to NC", "Closed"}:
+            return True
     return False
 
 
@@ -531,9 +548,10 @@ def update_status(
             hiccup.response_text = response_text
         hiccup.response_by_name = user.name
     if status == "Closed":
-        if not closure_notes:
+        is_mgmt_user = _is_management_user(user)
+        if not closure_notes and not is_mgmt_user:
             raise HTTPException(status_code=400, detail="Closure notes required")
-        hiccup.closure_notes = closure_notes
+        hiccup.closure_notes = closure_notes or hiccup.closure_notes or ""
         hiccup.closed_at = now_local()
     if status == "Escalated to NC":
         if root_cause is not None:
@@ -545,7 +563,7 @@ def update_status(
         if escalation_form:
             _upsert_escalation_form(db, hiccup_id, escalation_form)
         hiccup.nc_assigned_staff_id = _parse_int(escalation_form.get("staff_id") if escalation_form else None)
-    else:
+    elif status != "Closed":
         hiccup.nc_assigned_staff_id = None
     if root_cause_category:
         hiccup.root_cause_category = root_cause_category

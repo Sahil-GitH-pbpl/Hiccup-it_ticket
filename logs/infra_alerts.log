@@ -1091,3 +1091,822 @@ sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000
 2026-01-12 12:24:48,937 [INFO] app.api.routes_infra: WA[677b2785] -> sendMessage | target=120363141953100908@g.us | len=209
 2026-01-12 12:24:49,099 [INFO] app.api.routes_infra: WA[677b2785] <- status=200 | body={"success":true}
 2026-01-12 12:24:49,100 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-12 13:28:33,261 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 13:28:33,263 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 13:41:53,106 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 13:41:53,094 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 13:41:53,094 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 13:56:43,602 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 13:56:43,602 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 13:56:43,608 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 14:30:01,854 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 14:30:01,855 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 14:30:01,854 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 14:57:09,504 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 14:57:09,504 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 14:57:09,505 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:03:55,790 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:03:55,790 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:03:55,790 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:13:34,709 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:13:34,714 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:13:34,714 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:27:00,830 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:27:00,828 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:27:00,863 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:33:57,568 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:33:57,568 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:33:57,569 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:39:45,008 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:39:45,008 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:39:45,024 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:43:59,135 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:43:59,135 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:43:59,131 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:49:52,737 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:49:52,751 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:49:52,756 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:53:16,222 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:53:16,222 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:53:16,222 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:59:25,208 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:59:25,197 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 15:59:25,197 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:43:08,313 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:43:08,334 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:43:08,313 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:50:57,791 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:50:57,791 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:50:57,795 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:54:46,118 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:54:46,127 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 17:54:46,152 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:12:56,146 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:12:56,146 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:12:56,146 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:19:30,477 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:19:30,509 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:19:30,510 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:26:14,249 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:26:14,255 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:26:14,271 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:31:55,449 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:31:55,449 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:31:55,467 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:36:25,136 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:36:25,138 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:36:25,143 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:36:28,506 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-12 18:47:16,563 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 18:47:24,819 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:40:49,248 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:40:49,253 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:40:49,266 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:45:19,678 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:45:19,678 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:45:19,678 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:48:38,883 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:48:38,883 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 19:48:38,883 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-12 21:17:41,848 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=220 created_by=Dr Vipul Bhasin dept=Other category=Software
+2026-01-12 21:17:41,858 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=220 | msg_len=500
+2026-01-12 21:17:41,865 [INFO] app.api.routes_infra: WA[cee7ede1] -> sendMessage | target=120363141953100908@g.us | len=500
+2026-01-12 21:17:42,259 [INFO] app.api.routes_infra: WA[cee7ede1] <- status=200 | body={"success":true}
+2026-01-12 21:17:42,260 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 08:41:08,593 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 08:41:40,064 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 08:41:45,298 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 09:43:38,777 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 09:44:01,059 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 11:36:29,723 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 11:36:29,754 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 11:36:29,817 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-13 11:36:48,921 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=14); skipping start
+2026-01-13 11:36:49,107 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=14); skipping start
+2026-01-13 13:28:55,712 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=221 created_by=Gulrez Sultan dept=Technical category=Office Infra
+2026-01-13 13:28:55,727 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=221 | msg_len=278
+2026-01-13 13:28:55,735 [INFO] app.api.routes_infra: WA[c646d6d8] -> sendMessage | target=120363141953100908@g.us | len=278
+2026-01-13 13:28:56,135 [INFO] app.api.routes_infra: WA[c646d6d8] <- status=200 | body={"success":true}
+2026-01-13 13:28:56,138 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 13:37:38,041 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=222 created_by=SALEEM JAVED dept=Customer Care category=Software
+2026-01-13 13:37:38,059 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=222 | msg_len=288
+2026-01-13 13:37:38,069 [INFO] app.api.routes_infra: WA[ea61b45c] -> sendMessage | target=120363141953100908@g.us | len=288
+2026-01-13 13:37:38,314 [INFO] app.api.routes_infra: WA[ea61b45c] <- status=200 | body={"success":true}
+2026-01-13 13:37:38,323 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 14:40:41,864 [INFO] app.api.routes_infra: WA[97083a2e] -> sendMessage | target=919818247844 | len=122
+2026-01-13 14:40:42,059 [INFO] app.api.routes_infra: WA[97083a2e] <- status=200 | body={"success":true}
+2026-01-13 14:40:42,061 [INFO] app.api.routes_infra: PickNotify sent to 9818247844 | ticket_id=221
+2026-01-13 15:35:08,559 [INFO] app.api.routes_infra: WA[f3b78d5c] -> sendMessage | target=919871366002 | len=163
+2026-01-13 15:35:08,684 [INFO] app.api.routes_infra: WA[f3b78d5c] <- status=200 | body={"success":true}
+2026-01-13 15:35:08,692 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=208 contact=9871366002
+2026-01-13 15:36:30,406 [INFO] app.api.routes_infra: WA[621f98b3] -> sendMessage | target=919654441851 | len=125
+2026-01-13 15:36:30,595 [INFO] app.api.routes_infra: WA[621f98b3] <- status=200 | body={"success":true}
+2026-01-13 15:36:30,599 [INFO] app.api.routes_infra: PickNotify sent to 9654441851 | ticket_id=222
+2026-01-13 15:36:35,073 [INFO] app.api.routes_infra: WA[8a54d6c2] -> sendMessage | target=919654441851 | len=163
+2026-01-13 15:36:35,244 [INFO] app.api.routes_infra: WA[8a54d6c2] <- status=200 | body={"success":true}
+2026-01-13 15:36:35,252 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=222 contact=9654441851
+2026-01-13 15:36:43,401 [INFO] app.api.routes_infra: WA[f6c2f97b] -> sendMessage | target=919810030372 | len=125
+2026-01-13 15:36:43,454 [INFO] app.api.routes_infra: WA[f6c2f97b] <- status=200 | body={"success":true}
+2026-01-13 15:36:43,457 [INFO] app.api.routes_infra: PickNotify sent to 9810030372 | ticket_id=220
+2026-01-13 15:36:48,140 [INFO] app.api.routes_infra: WA[894252aa] -> sendMessage | target=919810030372 | len=163
+2026-01-13 15:36:48,200 [INFO] app.api.routes_infra: WA[894252aa] <- status=200 | body={"success":true}
+2026-01-13 15:36:48,200 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=220 contact=9810030372
+2026-01-13 15:54:39,244 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=223 created_by=ANKITA dept=Other category=Software
+2026-01-13 15:54:39,250 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=223 | msg_len=310
+2026-01-13 15:54:39,253 [INFO] app.api.routes_infra: WA[18716f5c] -> sendMessage | target=120363141953100908@g.us | len=310
+2026-01-13 15:54:39,371 [INFO] app.api.routes_infra: WA[18716f5c] <- status=200 | body={"success":true}
+2026-01-13 15:54:39,372 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 15:56:13,439 [INFO] app.api.routes_infra: WA[7f60a5e8] -> sendMessage | target=918700004157 | len=125
+2026-01-13 15:56:13,519 [INFO] app.api.routes_infra: WA[7f60a5e8] <- status=200 | body={"success":true}
+2026-01-13 15:56:13,520 [INFO] app.api.routes_infra: PickNotify sent to 8700004157 | ticket_id=223
+2026-01-13 16:01:20,849 [INFO] app.api.routes_infra: WA[eaebc4bb] -> sendMessage | target=918700004157 | len=163
+2026-01-13 16:01:20,903 [INFO] app.api.routes_infra: WA[eaebc4bb] <- status=200 | body={"success":true}
+2026-01-13 16:01:20,904 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=223 contact=8700004157
+2026-01-13 16:01:54,372 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=224 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-01-13 16:01:54,374 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=224 | msg_len=281
+2026-01-13 16:01:54,375 [INFO] app.api.routes_infra: WA[d8112e9f] -> sendMessage | target=120363141953100908@g.us | len=281
+2026-01-13 16:01:54,423 [INFO] app.api.routes_infra: WA[d8112e9f] <- status=200 | body={"success":true}
+2026-01-13 16:01:54,424 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 16:03:10,888 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=225 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-01-13 16:03:10,890 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=225 | msg_len=297
+2026-01-13 16:03:10,891 [INFO] app.api.routes_infra: WA[dd487973] -> sendMessage | target=120363141953100908@g.us | len=297
+2026-01-13 16:03:10,942 [INFO] app.api.routes_infra: WA[dd487973] <- status=200 | body={"success":true}
+2026-01-13 16:03:10,943 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 16:06:08,062 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=226 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-01-13 16:06:08,066 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=226 | msg_len=293
+2026-01-13 16:06:08,069 [INFO] app.api.routes_infra: WA[576a31b1] -> sendMessage | target=120363141953100908@g.us | len=293
+2026-01-13 16:06:08,209 [INFO] app.api.routes_infra: WA[576a31b1] <- status=200 | body={"success":true}
+2026-01-13 16:06:08,210 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 19:19:15,969 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=7); skipping start
+2026-01-13 19:19:30,152 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-01-13 19:19:30,569 [INFO] app.api.routes_infra: WA[24b42804] -> sendMessage | target=120363141953100908@g.us | len=305
+2026-01-13 19:19:32,714 [INFO] app.api.routes_infra: WA[24b42804] <- status=200 | body={"success":true}
+2026-01-13 19:19:32,758 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=219 status=200
+2026-01-13 19:19:34,115 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=16); skipping start
+2026-01-13 19:47:33,284 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=227 created_by=Akshay Kumar Ram dept=House Keeping category=Other
+2026-01-13 19:47:33,287 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=227 | msg_len=377
+2026-01-13 19:47:33,289 [INFO] app.api.routes_infra: WA[d4667892] -> sendMessage | target=120363141953100908@g.us | len=377
+2026-01-13 19:47:33,397 [INFO] app.api.routes_infra: WA[d4667892] <- status=200 | body={"success":true}
+2026-01-13 19:47:33,399 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-13 19:52:25,364 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-13 19:52:25,434 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-13 19:52:25,496 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-13 19:52:35,724 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=15); skipping start
+2026-01-13 19:52:35,790 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=15); skipping start
+2026-01-13 19:52:44,621 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=22); skipping start
+2026-01-13 19:52:44,693 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=22); skipping start
+2026-01-13 19:52:53,575 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=28); skipping start
+2026-01-13 19:52:53,610 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=28); skipping start
+2026-01-13 19:53:02,831 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=35); skipping start
+2026-01-13 19:53:03,090 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=35); skipping start
+2026-01-13 19:53:14,248 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=42); skipping start
+2026-01-13 19:53:14,533 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=42); skipping start
+2026-01-13 19:53:23,794 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=49); skipping start
+2026-01-13 19:53:24,074 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=49); skipping start
+2026-01-13 19:54:21,333 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-13 19:54:21,333 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-13 19:54:33,216 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=18); skipping start
+2026-01-13 19:54:33,259 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=18); skipping start
+2026-01-13 19:54:43,701 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=23); skipping start
+2026-01-13 19:54:43,712 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=23); skipping start
+2026-01-13 19:54:56,135 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=30); skipping start
+2026-01-13 19:54:56,185 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=30); skipping start
+2026-01-13 19:55:08,798 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=38); skipping start
+2026-01-13 19:55:08,947 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=38); skipping start
+2026-01-13 19:55:20,133 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=45); skipping start
+2026-01-13 19:55:20,396 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=45); skipping start
+2026-01-13 19:55:30,144 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=52); skipping start
+2026-01-13 19:55:31,405 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=52); skipping start
+2026-01-13 19:55:40,870 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=58); skipping start
+2026-01-13 19:56:36,093 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-13 19:56:36,093 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-13 19:56:36,365 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 319, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 280, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-13 19:57:41,855 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-13 19:57:41,981 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-13 19:57:42,129 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 319, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 280, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-13 19:57:52,112 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=16); skipping start
+2026-01-13 20:22:06,040 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=228 created_by=Akshay Kumar Ram dept=House Keeping category=Other
+2026-01-13 20:22:06,042 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=228 | msg_len=406
+2026-01-13 20:22:06,046 [INFO] app.api.routes_infra: WA[b46b0b2c] -> sendMessage | target=120363141953100908@g.us | len=406
+2026-01-13 20:22:06,159 [INFO] app.api.routes_infra: WA[b46b0b2c] <- status=200 | body={"success":true}
+2026-01-13 20:22:06,160 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 11:27:26,012 [INFO] app.api.routes_infra: WA[d0d154ef] -> sendMessage | target=919958547534 | len=122
+2026-01-14 11:27:26,425 [INFO] app.api.routes_infra: WA[d0d154ef] <- status=200 | body={"success":true}
+2026-01-14 11:27:26,427 [INFO] app.api.routes_infra: PickNotify sent to 9958547534 | ticket_id=228
+2026-01-14 11:27:52,248 [INFO] app.api.routes_infra: WA[8a519bd7] -> sendMessage | target=919958547534 | len=122
+2026-01-14 11:27:52,304 [INFO] app.api.routes_infra: WA[8a519bd7] <- status=200 | body={"success":true}
+2026-01-14 11:27:52,306 [INFO] app.api.routes_infra: PickNotify sent to 9958547534 | ticket_id=227
+2026-01-14 11:28:15,821 [INFO] app.api.routes_infra: WA[f63c46e4] -> sendMessage | target=919818247844 | len=160
+2026-01-14 11:28:15,875 [INFO] app.api.routes_infra: WA[f63c46e4] <- status=200 | body={"success":true}
+2026-01-14 11:28:15,876 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=221 contact=9818247844
+2026-01-14 11:28:31,638 [INFO] app.api.routes_infra: WA[491c603d] -> sendMessage | target=918448558464 | len=160
+2026-01-14 11:28:31,698 [INFO] app.api.routes_infra: WA[491c603d] <- status=200 | body={"success":true}
+2026-01-14 11:28:31,699 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=174 contact=8448558464
+2026-01-14 11:53:28,405 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-14 11:53:43,404 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=18); skipping start
+2026-01-14 11:53:43,521 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=18); skipping start
+2026-01-14 11:53:52,856 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=24); skipping start
+2026-01-14 11:53:52,873 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=24); skipping start
+2026-01-14 11:54:01,646 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=32); skipping start
+2026-01-14 11:54:01,745 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=32); skipping start
+2026-01-14 11:54:11,916 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=40); skipping start
+2026-01-14 11:54:12,020 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=40); skipping start
+2026-01-14 11:54:21,313 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=45); skipping start
+2026-01-14 11:54:21,402 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=45); skipping start
+2026-01-14 11:54:29,490 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=52); skipping start
+2026-01-14 11:54:29,688 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=52); skipping start
+2026-01-14 11:54:37,418 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=59); skipping start
+2026-01-14 11:54:37,485 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=59); skipping start
+2026-01-14 11:54:45,590 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=66); skipping start
+2026-01-14 11:54:45,620 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=66); skipping start
+2026-01-14 11:54:54,692 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=73); skipping start
+2026-01-14 11:54:54,706 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=73); skipping start
+2026-01-14 11:55:05,889 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=80); skipping start
+2026-01-14 11:55:06,195 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=80); skipping start
+2026-01-14 11:55:14,907 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=87); skipping start
+2026-01-14 11:55:15,259 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=87); skipping start
+2026-01-14 11:55:23,666 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=94); skipping start
+2026-01-14 11:55:23,864 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=94); skipping start
+2026-01-14 11:55:33,677 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=101); skipping start
+2026-01-14 11:55:34,711 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=101); skipping start
+2026-01-14 11:55:44,830 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=110); skipping start
+2026-01-14 11:55:46,189 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=110); skipping start
+2026-01-14 11:55:57,225 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=115); skipping start
+2026-01-14 11:55:57,488 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=115); skipping start
+2026-01-14 11:56:07,809 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=123); skipping start
+2026-01-14 11:56:08,412 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=123); skipping start
+2026-01-14 11:56:16,943 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=130); skipping start
+2026-01-14 11:56:17,566 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=130); skipping start
+2026-01-14 11:56:26,981 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=136); skipping start
+2026-01-14 11:56:27,785 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=136); skipping start
+2026-01-14 11:56:37,898 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=143); skipping start
+2026-01-14 11:56:38,161 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=143); skipping start
+2026-01-14 11:56:45,931 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=150); skipping start
+2026-01-14 11:56:46,697 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=150); skipping start
+2026-01-14 11:56:57,484 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=157); skipping start
+2026-01-14 11:56:58,889 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=157); skipping start
+2026-01-14 11:57:09,024 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=165); skipping start
+2026-01-14 11:57:09,283 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=165); skipping start
+2026-01-14 11:57:18,417 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=172); skipping start
+2026-01-14 11:57:19,155 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=172); skipping start
+2026-01-14 11:57:31,231 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=178); skipping start
+2026-01-14 11:57:31,677 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=178); skipping start
+2026-01-14 12:03:11,457 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-01-14 12:03:11,487 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-01-14 12:03:11,673 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 319, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 280, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-14 12:03:24,543 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=16); skipping start
+2026-01-14 12:07:42,339 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:18:20,541 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:18:20,543 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:18:20,554 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:26:17,091 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:26:17,093 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:26:17,093 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:29:27,976 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:29:28,042 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:29:28,042 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:32:51,538 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:32:51,581 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:32:51,581 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:43:42,335 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:43:42,335 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:43:42,335 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:48:40,243 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:48:40,246 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:48:40,312 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:52:20,643 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:52:20,643 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 12:52:20,644 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:01:13,927 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:01:13,931 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:01:14,094 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:05:01,553 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:05:01,564 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:05:01,629 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:24:50,194 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:24:50,201 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:24:50,273 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:28:05,724 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:28:05,724 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:28:05,725 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:33:20,572 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:33:20,572 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:33:20,600 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:36:49,280 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:36:49,286 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:36:49,297 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:45:34,218 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:45:34,220 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:45:34,231 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:48:35,593 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:48:35,611 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:48:35,626 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:50:38,080 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:50:38,082 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:50:38,088 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:56:02,457 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:56:02,464 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:56:02,466 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:57:55,733 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:57:55,733 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 13:57:55,733 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:01:02,878 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:01:02,889 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:01:02,889 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:03:54,556 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:03:54,575 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:03:54,579 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:27:10,982 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:27:11,033 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:27:11,212 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:29:13,616 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:29:13,620 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 14:29:13,629 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 15:36:05,116 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=229 created_by=Ritu Mahalwal dept=Customer Care category=Office Infra
+2026-01-14 15:36:05,128 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=229 | msg_len=265
+2026-01-14 15:36:05,137 [INFO] app.api.routes_infra: WA[38ec90aa] -> sendMessage | target=120363141953100908@g.us | len=265
+2026-01-14 15:36:05,192 [INFO] app.api.routes_infra: WA[38ec90aa] <- status=200 | body={"success":true}
+2026-01-14 15:36:05,193 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 16:08:47,102 [INFO] app.api.routes_infra: InfraReminder -> processing 3 pending tickets
+2026-01-14 16:08:47,103 [INFO] app.api.routes_infra: WA[c76e484e] -> sendMessage | target=120363141953100908@g.us | len=283
+2026-01-14 16:08:47,251 [INFO] app.api.routes_infra: WA[c76e484e] <- status=200 | body={"success":true}
+2026-01-14 16:08:47,254 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=224 status=200
+2026-01-14 16:08:47,255 [INFO] app.api.routes_infra: WA[86baa95d] -> sendMessage | target=120363141953100908@g.us | len=299
+2026-01-14 16:08:47,442 [INFO] app.api.routes_infra: WA[86baa95d] <- status=200 | body={"success":true}
+2026-01-14 16:08:47,443 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=225 status=200
+2026-01-14 16:08:47,444 [INFO] app.api.routes_infra: WA[c11afc91] -> sendMessage | target=120363141953100908@g.us | len=295
+2026-01-14 16:08:47,727 [INFO] app.api.routes_infra: WA[c11afc91] <- status=200 | body={"success":true}
+2026-01-14 16:08:47,729 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=226 status=200
+2026-01-14 16:21:22,999 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=230 created_by=Ritu Mahalwal dept=Customer Care category=Office Infra
+2026-01-14 16:21:23,003 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=230 | msg_len=257
+2026-01-14 16:21:23,008 [INFO] app.api.routes_infra: WA[aa718ebb] -> sendMessage | target=120363141953100908@g.us | len=257
+2026-01-14 16:21:23,092 [INFO] app.api.routes_infra: WA[aa718ebb] <- status=200 | body={"success":true}
+2026-01-14 16:21:23,102 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 16:25:02,077 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:25:02,077 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:25:02,080 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:33:32,958 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:33:32,970 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:33:32,970 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:36:58,266 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:36:58,266 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 16:36:58,266 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 17:12:40,263 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 17:12:40,263 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 17:12:40,264 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 18:21:48,081 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=231 created_by=Shahana Parveen dept=Marketing category=Software
+2026-01-14 18:21:48,119 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=231 | msg_len=385
+2026-01-14 18:21:48,162 [INFO] app.api.routes_infra: WA[19556ea6] -> sendMessage | target=120363141953100908@g.us | len=385
+2026-01-14 18:21:49,320 [INFO] app.api.routes_infra: WA[19556ea6] <- status=200 | body={"success":true}
+2026-01-14 18:21:49,418 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 18:23:47,338 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 18:23:47,337 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 18:23:47,374 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 18:26:56,386 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 18:26:56,386 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 18:26:56,386 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-14 18:27:05,380 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=15); skipping start

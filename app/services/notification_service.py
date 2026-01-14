@@ -9,17 +9,29 @@ from sqlalchemy.orm import Session
 from app.integrations.whatsapp_client import send_bulk
 from app.core.config import get_settings
 from app.services.report_service import recent_stats
-from app.services.hiccup_service import trend_alerts, low_reporters
+from app.services.hiccup_service import trend_alerts
 from app.models.department import Department
 from app.models.hiccup import Hiccup
 from app.models.staff import Staff
 from app.utils.time_utils import now_local
-from app.core.security import create_jwt
+from app.core.security import create_public_response_token
 from pytz import timezone
 from urllib.parse import quote_plus
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+
+def _dedup_numbers(numbers: List[str]) -> List[str]:
+    seen = set()
+    deduped = []
+    for n in numbers:
+        v = (n or "").strip()
+        if not v or v in seen:
+            continue
+        seen.add(v)
+        deduped.append(v)
+    return deduped
 
 
 def _localize_timestamp(value: datetime | None) -> datetime | None:
@@ -41,7 +53,7 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
         staff = _get_staff(db, hiccup.raised_against)
         if staff and staff.contact:
             numbers.append(staff.contact)
-            public_token = create_jwt(
+            public_token = create_public_response_token(
                 {
                     "user_id": staff.id,
                     "role": "external",
@@ -68,8 +80,8 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
 
     if public_token:
         token_param = quote_plus(public_token)
-        internal_url = f"{internal_host}/wa/redirect/{hiccup.hiccup_id}?public_token={token_param}"
-        external_url = f"{external_host}/wa/redirect/{hiccup.hiccup_id}?public_token={token_param}"
+        internal_url = f"{internal_host}/wa/redirect/{hiccup.hiccup_id}?t={token_param}"
+        external_url = f"{external_host}/wa/redirect/{hiccup.hiccup_id}?t={token_param}"
     else:
         internal_url = f"{internal_host}/hiccups/{hiccup.hiccup_id}"
         external_url = f"{external_host}/hiccups/{hiccup.hiccup_id}"
@@ -88,11 +100,11 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
         "Copy-paste the text box, submit it, and you're done.",
     ]
 
-    send_bulk(numbers, "\n".join(message_lines))
+    send_bulk(_dedup_numbers(numbers), "\n".join(message_lines))
 
 
 def _build_response_token(staff: Staff, hiccup: Hiccup) -> str:
-    return create_jwt(
+    return create_public_response_token(
         {
             "user_id": staff.id,
             "role": "external",
@@ -112,8 +124,8 @@ def _build_response_urls(hiccup: Hiccup, token: str) -> tuple[str, str]:
     internal_host = settings.whatsapp_response_base_url or settings.frontend_base_url
     external_host = settings.external_whatsapp_response_base_url or internal_host
     params = quote_plus(token)
-    internal_url = f"{internal_host}/public/hiccups/{hiccup.hiccup_id}?public_token={params}"
-    external_url = f"{external_host}/public/hiccups/{hiccup.hiccup_id}?public_token={params}"
+    internal_url = f"{internal_host}/wa/redirect/{hiccup.hiccup_id}?t={params}"
+    external_url = f"{external_host}/wa/redirect/{hiccup.hiccup_id}?t={params}"
     return internal_url, external_url
 
 
@@ -126,7 +138,6 @@ def send_daily_summary(db: Session):
         f"{alert['label']} has {alert['count']} hiccups in last 7 days"
         for alert in trend_list
     ]
-    low = low_reporters(db)
     samples = _fetch_samples(db, today_start, limit=2)
     dept_lines = [f"{dept}: {count}" for dept, count in dept_counts.items()]
     sample_lines = [_format_sample(sample) for sample in samples]
@@ -146,15 +157,12 @@ def send_daily_summary(db: Session):
         "Trend alerts:",
         *(trend_lines if trend_lines else ["No trend alerts today"]),
         "",
-        "Low reporters:",
-        *(low if low else ["No low reporters identified"]),
-        "",
         "Sample hiccups:",
         *(sample_lines if sample_lines else ["None yet today"]),
     ]
-    numbers = [
-        n.strip() for n in settings.management_group_numbers.split(",") if n.strip()
-    ]
+    numbers = _dedup_numbers(
+        [n.strip() for n in settings.management_group_numbers.split(",") if n.strip()]
+    )
     if numbers:
         send_bulk(numbers, "\n".join(message_lines))
 
@@ -220,7 +228,8 @@ def send_nc_assignment_notice(db: Session, hiccup: Hiccup):
     summary = (hiccup.description or "").strip()
     if len(summary) > 140:
         summary = f"{summary[:137].rstrip()}..."
-    assigned_link = f"{settings.frontend_base_url}/assigned"
+    assigned_link_external = f"{settings.external_whatsapp_response_base_url or settings.frontend_base_url}/assigned"
+    assigned_link_internal = f"{settings.whatsapp_response_base_url or settings.frontend_base_url}/assigned"
     hiccup_link = f"{settings.frontend_base_url}/hiccups/{hiccup.hiccup_id}"
     message_lines = [
         "Hiccup escalated to NC and assigned to you.",
@@ -232,13 +241,15 @@ def send_nc_assignment_notice(db: Session, hiccup: Hiccup):
         "Steps:",
         "- Login to the portal.",
         "- Open 'Assigned to Me' and use the Hiccup ID above.",
-        f"Assigned list: {assigned_link}",
+        "Assigned list:",
+        f"- In office (192.168.0.71): {assigned_link_internal}",
+        f"- Outside office (internet): {assigned_link_external}",
         f"Hiccup page: {hiccup_link}",
     ]
     logger.info(
         "Sending NC assignment notice for %s to %s", hiccup.hiccup_id, staff.contact
     )
-    send_bulk([staff.contact], "\n".join(message_lines))
+    send_bulk(_dedup_numbers([staff.contact]), "\n".join(message_lines))
 
 
 def send_response_reminders(db: Session):

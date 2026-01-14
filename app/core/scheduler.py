@@ -56,7 +56,7 @@ def start_scheduler():
     )
     scheduler.add_job(
         daily_summary_job,
-        trigger=CronTrigger(hour=11, minute=0, timezone=timezone(settings.timezone)),
+        trigger=CronTrigger(hour=23, minute=59, timezone=timezone(settings.timezone)),
         id="daily-summary",
         replace_existing=True,
     )

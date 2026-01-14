@@ -15,6 +15,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 
 from app.core.config import get_settings
+from app.core.security import is_allowlisted_infra_admin_by_staff
+from app.db.session import MainSessionLocal
 from app.core.security import TokenData, get_current_user
 from app.db.session import SessionLocal
 from app.models.infra import InfraTicket, InfraTicketImage, InfraUpdate
@@ -53,6 +55,25 @@ def _is_admin(user: TokenData) -> bool:
     Admin check: only allow users whose designation or role contains 'admin'.
     (e.g., 'Admin', 'System Admin', 'Admin Head').
     """
+    # Token flag short-circuit (infra-specific)
+    if getattr(user, "is_infra_admin", False):
+        return True
+    # Allowlist override (e.g., Ankita)
+    try:
+        if user and getattr(user, "user_id", None):
+            db_main = MainSessionLocal()
+            staff = db_main.query(Staff).filter(Staff.id == user.user_id).first()
+            if staff and is_allowlisted_infra_admin_by_staff(staff):
+                return True
+    except Exception:
+        # Fallback to designation/role checks
+        pass
+    finally:
+        try:
+            db_main.close()
+        except Exception:
+            pass
+
     designation = (user.designation or "").lower()
     role = (user.role or "").lower()
     keywords = ("admin", "it", "infra")

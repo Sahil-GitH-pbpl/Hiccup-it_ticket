@@ -51,8 +51,7 @@ block body_attrs %}class="app-bg"{% endblock %} {% block content %}
           <div class="hero-stat glass-card">
             <p class="text-xs uppercase tracking-wide text-slate-500">Open</p>
             <p class="text-3xl font-bold text-amber-700">
-              {{ tickets |selectattr("status", "ne", "Resolved") |list |length
-              }}
+              {{ tickets |rejectattr("status", "in", ["Resolved", "Rejected"]) |list |length }}
             </p>
             <p class="text-xs text-slate-500">Awaiting closure</p>
           </div>
@@ -75,6 +74,13 @@ block body_attrs %}class="app-bg"{% endblock %} {% block content %}
               </a>
             </div>
             <p class="text-xs text-slate-500 mt-1">Closed with a resolution</p>
+          </div>
+          <div class="hero-stat glass-card col-span-2">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Rejected</p>
+            <p class="text-2xl font-bold text-rose-700">
+              {{ tickets |selectattr("status", "eq", "Rejected") |list |length }}
+            </p>
+            <p class="text-xs text-slate-500 mt-1">Marked invalid/declined</p>
           </div>
           {% else %}
           <div class="hero-stat glass-card col-span-2 text-center">

@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+
+{% block body_attrs %}class="text-slate-900 min-h-screen no-nav"{% endblock %}
 {% block body %}
 <div class="relative mx-auto my-16 w-full max-w-md">
     <div class="absolute inset-0 rounded-3xl bg-gradient-to-br from-teal-200 to-white opacity-70 blur-3xl"></div>
@@ -31,6 +33,15 @@
 
 {% block scripts %}
 <script>
+const adminKeywords = ['admin','management','manager','supervisor','lead','it','infra'];
+function isAdminLike(user){
+    if (!user) return false;
+    if (user.is_admin_like === true) return true;
+    const role = (user.role || '').toLowerCase();
+    const designation = (user.designation || '').toLowerCase();
+    return role === 'admin' || adminKeywords.some(k => role.includes(k) || designation.includes(k));
+}
+
 async function verifyTokenAndRedirect(){
     try {
         const res = await fetch('/api/auth/me', {
@@ -38,7 +49,9 @@ async function verifyTokenAndRedirect(){
             credentials: 'same-origin',
         });
         if(res.ok){
-            window.location.href = '/dashboard';
+            const user = await res.json();
+            const target = isAdminLike(user) ? '/dashboard' : '/home';
+            window.location.href = target;
             return;
         }
     } catch {
@@ -96,11 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 await showAlert({
                     icon: 'success',
                     title: 'Signed in',
-                    text: 'Redirecting to your dashboard',
+                    text: 'Redirecting to your workspace',
                     timer: 1200,
                     showConfirmButton: false,
                 });
-                window.location.href = '/dashboard';
+                const target = isAdminLike(data) ? '/dashboard' : '/home';
+                window.location.href = target;
                 return;
             }
             await showAlert({

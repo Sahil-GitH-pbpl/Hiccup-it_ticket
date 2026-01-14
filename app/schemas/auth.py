@@ -15,6 +15,8 @@ class TokenResponse(BaseModel):
     department_id: Optional[int] = None
     user_id: int
     designation: Optional[str] = None
+    is_admin_like: bool = False
+    is_infra_admin: bool = False
 
 
 class TokenDataResponse(BaseModel):
@@ -23,3 +25,5 @@ class TokenDataResponse(BaseModel):
     name: str
     department_id: Optional[int]
     designation: Optional[str] = None
+    is_admin_like: bool = False
+    is_infra_admin: bool = False

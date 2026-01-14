@@ -108,7 +108,9 @@ function managementActionButtons(hiccup) {
 }
 
 function actionCellHtml(h, includeMgmtActions = false, options = {}) {
-    const { allowNcView = false, ncReadonly = false, allowRespond = false } = options;
+    const { allowNcView = false, ncReadonly = false, allowRespond = false, showNcButton = false } = options;
+    const allowNcViewForCell = resolveOptionValue(allowNcView, h);
+    const ncReadonlyValue = resolveOptionValue(ncReadonly, h);
     const detailButton = `<button type="button" data-hiccup-detail="${h.hiccup_id}" class="detail-btn" aria-label="tails for ${escapeHtml(h.hiccup_id)}">View details</button>`;
     let mgmtActions = '';
     if (includeMgmtActions) {
@@ -123,8 +125,8 @@ function actionCellHtml(h, includeMgmtActions = false, options = {}) {
         }
     }
     const ncViewButton =
-        allowNcView && (h.status === 'Escalated to NC' || h.escalated_by)
-            ? `<button type="button" class="detail-btn" data-behavior="view-nc" data-nc-readonly="${ncReadonly}" data-hiccup="${h.hiccup_id}">View NC Form</button>`
+        showNcButton && allowNcViewForCell
+            ? `<button type="button" class="detail-btn" data-behavior="view-nc" data-nc-readonly="${ncReadonlyValue}" data-hiccup="${h.hiccup_id}">View NC Form</button>`
             : '';
     const respondButton =
         allowRespond && h.status !== 'Closed'
@@ -182,11 +184,15 @@ function detailMarkup(h, ncForm) {
         <div class="grid gap-2 sm:grid-cols-2">
             <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
                 <p class="text-xs uppercase tracking-[0.4em] text-slate-500">Description</p>
-                <p class="mt-2 text-sm text-slate-900">${truncatedText(h.description, 200)}</p>
+                <div class="mt-2 text-[12px] leading-relaxed text-slate-800 whitespace-pre-line break-words max-h-56 overflow-y-auto normal-case">
+                    ${escapeHtml(h.description || '-')}
+                </div>
             </div>
             <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
                 <p class="text-xs uppercase tracking-[0.4em] text-slate-500">Immediate Effect</p>
-                <p class="mt-2 text-sm text-slate-900">${truncatedText(h.immediate_effect, 200)}</p>
+                <div class="mt-2 text-[12px] leading-relaxed text-slate-800 whitespace-pre-line break-words max-h-56 overflow-y-auto normal-case">
+                    ${escapeHtml(h.immediate_effect || '-')}
+                </div>
             </div>
             ${
                 h.status === 'Closed' && h.closure_notes
@@ -267,8 +273,10 @@ async function presentHiccupDetails(h) {
 }
 
 function summaryRowHtml(h, includeActions = true, includeMgmtActions = false, options = {}) {
-    const { displayRaisedAgainst = true, allowNcView = false, ncReadonly = false, allowRespond = false } = options;
-    const actionCell = includeActions ? actionCellHtml(h, includeMgmtActions, { allowNcView, ncReadonly, allowRespond }) : '';
+    const { displayRaisedAgainst = true, allowNcView = false, ncReadonly = false, allowRespond = false, showNcButton = false } = options;
+    const actionCell = includeActions
+        ? actionCellHtml(h, includeMgmtActions, { allowNcView, ncReadonly, allowRespond, showNcButton })
+        : '';
     const targetPerson = displayRaisedAgainst
         ? formatPersonDisplay(h.raised_against_name, h.raised_against)
         : formatPersonDisplay(h.raised_by_name, h.raised_by);
@@ -316,6 +324,7 @@ function hiccupCardHtml(h, options = {}) {
         allowNcView = false,
         ncReadonly = false,
         allowRespond = false,
+        showNcButton = false,
     } = options;
     const targetPerson = displayRaisedAgainst
         ? formatPersonDisplay(h.raised_against_name, h.raised_against)
@@ -330,9 +339,10 @@ function hiccupCardHtml(h, options = {}) {
         : 'No attachments';
     const allowNcViewForCard = resolveOptionValue(allowNcView, h);
     const allowRespondForCard = resolveOptionValue(allowRespond, h);
+    const ncReadonlyValue = resolveOptionValue(ncReadonly, h);
     const ncViewButton =
-        allowNcViewForCard && (h.status === 'Escalated to NC' || h.escalated_by)
-            ? `<button type="button" class="detail-btn" data-behavior="view-nc" data-nc-readonly="${ncReadonly}" data-hiccup="${h.hiccup_id}">View NC Form</button>`
+        showNcButton && allowNcViewForCard
+            ? `<button type="button" class="detail-btn" data-behavior="view-nc" data-nc-readonly="${ncReadonlyValue}" data-hiccup="${h.hiccup_id}">View NC Form</button>`
             : '';
     const respondButton =
         allowRespondForCard && h.status !== 'Closed'
@@ -405,26 +415,53 @@ function renderMyHiccupsTable() {
     if (searchValue) {
         filtered = filtered.filter((entry) => matchesGlobalSearch(entry, searchValue));
     }
-    renderHiccupCards('raised-by-cards', filtered, { displayRaisedAgainst: true });
+    const allowNcForCreator = (h) =>
+        h.status === 'Escalated to NC' || h.escalated_by || h.nc_assigned_staff_id;
+    renderHiccupCards('raised-by-cards', filtered, {
+        displayRaisedAgainst: true,
+        allowNcView: allowNcForCreator,
+        ncReadonly: true,
+        showNcButton: true,
+    });
     if (tbody) {
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
         } else {
-            tbody.innerHTML = filtered.map((h) => summaryRowHtml(h, true, false)).join('');
+            tbody.innerHTML = filtered
+                .map((h) =>
+                    summaryRowHtml(h, true, false, {
+                        allowNcView: allowNcForCreator(h),
+                        ncReadonly: true,
+                        showNcButton: true,
+                    })
+                )
+                .join('');
         }
     }
 }
 
 function renderAssignedTable(data) {
-    const assignedBody = document.querySelector('#assigned-table tbody');
-    if (!assignedBody && !document.getElementById('against-me-cards')) return;
+    const assignedBody = assignedViewMode
+        ? document.querySelector('#management-table tbody')
+        : document.querySelector('#assigned-table tbody');
+    const assignedCardsId = assignedViewMode ? 'assigned-nc-cards' : 'against-me-cards';
+    if (!assignedBody && !document.getElementById(assignedCardsId)) return;
     const rows = Array.isArray(data) ? data : [];
-    const assigned = rows.filter((h) =>
-        matchesCurrentUser(h.raised_against, h.raised_against_name)
-    );
+    const assigned = assignedViewMode
+        ? rows.filter((h) => {
+              const isNcAssigned =
+                  h.nc_assigned_staff_id &&
+                  currentUserId &&
+                  String(h.nc_assigned_staff_id) === String(currentUserId);
+              const isRaisedAgainst = matchesCurrentUser(h.raised_against, h.raised_against_name);
+              return isNcAssigned || isRaisedAgainst;
+          })
+        : rows.filter((h) => matchesCurrentUser(h.raised_against, h.raised_against_name));
     if (assigned.length === 0) {
-        assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
-        renderHiccupCards('against-me-cards', [], {
+        if (assignedBody) {
+            assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
+        }
+        renderHiccupCards(assignedCardsId, [], {
             displayRaisedAgainst: false,
         });
         return;
@@ -432,17 +469,27 @@ function renderAssignedTable(data) {
     const searchValue = globalSearchInput?.value?.trim();
     const filteredAssigned = searchValue ? assigned.filter((entry) => matchesGlobalSearch(entry, searchValue)) : assigned;
     if (filteredAssigned.length === 0) {
-        assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
-        renderHiccupCards('against-me-cards', [], {
+        if (assignedBody) {
+            assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
+        }
+        renderHiccupCards(assignedCardsId, [], {
             displayRaisedAgainst: false,
         });
         return;
     }
-    renderHiccupCards('against-me-cards', filteredAssigned, {
+    const isAssignedNc = (entry) =>
+        entry &&
+        entry.nc_assigned_staff_id &&
+        currentUserId &&
+        String(entry.nc_assigned_staff_id) === String(currentUserId);
+    const ncReadonlyForAssigned = (h) => h.status === 'Closed';
+    renderHiccupCards(assignedCardsId, filteredAssigned, {
         displayRaisedAgainst: false,
         allowRespond: (h) => h.status !== 'Closed' && !h.response_text,
-        allowNcView: (h) => h.status === 'Escalated to NC' || h.escalated_by,
-        ncReadonly: true,
+        allowNcView: (h) =>
+            isAssignedNc(h) && (h.status === 'Escalated to NC' || h.status === 'Closed' || h.escalated_by),
+        ncReadonly: ncReadonlyForAssigned, // editable when open, read-only when closed
+        showNcButton: true,
     });
     if (assignedBody) {
         assignedBody.innerHTML = filteredAssigned
@@ -450,9 +497,10 @@ function renderAssignedTable(data) {
                 const canRespond = h.status !== 'Closed' && !h.response_text;
                 return summaryRowHtml(h, true, false, {
                     displayRaisedAgainst: false,
-                    allowNcView: h.status === 'Escalated to NC' || h.escalated_by,
-                    ncReadonly: true,
+                    allowNcView: isAssignedNc(h) && (h.status === 'Escalated to NC' || h.status === 'Closed' || h.escalated_by),
+                    ncReadonly: ncReadonlyForAssigned,
                     allowRespond: canRespond,
+                    showNcButton: true,
                 });
             })
             .join('');
@@ -482,29 +530,49 @@ function renderManagementTable(data) {
     const rows = Array.isArray(data) ? data : [];
     const filtered = applyManagementFilters(rows);
     const assignedFiltered = assignedViewMode
-        ? filtered.filter(
-              (entry) =>
-                  entry.status === 'Escalated to NC' &&
+        ? filtered.filter((entry) => {
+              const isAssignedNc =
                   entry.nc_assigned_staff_id &&
-                  String(entry.nc_assigned_staff_id) === String(currentUserId)
-          )
+                  currentUserId &&
+                  String(entry.nc_assigned_staff_id) === String(currentUserId);
+              const isRaisedAgainst = matchesCurrentUser(entry.raised_against, entry.raised_against_name);
+              const isNcStatus = entry.status === 'Escalated to NC' || entry.status === 'Closed';
+              return isNcStatus && (isAssignedNc || isRaisedAgainst);
+          })
         : filtered;
     const mgmtSearchValue = mgmtGlobalSearchInput?.value?.trim();
     const finalFiltered = mgmtSearchValue
         ? assignedFiltered.filter((entry) => matchesGlobalSearch(entry, mgmtSearchValue))
         : assignedFiltered;
+    const isAssignedNc = (entry) =>
+        entry &&
+        entry.nc_assigned_staff_id &&
+        currentUserId &&
+        String(entry.nc_assigned_staff_id) === String(currentUserId);
+    const allowNcViewFn = (h) =>
+        h.status === 'Escalated to NC' || h.escalated_by || h.status === 'Closed';
+    const ncReadonlyFor = (h) => {
+        if (h.status === 'Closed') return true;
+        if (showManagementActions) return false; // management (Dr Vipul/Dr Vishu) can edit/close
+        return !isAssignedNc(h);
+    };
     renderHiccupCards('assigned-nc-cards', assignedViewMode ? finalFiltered : [], {
         displayRaisedAgainst: true,
         includeMgmtActions: showManagementActions,
-        allowNcView: (h) => h.status === 'Escalated to NC' || h.escalated_by,
-        ncReadonly: true,
+        allowNcView: allowNcViewFn,
+        ncReadonly: ncReadonlyFor,
     });
     if (finalFiltered.length === 0) {
         mgmtBody.innerHTML = `<tr><td colspan="${managementColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
         return;
     }
     mgmtBody.innerHTML = finalFiltered
-        .map((h) => summaryRowHtml(h, showManagementActions, showManagementActions))
+        .map((h) =>
+            summaryRowHtml(h, showManagementActions, showManagementActions, {
+                allowNcView: allowNcViewFn(h),
+                ncReadonly: ncReadonlyFor(h),
+            })
+        )
         .join('');
 }
 
@@ -1314,22 +1382,26 @@ async function openNCEscalationForm(hiccupId, options = {}) {
     });
 
     if (closeChoice?.isConfirmed) {
-        const closurePayload = await showStatusModal({
-            title: 'Closure notes',
-            confirmText: 'Close',
-            fields: [
-                {
-                    id: 'closure-notes',
-                    key: 'closure_notes',
-                    label: 'Closure notes',
-                    placeholder: 'Summarize resolution',
-                    required: true,
-                    type: 'textarea',
-                },
-            ],
-        });
-        if (!closurePayload) {
-            return;
+        let closurePayload = null;
+        const isMgmtUser = Boolean(window.managementActionsEnabled && window.managementView);
+        if (!isMgmtUser) {
+            closurePayload = await showStatusModal({
+                title: 'Closure notes',
+                confirmText: 'Close',
+                fields: [
+                    {
+                        id: 'closure-notes',
+                        key: 'closure_notes',
+                        label: 'Closure notes',
+                        placeholder: 'Summarize resolution',
+                        required: true,
+                        type: 'textarea',
+                    },
+                ],
+            });
+            if (!closurePayload) {
+                return;
+            }
         }
         showLoading('Saving & closing hiccup...');
         try {
@@ -1343,7 +1415,7 @@ async function openNCEscalationForm(hiccupId, options = {}) {
                 method: 'PATCH',
                 body: JSON.stringify({
                     status: 'Closed',
-                    closure_notes: closurePayload.closure_notes,
+                    closure_notes: closurePayload ? closurePayload.closure_notes : null,
                 }),
             });
             await loadMyHiccups?.();

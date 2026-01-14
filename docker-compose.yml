@@ -11,6 +11,13 @@ services:
       - DB_USER=root
       - DB_PASSWORD=example
       - DB_NAME=hiccup_ticket
+      - ENABLE_SCHEMA_BOOTSTRAP=1
+      # Remote/main auth DB (users table)
+      - MAIN_DB_HOST=remote-db-host
+      - MAIN_DB_PORT=3306
+      - MAIN_DB_USER=remote-db-user
+      - MAIN_DB_PASSWORD=remote-db-password
+      - MAIN_DB_NAME=lead_management
       - JWT_SECRET=supersecret
       - JWT_ALGO=HS256
       - WHATSAPP_API_URL=http://192.168.0.71:3004/api/messages/send
@@ -21,6 +28,7 @@ services:
       - WHATSAPP_RESPONSE_BASE_URL=http://192.168.0.71:4001
       - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
       - TIMEZONE=Asia/Kolkata
+      - SCHEDULER_PRIMARY=1
     ports:
       - "4001:7410"
     volumes:

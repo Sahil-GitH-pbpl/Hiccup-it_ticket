@@ -3,8 +3,9 @@ from typing import List
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
-from app.db.session import SessionLocal
+from app.db.session import MainSessionLocal
 from app.models.staff import Staff
 from app.models.department import Department
 
@@ -26,7 +27,7 @@ class DepartmentSummary(BaseModel):
 
 
 def get_db():
-    db = SessionLocal()
+    db = MainSessionLocal()
     try:
         yield db
     finally:
@@ -39,7 +40,14 @@ def suggest_staff(q: str | None = None, limit: int = 10, db: Session = Depends(g
     department_map = {dept_id: dept_name for dept_id, dept_name in department_rows}
     query = db.query(Staff.id, Staff.name, Staff.department_id, Staff.departments, Staff.designation)
     if q:
-        query = query.filter(Staff.name.ilike(f"%{q}%"))
+        ilike = f"%{q}%"
+        query = query.filter(
+            or_(
+                Staff.name.ilike(ilike),
+                Staff.designation.ilike(ilike),
+                Staff.departments.ilike(ilike),
+            )
+        )
     results = query.order_by(Staff.name).limit(limit).all()
 
     def iter_department_ids(primary_id: int | None, extra: str | None):

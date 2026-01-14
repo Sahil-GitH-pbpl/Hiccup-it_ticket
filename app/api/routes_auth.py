@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from app.schemas.auth import LoginRequest, TokenResponse, TokenDataResponse
-from app.core.security import create_jwt, get_current_user
-from app.db.session import SessionLocal
+from app.core.security import create_jwt, get_current_user, is_allowlisted_hiccup_admin
+from app.core.security import is_allowlisted_infra_admin_by_staff
+from app.db.session import MainSessionLocal
 from app.models.staff import Staff
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,7 @@ def matches_dob_password(password: str, dob: str | None) -> bool:
 
 
 def get_db():
-    db = SessionLocal()
+    db = MainSessionLocal()
     try:
         yield db
     finally:
@@ -97,22 +98,38 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
+    # Force-admin for Ankita (infra)
+    infra_override = is_allowlisted_infra_admin_by_staff(user)
+    # Hiccup admins
+    hiccup_admin = is_allowlisted_hiccup_admin(user.id)
+    is_admin_like = hiccup_admin  # only hiccup admins get this flag
+    is_infra_admin = infra_override
+    # If infra-allowlisted, elevate role for token/claims
+    token_role = user.role
+    token_designation = user.designation
+    if infra_override:
+        token_role = "admin"
+        token_designation = f"{user.designation or ''} (infra_admin)".strip()
     token = create_jwt(
         {
             "user_id": user.id,
-            "role": user.role,
+            "role": token_role,
             "department_id": user.department_id,
             "name": user.name,
-            "designation": user.designation,
+            "designation": token_designation,
+            "is_admin_like": is_admin_like,
+            "is_infra_admin": is_infra_admin,
         }
     )
     token_response = TokenResponse(
         access_token=token,
-        role=user.role,
+        role=token_role,
         name=user.name,
         department_id=user.department_id,
         user_id=user.id,
-        designation=user.designation,
+        designation=token_designation,
+        is_admin_like=is_admin_like,
+        is_infra_admin=is_infra_admin,
     )
     response.set_cookie(
         "token",
@@ -143,6 +160,8 @@ def me(user=Depends(get_current_user)):
         name=user.name,
         department_id=user.department_id,
         designation=user.designation,
+        is_admin_like=is_allowlisted_hiccup_admin(user.user_id),
+        is_infra_admin=getattr(user, "is_infra_admin", False),
     )
 
 

@@ -1,4 +1,5 @@
 import logging
+import os
 from fastapi import FastAPI, Request, Depends, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -23,7 +24,12 @@ from app.api import (
     routes_staff,
 )
 from app.core.scheduler import start_scheduler
-from app.core.security import get_current_user, decode_jwt, decode_public_token
+from app.core.security import (
+    get_current_user,
+    decode_jwt,
+    decode_public_token,
+    is_allowlisted_hiccup_admin,
+)
 from app.core.config import get_settings
 from urllib.parse import quote_plus
 import json
@@ -34,7 +40,12 @@ from app.schemas.hiccup import HiccupResponse
 import app.models  # ensure all models register before metadata creation
 
 configure_logging()
-Base.metadata.create_all(bind=engine)
+
+# Optional: skip automatic schema bootstrap unless explicitly enabled.
+_schema_bootstrap_enabled = os.getenv("ENABLE_SCHEMA_BOOTSTRAP", "0") == "1"
+
+if _schema_bootstrap_enabled:
+    Base.metadata.create_all(bind=engine)
 
 
 def _ensure_name_columns(engine):
@@ -106,8 +117,9 @@ def _ensure_nc_escalation_columns(engine):
                 conn.execute(text(stmt))
 
 
-_ensure_name_columns(engine)
-_ensure_nc_escalation_columns(engine)
+if _schema_bootstrap_enabled:
+    _ensure_name_columns(engine)
+    _ensure_nc_escalation_columns(engine)
 def _ensure_user_columns(engine):
     inspector = inspect(engine)
     try:
@@ -122,7 +134,8 @@ def _ensure_user_columns(engine):
             for stmt in statements:
                 conn.execute(text(stmt))
 
-_ensure_user_columns(engine)
+if _schema_bootstrap_enabled:
+    _ensure_user_columns(engine)
 
 
 def _ensure_infra_ticket_autoincrement(engine):
@@ -146,7 +159,8 @@ def _ensure_infra_ticket_autoincrement(engine):
         )
 
 
-_ensure_infra_ticket_autoincrement(engine)
+if _schema_bootstrap_enabled:
+    _ensure_infra_ticket_autoincrement(engine)
 
 
 def _ensure_infra_ticket_images_autoincrement(engine):
@@ -169,7 +183,8 @@ def _ensure_infra_ticket_images_autoincrement(engine):
         )
 
 
-_ensure_infra_ticket_images_autoincrement(engine)
+if _schema_bootstrap_enabled:
+    _ensure_infra_ticket_images_autoincrement(engine)
 
 
 def _ensure_infra_updates_autoincrement(engine):      
@@ -192,7 +207,8 @@ def _ensure_infra_updates_autoincrement(engine):
         )
 
 
-_ensure_infra_updates_autoincrement(engine)
+if _schema_bootstrap_enabled:
+    _ensure_infra_updates_autoincrement(engine)
 
 settings = get_settings()
 
@@ -239,16 +255,27 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
     app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-    def _can_view_all_hiccups(user):
+    def _is_admin_like(user):
         if not user:
             return False
-        designation = (getattr(user, "designation", "") or "").lower()
-        role = (getattr(user, "role", "") or "").lower()
-        allowed_keywords = ["management", "manager", "admin", "supervisor", "lead"]
-        return role == "admin" or any(key in designation for key in allowed_keywords)
+        # Hiccup admin only (not infra-only overrides)
+        if getattr(user, "is_admin_like", False):
+            return True
+        return is_allowlisted_hiccup_admin(getattr(user, "user_id", None))
+
+    def _can_view_all_hiccups(user):
+        return _is_admin_like(user)
 
     @app.get("/", response_class=HTMLResponse)
-    async def root():
+    async def root(request: Request):
+        token = request.cookies.get("token")
+        if token:
+            try:
+                decoded = decode_jwt(token)
+                target = "/dashboard" if _is_admin_like(decoded) else "/home"
+                return RedirectResponse(url=target)
+            except HTTPException:
+                pass
         return RedirectResponse(url="/login")
 
     @app.get("/login", response_class=HTMLResponse)
@@ -256,18 +283,70 @@ def create_app() -> FastAPI:
         token = request.cookies.get("token")
         if token:
             try:
-                decode_jwt(token)
-                return RedirectResponse(url="/dashboard")
+                decoded = decode_jwt(token)
+                target = "/dashboard" if _is_admin_like(decoded) else "/home"
+                return RedirectResponse(url=target)
             except HTTPException:
                 pass
         return templates.TemplateResponse(
             "login.html", {"request": request, "title": "Login"}
         )
 
+    @app.get("/home", response_class=HTMLResponse)
+    async def home_page(
+        request: Request, db: Session = Depends(get_db), user=Depends(get_current_user)
+    ):
+        if _is_admin_like(user):
+            return RedirectResponse(url="/dashboard")
+        hiccup_q = db.query(Hiccup).filter(Hiccup.raised_by == user.user_id)
+        infra_q = (
+            db.query(InfraTicket).filter(InfraTicket.created_by == user.name)
+            if getattr(user, "name", None)
+            else None
+        )
+
+        hiccup_stats = {
+            "total": hiccup_q.count(),
+            "open": hiccup_q.filter(Hiccup.status == "Open").count(),
+            "responded": hiccup_q.filter(Hiccup.status == "Responded").count(),
+            "closed": hiccup_q.filter(Hiccup.status == "Closed").count(),
+        }
+
+        infra_stats = {
+            "total": infra_q.count() if infra_q is not None else 0,
+            "open": infra_q.filter(InfraTicket.status.notin_(["Resolved", "Rejected"])).count() if infra_q is not None else 0,
+            "resolved": infra_q.filter(InfraTicket.status == "Resolved").count() if infra_q is not None else 0,
+            "rejected": infra_q.filter(InfraTicket.status == "Rejected").count() if infra_q is not None else 0,
+            "delayed": infra_q.filter(InfraTicket.is_delayed_pick == True).count() if infra_q is not None else 0,
+            "invalid": infra_q.filter(InfraTicket.is_invalid == True).count() if infra_q is not None else 0,
+        }
+
+        hiccup_recent = hiccup_q.order_by(Hiccup.created_at.desc()).limit(5).all()
+        infra_recent = (
+            infra_q.order_by(InfraTicket.ticket_id.desc(), InfraTicket.created_at.desc()).limit(5).all()
+            if infra_q is not None
+            else []
+        )
+
+        return templates.TemplateResponse(
+            "home.html",
+            {
+                "request": request,
+                "user": user,
+                "is_admin_like": _is_admin_like(user),
+                "hiccup_stats": hiccup_stats,
+                "infra_stats": infra_stats,
+                "hiccup_recent": hiccup_recent,
+                "infra_recent": infra_recent,
+            },
+        )
+
     @app.get("/dashboard", response_class=HTMLResponse)
     async def dashboard(
         request: Request, db: Session = Depends(get_db), user=Depends(get_current_user)
     ):
+        if not _is_admin_like(user):
+            return RedirectResponse(url="/home")
         hiccup_total = db.query(Hiccup).count()
         hiccup_open = db.query(Hiccup).filter(Hiccup.status == "Open").count()
         hiccup_responded = db.query(Hiccup).filter(Hiccup.status == "Responded").count()
@@ -307,6 +386,7 @@ def create_app() -> FastAPI:
             {
                 "request": request,
                 "user": user,
+                "is_admin_like": _is_admin_like(user),
                 "hiccup": {
                     "total": hiccup_total,
                     "open": hiccup_open,
@@ -346,9 +426,9 @@ def create_app() -> FastAPI:
     @app.get("/management", response_class=HTMLResponse)
     async def management_page(request: Request, user=Depends(get_current_user)):
         if not _can_view_all_hiccups(user):
-            return RedirectResponse(url="/dashboard")
+            return RedirectResponse(url="/home")
         return templates.TemplateResponse(
-            "management_hiccups.html", {"request": request, "user": user}
+            "management_hiccups.html", {"request": request, "user": user, "is_admin_like": _is_admin_like(user)}
         )
 
     @app.get("/hiccups/{hiccup_id}", response_class=HTMLResponse)
@@ -404,14 +484,34 @@ def create_app() -> FastAPI:
             ) from err
 
     @app.get("/wa/redirect/{hiccup_id}")
-    async def wa_response_redirect(hiccup_id: str, public_token: str = Query(...)):
-        payload = decode_public_token(public_token, purpose="response_link")
+    async def wa_response_redirect(
+        request: Request,
+        hiccup_id: str,
+        public_token: str | None = Query(None),
+        short_token: str | None = Query(None, alias="t"),
+    ):
+        token_value = public_token or short_token
+        if not token_value:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="public_token required",
+            )
+        payload = decode_public_token(token_value, purpose="response_link")
         if payload.get("hiccup_id") != hiccup_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Token mismatch"
             )
-        target = f"{settings.frontend_base_url}/public/hiccups/{hiccup_id}?public_token={quote_plus(public_token)}"
+        # Prefer the incoming host/proto for redirect; fall back to configured external URLs.
+        # Prefer explicitly configured external response base (with port) to avoid
+        # proxy host stripping the custom port.
+        base = (
+            settings.external_whatsapp_response_base_url
+            or settings.whatsapp_response_base_url
+            or settings.frontend_base_url
+        ).rstrip("/")
+        target = f"{base}/public/hiccups/{hiccup_id}?public_token={quote_plus(token_value)}"
         return RedirectResponse(target)
 
-    start_scheduler()
+    if os.getenv("SCHEDULER_PRIMARY", "0") == "1":
+        start_scheduler()
     return app
