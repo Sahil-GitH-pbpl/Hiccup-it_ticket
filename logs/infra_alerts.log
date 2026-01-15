@@ -1910,3 +1910,541 @@ sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000
 2026-01-14 18:26:56,386 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
 2026-01-14 18:26:56,386 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
 2026-01-14 18:27:05,380 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=15); skipping start
+2026-01-14 18:37:43,750 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-14 18:37:43,783 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-14 18:42:12,846 [INFO] app.api.routes_infra: WA[7e333410] -> sendMessage | target=918448546358 | len=125
+2026-01-14 18:42:12,965 [INFO] app.api.routes_infra: WA[7e333410] <- status=200 | body={"success":true}
+2026-01-14 18:42:12,968 [INFO] app.api.routes_infra: PickNotify sent to 8448546358 | ticket_id=231
+2026-01-14 18:42:18,454 [INFO] app.api.routes_infra: WA[5979dd30] -> sendMessage | target=918448546358 | len=163
+2026-01-14 18:42:18,510 [INFO] app.api.routes_infra: WA[5979dd30] <- status=200 | body={"success":true}
+2026-01-14 18:42:18,513 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=231 contact=8448546358
+2026-01-14 18:42:37,042 [INFO] app.api.routes_infra: WA[53fdf9db] -> sendMessage | target=919871366002 | len=125
+2026-01-14 18:42:37,107 [INFO] app.api.routes_infra: WA[53fdf9db] <- status=200 | body={"success":true}
+2026-01-14 18:42:37,109 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=226
+2026-01-14 18:52:00,492 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=232 created_by=Aman Shukla dept=Field category=Software
+2026-01-14 18:52:00,498 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=232 | msg_len=335
+2026-01-14 18:52:00,504 [INFO] app.api.routes_infra: WA[b90c4eb2] -> sendMessage | target=120363141953100908@g.us | len=335
+2026-01-14 18:52:00,621 [INFO] app.api.routes_infra: WA[b90c4eb2] <- status=200 | body={"success":true}
+2026-01-14 18:52:00,625 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 19:10:54,881 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=233 created_by=Akshay Kumar Ram dept=House Keeping category=Other
+2026-01-14 19:10:54,913 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=233 | msg_len=445
+2026-01-14 19:10:54,917 [INFO] app.api.routes_infra: WA[0e814fec] -> sendMessage | target=120363141953100908@g.us | len=445
+2026-01-14 19:10:55,100 [INFO] app.api.routes_infra: WA[0e814fec] <- status=200 | body={"success":true}
+2026-01-14 19:10:55,102 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 19:14:42,670 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=234 created_by=Akshay Kumar Ram dept=House Keeping category=Other
+2026-01-14 19:14:42,672 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=234 | msg_len=444
+2026-01-14 19:14:42,673 [INFO] app.api.routes_infra: WA[09f75860] -> sendMessage | target=120363141953100908@g.us | len=444
+2026-01-14 19:14:42,723 [INFO] app.api.routes_infra: WA[09f75860] <- status=200 | body={"success":true}
+2026-01-14 19:14:42,725 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 19:18:24,499 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=235 created_by=Akshay Kumar Ram dept=House Keeping category=Other
+2026-01-14 19:18:24,528 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=235 | msg_len=288
+2026-01-14 19:18:24,544 [INFO] app.api.routes_infra: WA[8b8122d8] -> sendMessage | target=120363141953100908@g.us | len=288
+2026-01-14 19:18:24,818 [INFO] app.api.routes_infra: WA[8b8122d8] <- status=200 | body={"success":true}
+2026-01-14 19:18:24,820 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-14 19:30:20,919 [INFO] app.api.routes_infra: WA[fd18ddd2] -> sendMessage | target=919871366002 | len=122
+2026-01-14 19:30:21,137 [INFO] app.api.routes_infra: WA[fd18ddd2] <- status=200 | body={"success":true}
+2026-01-14 19:30:21,141 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=230
+2026-01-14 19:30:32,953 [INFO] app.api.routes_infra: WA[6ab722df] -> sendMessage | target=919958547534 | len=122
+2026-01-14 19:30:33,021 [INFO] app.api.routes_infra: WA[6ab722df] <- status=200 | body={"success":true}
+2026-01-14 19:30:33,022 [INFO] app.api.routes_infra: PickNotify sent to 9958547534 | ticket_id=235
+2026-01-14 19:30:44,390 [INFO] app.api.routes_infra: WA[4760f515] -> sendMessage | target=919958547534 | len=122
+2026-01-14 19:30:44,458 [INFO] app.api.routes_infra: WA[4760f515] <- status=200 | body={"success":true}
+2026-01-14 19:30:44,460 [INFO] app.api.routes_infra: PickNotify sent to 9958547534 | ticket_id=234
+2026-01-14 19:30:56,663 [INFO] app.api.routes_infra: WA[7d4cb953] -> sendMessage | target=919958547534 | len=122
+2026-01-14 19:30:56,768 [INFO] app.api.routes_infra: WA[7d4cb953] <- status=200 | body={"success":true}
+2026-01-14 19:30:56,771 [INFO] app.api.routes_infra: PickNotify sent to 9958547534 | ticket_id=233
+2026-01-14 19:31:27,952 [INFO] app.api.routes_infra: WA[08532ee1] -> sendMessage | target=919871366002 | len=122
+2026-01-14 19:31:28,014 [INFO] app.api.routes_infra: WA[08532ee1] <- status=200 | body={"success":true}
+2026-01-14 19:31:28,015 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=229
+2026-01-14 19:42:05,046 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=236 created_by=Md Shaquib Alam dept=Technical category=Software
+2026-01-14 19:42:05,049 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=236 | msg_len=272
+2026-01-14 19:42:05,056 [INFO] app.api.routes_infra: WA[8ff53b33] -> sendMessage | target=120363141953100908@g.us | len=272
+2026-01-14 19:42:05,139 [INFO] app.api.routes_infra: WA[8ff53b33] <- status=200 | body={"success":true}
+2026-01-14 19:42:05,144 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-15 13:07:05,287 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 13:07:05,282 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 13:07:05,285 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 13:27:52,573 [INFO] app.api.routes_infra: WA[d65bab4d] -> sendMessage | target=918178408980 | len=125
+2026-01-15 13:27:53,015 [INFO] app.api.routes_infra: WA[d65bab4d] <- status=200 | body={"success":true}
+2026-01-15 13:27:53,016 [INFO] app.api.routes_infra: PickNotify sent to 8178408980 | ticket_id=232
+2026-01-15 13:28:04,045 [INFO] app.api.routes_infra: WA[a7fed42c] -> sendMessage | target=918178408980 | len=163
+2026-01-15 13:28:04,401 [INFO] app.api.routes_infra: WA[a7fed42c] <- status=200 | body={"success":true}
+2026-01-15 13:28:04,402 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=232 contact=8178408980
+2026-01-15 13:36:25,815 [INFO] app.api.routes_infra: WA[bd6932e7] -> sendMessage | target=919871366002 | len=163
+2026-01-15 13:36:26,104 [INFO] app.api.routes_infra: WA[bd6932e7] <- status=200 | body={"success":true}
+2026-01-15 13:36:26,105 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=226 contact=9871366002
+2026-01-15 13:41:48,169 [INFO] app.api.routes_infra: WA[cdacd252] -> sendMessage | target=919871366002 | len=125
+2026-01-15 13:41:48,517 [INFO] app.api.routes_infra: WA[cdacd252] <- status=200 | body={"success":true}
+2026-01-15 13:41:48,518 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=225
+2026-01-15 14:47:42,687 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=237 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-01-15 14:47:42,699 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=237 | msg_len=464
+2026-01-15 14:47:42,703 [INFO] app.api.routes_infra: WA[24d92525] -> sendMessage | target=120363141953100908@g.us | len=464
+2026-01-15 14:47:44,243 [INFO] app.api.routes_infra: WA[24d92525] <- status=200 | body={"success":true}
+2026-01-15 14:47:44,252 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-01-15 16:46:45,388 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-15 16:46:45,392 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-01-15 16:46:47,060 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 319, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 280, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-15 16:46:59,080 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=18); skipping start
+2026-01-15 16:46:59,082 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=18); skipping start
+2026-01-15 16:46:59,324 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 319, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 280, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-15 16:47:09,389 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-15 16:47:10,480 [ERROR] app.api.routes_infra: InfraReminder background loop error: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 354, in _open_connection
+    self._cmysql.connect(**cnx_kwargs)
+_mysql_connector.MySQLInterfaceError: Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+mysql.connector.errors.DatabaseError: 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/app/app/api/routes_infra.py", line 319, in _reminder_loop
+    _send_pick_reminders(db)
+  File "/app/app/api/routes_infra.py", line 280, in _send_pick_reminders
+    .all()
+     ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2704, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/query.py", line 2857, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2239, in _execute_internal
+    conn = self._connection_for_bind(bind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 2108, in _connection_for_bind
+    return trans._connection_for_bind(engine, execution_options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in _connection_for_bind
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/state_changes.py", line 137, in _go
+    ret_value = fn(self, *arg, **kw)
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py", line 1187, in _connection_for_bind
+    conn = bind.connect()
+           ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3285, in connect
+    return self._connection_cls(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 145, in __init__
+    Connection._handle_dbapi_exception_noconnection(
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 2448, in _handle_dbapi_exception_noconnection
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 143, in __init__
+    self._dbapi_connection = engine.raw_connection()
+                             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py", line 3309, in raw_connection
+    return self.pool.connect()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 447, in connect
+    return _ConnectionFairy._checkout(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 1264, in _checkout
+    fairy = _ConnectionRecord.checkout(pool)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 711, in checkout
+    rec = pool._do_get()
+          ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 177, in _do_get
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/impl.py", line 175, in _do_get
+    return self._create_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 388, in _create_connection
+    return _ConnectionRecord(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 673, in __init__
+    self.__connect()
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 899, in __connect
+    with util.safe_reraise():
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py", line 224, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/pool/base.py", line 895, in __connect
+    self.dbapi_connection = connection = pool._invoke_creator(self)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/create.py", line 661, in connect
+    return dialect.connect(*cargs, **cparams)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py", line 630, in connect
+    return self.loaded_dbapi.connect(*cargs, **cparams)  # type: ignore[no-any-return]  # NOQA: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/pooling.py", line 322, in connect
+    return CMySQLConnection(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 142, in __init__
+    self.connect(**kwargs)
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/abstracts.py", line 1604, in connect
+    self._open_connection()
+  File "/usr/local/lib/python3.11/site-packages/mysql/connector/connection_cext.py", line 360, in _open_connection
+    raise get_mysql_exception(
+sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2003 (HY000): Can't connect to MySQL server on 'mysql:3306' (111)
+(Background on this error at: https://sqlalche.me/e/20/4xp6)
+2026-01-15 16:47:12,757 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=24); skipping start
+2026-01-15 16:47:12,890 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=24); skipping start
+2026-01-15 16:47:21,679 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-15 16:47:22,841 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=36); skipping start
+2026-01-15 17:46:09,077 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-15 17:46:09,077 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-01-15 17:51:08,124 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 17:51:08,125 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 17:51:08,135 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 17:55:04,048 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 17:55:04,048 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 17:55:04,061 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 18:12:04,327 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 18:12:04,418 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start
+2026-01-15 18:12:04,639 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=8); skipping start

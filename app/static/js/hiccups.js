@@ -1,11 +1,19 @@
 let myHiccupsData = [];
 const statusFilter = document.getElementById('filter-status');
 const typeFilter = document.getElementById('filter-type');
+const dateFromFilter = document.getElementById('filter-date-from');
+const dateToFilter = document.getElementById('filter-date-to');
+const escalatedFilter = document.getElementById('filter-escalated');
+const overdueFilter = document.getElementById('filter-overdue');
 const resetFilters = document.getElementById('reset-filters');
 const globalSearchInput = document.getElementById('global-hiccup-search');
 const mgmtStatusFilter = document.getElementById('mgmt-filter-status');
 const mgmtTypeFilter = document.getElementById('mgmt-filter-type');
 const mgmtRootFilter = document.getElementById('mgmt-filter-root');
+const mgmtDateFromFilter = document.getElementById('mgmt-date-from');
+const mgmtDateToFilter = document.getElementById('mgmt-date-to');
+const mgmtEscalatedFilter = document.getElementById('mgmt-filter-escalated');
+const mgmtOverdueFilter = document.getElementById('mgmt-filter-overdue');
 const mgmtGlobalSearchInput = document.getElementById('mgmt-global-hiccup-search');
 const mgmtResetFilters = document.getElementById('mgmt-reset-filters');
 
@@ -67,6 +75,33 @@ async function hydrateRaisedAgainstNames(rows) {
 }
 
 const SUGGESTION_DEBOUNCE = 300;
+
+function isEscalated(entry) {
+    return (
+        entry.status === 'Escalated to NC' ||
+        Boolean(entry.escalated_by) ||
+        Boolean(entry.nc_assigned_staff_id)
+    );
+}
+
+function isOverdue(entry) {
+    return Boolean(entry.is_response_overdue || entry.is_closure_overdue);
+}
+
+function inDateRange(createdAt, fromValue, toValue) {
+    if (!createdAt) return true;
+    const createdDate = new Date(createdAt);
+    if (Number.isNaN(createdDate.getTime())) return true;
+    if (fromValue) {
+        const fromDate = new Date(`${fromValue}T00:00:00`);
+        if (createdDate < fromDate) return false;
+    }
+    if (toValue) {
+        const toDate = new Date(`${toValue}T23:59:59`);
+        if (createdDate > toDate) return false;
+    }
+    return true;
+}
 
 function managementActionButtons(hiccup) {
     const { hiccup_id: id, status, escalated_by } = hiccup;
@@ -411,6 +446,17 @@ function renderMyHiccupsTable() {
     if (typeValue) {
         filtered = filtered.filter((entry) => entry.hiccup_type === typeValue);
     }
+    const fromValue = dateFromFilter?.value;
+    const toValue = dateToFilter?.value;
+    if (fromValue || toValue) {
+        filtered = filtered.filter((entry) => inDateRange(entry.created_at, fromValue, toValue));
+    }
+    if (escalatedFilter?.checked) {
+        filtered = filtered.filter((entry) => isEscalated(entry));
+    }
+    if (overdueFilter?.checked) {
+        filtered = filtered.filter((entry) => isOverdue(entry));
+    }
     const searchValue = globalSearchInput?.value?.trim();
     if (searchValue) {
         filtered = filtered.filter((entry) => matchesGlobalSearch(entry, searchValue));
@@ -457,6 +503,18 @@ function renderAssignedTable(data) {
               return isNcAssigned || isRaisedAgainst;
           })
         : rows.filter((h) => matchesCurrentUser(h.raised_against, h.raised_against_name));
+    const fromValue = dateFromFilter?.value;
+    const toValue = dateToFilter?.value;
+    let filteredAssigned = assigned;
+    if (fromValue || toValue) {
+        filteredAssigned = filteredAssigned.filter((entry) => inDateRange(entry.created_at, fromValue, toValue));
+    }
+    if (escalatedFilter?.checked) {
+        filteredAssigned = filteredAssigned.filter((entry) => isEscalated(entry));
+    }
+    if (overdueFilter?.checked) {
+        filteredAssigned = filteredAssigned.filter((entry) => isOverdue(entry));
+    }
     if (assigned.length === 0) {
         if (assignedBody) {
             assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
@@ -467,7 +525,9 @@ function renderAssignedTable(data) {
         return;
     }
     const searchValue = globalSearchInput?.value?.trim();
-    const filteredAssigned = searchValue ? assigned.filter((entry) => matchesGlobalSearch(entry, searchValue)) : assigned;
+    filteredAssigned = searchValue
+        ? filteredAssigned.filter((entry) => matchesGlobalSearch(entry, searchValue))
+        : filteredAssigned;
     if (filteredAssigned.length === 0) {
         if (assignedBody) {
             assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
@@ -520,6 +580,17 @@ function applyManagementFilters(rows) {
     }
     if (rootValue) {
         filtered = filtered.filter((entry) => entry.root_cause_category === rootValue);
+    }
+    const fromValue = mgmtDateFromFilter?.value;
+    const toValue = mgmtDateToFilter?.value;
+    if (fromValue || toValue) {
+        filtered = filtered.filter((entry) => inDateRange(entry.created_at, fromValue, toValue));
+    }
+    if (mgmtEscalatedFilter?.checked) {
+        filtered = filtered.filter((entry) => isEscalated(entry));
+    }
+    if (mgmtOverdueFilter?.checked) {
+        filtered = filtered.filter((entry) => isOverdue(entry));
     }
     return filtered;
 }
@@ -590,9 +661,29 @@ if (statusFilter) {
 if (typeFilter) {
     typeFilter.addEventListener('change', renderMyHiccupsTable);
 }
+dateFromFilter?.addEventListener('change', () => {
+    renderMyHiccupsTable();
+    renderAssignedTable(myHiccupsData);
+});
+dateToFilter?.addEventListener('change', () => {
+    renderMyHiccupsTable();
+    renderAssignedTable(myHiccupsData);
+});
+escalatedFilter?.addEventListener('change', () => {
+    renderMyHiccupsTable();
+    renderAssignedTable(myHiccupsData);
+});
+overdueFilter?.addEventListener('change', () => {
+    renderMyHiccupsTable();
+    renderAssignedTable(myHiccupsData);
+});
 resetFilters?.addEventListener('click', () => {
     if (statusFilter) statusFilter.value = '';
     if (typeFilter) typeFilter.value = '';
+    if (dateFromFilter) dateFromFilter.value = '';
+    if (dateToFilter) dateToFilter.value = '';
+    if (escalatedFilter) escalatedFilter.checked = false;
+    if (overdueFilter) overdueFilter.checked = false;
     if (globalSearchInput) globalSearchInput.value = '';
     renderMyHiccupsTable();
     renderAssignedTable(myHiccupsData);
@@ -604,6 +695,10 @@ mgmtSelectFilters.forEach((filterEl) => {
         filterEl.addEventListener('change', () => renderManagementTable(myHiccupsData));
     }
 });
+mgmtDateFromFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
+mgmtDateToFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
+mgmtEscalatedFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
+mgmtOverdueFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
 globalSearchInput?.addEventListener('input', () => {
     renderMyHiccupsTable();
     renderAssignedTable(myHiccupsData);
@@ -613,6 +708,10 @@ mgmtResetFilters?.addEventListener('click', () => {
     if (mgmtStatusFilter) mgmtStatusFilter.value = '';
     if (mgmtTypeFilter) mgmtTypeFilter.value = '';
     if (mgmtRootFilter) mgmtRootFilter.value = '';
+    if (mgmtDateFromFilter) mgmtDateFromFilter.value = '';
+    if (mgmtDateToFilter) mgmtDateToFilter.value = '';
+    if (mgmtEscalatedFilter) mgmtEscalatedFilter.checked = false;
+    if (mgmtOverdueFilter) mgmtOverdueFilter.checked = false;
     if (mgmtGlobalSearchInput) mgmtGlobalSearchInput.value = '';
     renderManagementTable(myHiccupsData);
 });
