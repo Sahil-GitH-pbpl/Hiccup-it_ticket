@@ -99,6 +99,7 @@ class Hiccup(Base):
         Boolean, nullable=False, server_default=text("0"), default=False
     )
     is_closure_overdue = Column(Boolean, default=False)
+    was_response_overdue = Column(Boolean, default=False)
 
     audit_logs = relationship(
         "HiccupAuditLog", back_populates="hiccup", cascade="all, delete-orphan"

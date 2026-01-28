@@ -163,8 +163,9 @@ def send_daily_summary(db: Session):
     numbers = _dedup_numbers(
         [n.strip() for n in settings.management_group_numbers.split(",") if n.strip()]
     )
-    if numbers:
-        send_bulk(numbers, "\n".join(message_lines))
+    # Disabled: summary WhatsApp blast to management group
+    # if numbers:
+    #     send_bulk(numbers, "\n".join(message_lines))
 
 
 def _resolve_department(db: Session, department_id: Optional[int]) -> str:
@@ -277,9 +278,11 @@ def send_response_reminders(db: Session):
         if age >= escalate_delta and not hiccup.escalate_msg_sent:
             token = _build_response_token(staff, hiccup)
             internal_url, external_url = _build_response_urls(hiccup, token)
+            hours_old = int(age.total_seconds() // 3600)
+            # User-facing message (with links)
             message = "\n".join(
                 [
-                    f"Hiccup {hiccup.hiccup_id} is 60+ hours old.",
+                    f"Hiccup {hiccup.hiccup_id} is {hours_old}+ hours old.",
                     "Management will escalate to NC soon.",
                     f"Overdue flag: {hiccup.is_response_overdue}",
                     "Respond here (choose based on location):",
@@ -289,12 +292,19 @@ def send_response_reminders(db: Session):
             )
             hiccup.escalate_msg_sent = True
             if management_numbers:
+                mgmt_message = "\n".join(
+                    [
+                        f"Hiccup {hiccup.hiccup_id} is {hours_old}+ hours old.",
+                        "No response yet — please take action.",
+                        f"Overdue flag: {hiccup.is_response_overdue}",
+                    ]
+                )
                 logger.info(
                     "Escalation notice for %s -> %s",
                     hiccup.hiccup_id,
                     management_numbers,
                 )
-                send_bulk(management_numbers, message)
+                # send_bulk(management_numbers, mgmt_message)  # Disabled: escalation to group
         elif age >= overdue_delta and not hiccup.overdue_msg_sent:
             token = _build_response_token(staff, hiccup)
             internal_url, external_url = _build_response_urls(hiccup, token)

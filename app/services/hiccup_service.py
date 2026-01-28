@@ -638,6 +638,8 @@ def mark_overdue_flags(db: Session):
         hiccup.is_response_overdue = hiccup_age >= timedelta(
             minutes=settings.response_overdue_minutes
         )
+        if hiccup.is_response_overdue:
+            hiccup.was_response_overdue = True
         hiccup.response_blocked = hiccup_age >= timedelta(
             minutes=settings.response_escalate_minutes
         )

@@ -85,7 +85,7 @@ function isEscalated(entry) {
 }
 
 function isOverdue(entry) {
-    return Boolean(entry.is_response_overdue || entry.is_closure_overdue);
+    return Boolean(entry.is_response_overdue || entry.was_response_overdue || entry.is_closure_overdue);
 }
 
 function inDateRange(createdAt, fromValue, toValue) {

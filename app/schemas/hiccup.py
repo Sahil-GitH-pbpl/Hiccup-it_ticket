@@ -50,6 +50,7 @@ class HiccupResponse(BaseModel):
     is_closure_overdue: bool
     nc_assigned_staff_id: Optional[int] = None
     nc_assigned_staff_name: Optional[str] = None
+    was_response_overdue: bool = False
 
     class Config:
         orm_mode = True

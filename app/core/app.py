@@ -72,6 +72,10 @@ def _ensure_name_columns(engine):
         statements.append(
             "ALTER TABLE hiccups ADD COLUMN response_blocked TINYINT(1) NOT NULL DEFAULT 0"
         )
+    if "was_response_overdue" not in columns:
+        statements.append(
+            "ALTER TABLE hiccups ADD COLUMN was_response_overdue TINYINT(1) NOT NULL DEFAULT 0"
+        )
     if "reminder_sent" not in columns:
         statements.append(
             "ALTER TABLE hiccups ADD COLUMN reminder_sent TINYINT(1) NOT NULL DEFAULT 0"
