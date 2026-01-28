@@ -114,7 +114,7 @@ def _build_response_token(staff: Staff, hiccup: Hiccup) -> str:
             "purpose": "response_link",
         },
         expires_delta=timedelta(days=3),
-    )
+    )                   
 
 
 def _build_response_urls(hiccup: Hiccup, token: str) -> tuple[str, str]:
@@ -274,7 +274,6 @@ def send_response_reminders(db: Session):
         overdue_delta = timedelta(minutes=settings.response_overdue_minutes)
         escalate_delta = timedelta(minutes=settings.response_escalate_minutes)
         numbers = [staff.contact]
-        message = None
         if age >= escalate_delta and not hiccup.escalate_msg_sent:
             token = _build_response_token(staff, hiccup)
             internal_url, external_url = _build_response_urls(hiccup, token)
@@ -290,7 +289,19 @@ def send_response_reminders(db: Session):
                     f"- Outside office (internet): {external_url}",
                 ]
             )
-            hiccup.escalate_msg_sent = True
+            sent = send_bulk(numbers, message)
+            if sent:
+                hiccup.escalate_msg_sent = True
+                logger.info(
+                    "Escalation notice sent for %s -> %s",
+                    hiccup.hiccup_id,
+                    numbers,
+                )
+            else:
+                logger.warning(
+                    "Escalation notice failed, will retry next run for %s",
+                    hiccup.hiccup_id,
+                )
             if management_numbers:
                 mgmt_message = "\n".join(
                     [
@@ -317,10 +328,19 @@ def send_response_reminders(db: Session):
                     f"- Outside office (internet): {external_url}",
                 ]
             )
-            hiccup.overdue_msg_sent = True
-            logger.info(
-                "Overdue reminder for %s -> %s", hiccup.hiccup_id, staff.contact
-            )
+            sent = send_bulk(numbers, message)
+            if sent:
+                hiccup.overdue_msg_sent = True
+                logger.info(
+                    "Overdue reminder sent for %s -> %s",
+                    hiccup.hiccup_id,
+                    staff.contact,
+                )
+            else:
+                logger.warning(
+                    "Overdue reminder failed, will retry next run for %s",
+                    hiccup.hiccup_id,
+                )
         elif age >= reminder_delta and not hiccup.reminder_sent:
             token = _build_response_token(staff, hiccup)
             internal_url, external_url = _build_response_urls(hiccup, token)
@@ -333,14 +353,16 @@ def send_response_reminders(db: Session):
                     f"- Outside office (internet): {external_url}",
                 ]
             )
-            hiccup.reminder_sent = True
-            logger.info(
-                "Reminder message queued for %s -> %s", hiccup.hiccup_id, staff.contact
-            )
-        if message:
-            logger.info(
-                "Sending WhatsApp message for hiccup %s to %s",
-                hiccup.hiccup_id,
-                numbers,
-            )
-            send_bulk(numbers, message)
+            sent = send_bulk(numbers, message)
+            if sent:
+                hiccup.reminder_sent = True
+                logger.info(
+                    "Reminder message sent for %s -> %s",
+                    hiccup.hiccup_id,
+                    staff.contact,
+                )
+            else:
+                logger.warning(
+                    "Reminder send failed, will retry next run for %s",
+                    hiccup.hiccup_id,
+                )

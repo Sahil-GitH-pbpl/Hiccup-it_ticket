@@ -10,11 +10,11 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
-def send_whatsapp_message(to_number: str, message: str):
+def send_whatsapp_message(to_number: str, message: str) -> bool:
     target = (to_number or "").strip()
     if not settings.whatsapp_api_url or not target:
         logger.error("WhatsApp config missing or target empty, skipping send")
-        return
+        return False
 
     def _normalize_target(value: str) -> str:
         # keep group IDs like "....@g.us" as-is
@@ -56,20 +56,25 @@ def send_whatsapp_message(to_number: str, message: str):
             )
             logger.info(msg)
             print(msg)
-        else:
-            msg = (
-                f"WhatsApp send failed -> target={normalized_target} "
-                f"status={status} body={body}"
-            )
-            logger.error(msg)
-            print(msg)
-            response.raise_for_status()
+            return True
+
+        msg = (
+            f"WhatsApp send failed -> target={normalized_target} "
+            f"status={status} body={body}"
+        )
+        logger.error(msg)
+        print(msg)
+        return False
     except Exception as exc:
         msg = f"Failed to send WhatsApp message to {normalized_target}: {exc}"
         logger.exception(msg)
         print(msg)
+        return False
 
 
-def send_bulk(numbers: List[str], message: str):
+def send_bulk(numbers: List[str], message: str) -> bool:
+    """Send to all numbers; returns True if at least one send succeeded."""
+    success = False
     for number in numbers:
-        send_whatsapp_message(number, message)
+        success = send_whatsapp_message(number, message) or success
+    return success
