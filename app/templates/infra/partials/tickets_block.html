@@ -143,7 +143,6 @@
           </button>
           {% endif %}
 
-          {% if t.status == 'In Progress' %}
           <!-- Invalid Button -->
           <button type="button"
                   class="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 shadow-sm hover:shadow-md js-open-invalid-modal"
@@ -162,7 +161,6 @@
             </svg>
             Updates
           </a>
-          {% endif %}
         </div>
       </div>
     {% endif %}
@@ -328,7 +326,6 @@
                       {% endif %}
                   </div>
 
-                  {% if t.status == 'In Progress' %}
                   <!-- Second Row -->
                   <div class="flex gap-2">
                       <!-- Invalid Button -->
@@ -350,7 +347,6 @@
                           <span class="truncate">Updates</span>
                       </a>
                   </div>
-                  {% endif %}
               </div>
               {% endif %}
           </td>
