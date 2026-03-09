@@ -24,19 +24,22 @@ services:
       - WHATSAPP_API_TOKEN=61e3f2cd978650537d9223e7
       - MANAGEMENT_GROUP_NUMBERS=120363141953100908@g.us
       - INTERNAL_SERVICE_TOKEN=internal-token
-      - FRONTEND_BASE_URL=http://192.168.0.71:4001
-      - WHATSAPP_RESPONSE_BASE_URL=http://192.168.0.71:4001
+      - FRONTEND_BASE_URL=http://192.168.0.173:8015
+      - WHATSAPP_RESPONSE_BASE_URL=http://192.168.0.173:8015
       - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
       - TIMEZONE=Asia/Kolkata
       - SCHEDULER_PRIMARY=1
     ports:
-      - "4001:7410"
+      - "8015:7410"
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
     restart: unless-stopped
   mysql:
-    image: mysql:8
+    build:
+      context: .
+      dockerfile: db/Dockerfile
+    image: hiccup_mysql:latest
     container_name: hiccup_mysql
     environment:
       - MYSQL_ROOT_PASSWORD=example
@@ -45,7 +48,6 @@ services:
       - "8091:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     restart: unless-stopped
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

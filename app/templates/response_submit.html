@@ -1,0 +1,133 @@
+{% extends 'layout.html' %}
+{% block content %}
+<section class="max-w-2xl mx-auto">
+  <div class="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-lg shadow-slate-200/40">
+    <div class="mb-5">
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Quick Action</p>
+      <h2 class="text-2xl font-semibold text-slate-900">Response Submit</h2>
+      <p class="mt-1 text-sm text-slate-600">Yahan se kisi hiccup par response submit kiya ja sakta hai.</p>
+    </div>
+
+    <form id="response-submit-form" class="space-y-4">
+      <div>
+        <label for="hiccup-id" class="block text-sm font-semibold text-slate-700">Hiccup ID <span class="text-rose-500">*</span></label>
+        <input
+          id="hiccup-id"
+          name="hiccup_id"
+          type="text"
+          required
+          placeholder="e.g. HCP-26-001"
+          class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/30"
+        />
+      </div>
+
+      <div>
+        <label for="public-token" class="block text-sm font-semibold text-slate-700">Public Token (optional)</label>
+        <input
+          id="public-token"
+          name="public_token"
+          type="text"
+          placeholder="Public response link token"
+          class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/30"
+        />
+      </div>
+
+      <div>
+        <label for="response-text" class="block text-sm font-semibold text-slate-700">Response <span class="text-rose-500">*</span></label>
+        <textarea
+          id="response-text"
+          name="response_text"
+          rows="5"
+          maxlength="600"
+          required
+          placeholder="Apna response likhiye..."
+          class="mt-1 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/30"
+        ></textarea>
+        <p id="char-count" class="mt-1 text-xs text-slate-500">0 / 600</p>
+      </div>
+
+      <button
+        id="submit-btn"
+        type="submit"
+        class="w-full rounded-xl bg-tealbrand px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow hover:bg-tealbrand-dark"
+      >
+        Submit Response
+      </button>
+    </form>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const form = document.getElementById('response-submit-form');
+    const hiccupIdInput = document.getElementById('hiccup-id');
+    const publicTokenInput = document.getElementById('public-token');
+    const responseInput = document.getElementById('response-text');
+    const charCount = document.getElementById('char-count');
+    const submitBtn = document.getElementById('submit-btn');
+
+    function updateCount() {
+      if (!responseInput || !charCount) return;
+      charCount.textContent = `${responseInput.value.length} / 600`;
+    }
+
+    async function onSubmit(event) {
+      event.preventDefault();
+      const hiccupId = (hiccupIdInput?.value || '').trim();
+      const publicToken = (publicTokenInput?.value || '').trim();
+      const responseText = (responseInput?.value || '').trim();
+
+      if (!hiccupId || !responseText) {
+        await showAlert({ icon: 'warning', title: 'Required fields missing', text: 'Hiccup ID aur response dono required hain.' });
+        return;
+      }
+
+      let endpoint = `/api/hiccups/${encodeURIComponent(hiccupId)}/respond`;
+      const payload = { response_text: responseText };
+
+      if (publicToken) {
+        endpoint = `/api/hiccups/public/${encodeURIComponent(hiccupId)}/respond?public_token=${encodeURIComponent(publicToken)}`;
+        payload.public_token = publicToken;
+      }
+
+      try {
+        submitBtn.disabled = true;
+        const res = await fetch(endpoint, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders(),
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const message = await formatError(res);
+          throw new Error(message || 'Unable to submit response');
+        }
+
+        await showAlert({
+          icon: 'success',
+          title: 'Response submitted',
+          timer: 1200,
+          showConfirmButton: false,
+        });
+        responseInput.value = '';
+        updateCount();
+      } catch (err) {
+        await showAlert({
+          icon: 'error',
+          title: 'Submission failed',
+          text: err?.message || 'Please try again.',
+        });
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    form?.addEventListener('submit', onSubmit);
+    responseInput?.addEventListener('input', updateCount);
+    updateCount();
+  })();
+</script>
+{% endblock %}

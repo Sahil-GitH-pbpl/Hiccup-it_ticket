@@ -1,6 +1,6 @@
 import logging
 import os
-from fastapi import FastAPI, Request, Depends, HTTPException, Query, status
+from fastapi import FastAPI, Request, Depends, HTTPException, Query, status, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -35,6 +35,7 @@ from urllib.parse import quote_plus
 import json
 from app.models.hiccup import Hiccup
 from app.models.infra import InfraTicket
+from app.models.staff import Staff
 from app.schemas.hiccup import HiccupResponse
 
 import app.models  # ensure all models register before metadata creation
@@ -270,6 +271,80 @@ def create_app() -> FastAPI:
     def _can_view_all_hiccups(user):
         return _is_admin_like(user)
 
+    def _parse_attachment_paths(raw_value):
+        if not raw_value:
+            return []
+        if isinstance(raw_value, list):
+            return [str(item) for item in raw_value if str(item).strip()]
+        if isinstance(raw_value, str):
+            text_value = raw_value.strip()
+            if not text_value:
+                return []
+            try:
+                parsed = json.loads(text_value)
+                if isinstance(parsed, list):
+                    return [str(item) for item in parsed if str(item).strip()]
+            except Exception:
+                pass
+            return [text_value]
+        return []
+
+    def _load_venepunchre_record(db: Session, record_id: str):
+        row = db.execute(
+            text(
+                """
+                SELECT *
+                FROM venepunchre_records
+                WHERE hiccup_id = :record_id
+                LIMIT 1
+                """
+            ),
+            {"record_id": record_id},
+        ).mappings().first()
+        if not row:
+            return None
+        return dict(row)
+
+    def _resolve_staff_name(db: Session, staff_id):
+        try:
+            if staff_id in (None, ""):
+                return None
+            sid = int(staff_id)
+        except Exception:
+            return None
+        staff = db.query(Staff).filter(Staff.id == sid).first()
+        return staff.name if staff and staff.name else None
+
+    def _decorate_venipuncture_record(db: Session, record: dict):
+        if not record:
+            return record
+        reported_staff_name = _resolve_staff_name(db, record.get("reported_staff_id"))
+        if reported_staff_name:
+            record["reported_staff_name"] = reported_staff_name
+        venipuncture_staff_name = _resolve_staff_name(db, record.get("venepunchre_staff_id"))
+        if venipuncture_staff_name:
+            record["venipuncture_staff_name"] = venipuncture_staff_name
+        raised_by_name = _resolve_staff_name(db, record.get("raised_by"))
+        if raised_by_name:
+            record["raised_by_name_resolved"] = raised_by_name
+        raised_against_name = _resolve_staff_name(db, record.get("raised_against"))
+        if raised_against_name:
+            record["raised_against_name_resolved"] = raised_against_name
+        return record
+
+    def _has_column(db: Session, table_name: str, column_name: str) -> bool:
+        try:
+            cols = {col["name"] for col in inspect(db.get_bind()).get_columns(table_name)}
+            return column_name in cols
+        except Exception:
+            return False
+
+    def _get_columns(db: Session, table_name: str) -> set[str]:
+        try:
+            return {col["name"] for col in inspect(db.get_bind()).get_columns(table_name)}
+        except Exception:
+            return set()
+
     @app.get("/", response_class=HTMLResponse)
     async def root(request: Request):
         token = request.cookies.get("token")
@@ -421,6 +496,12 @@ def create_app() -> FastAPI:
             "list_hiccups.html", {"request": request, "user": user}
         )
 
+    @app.get("/response-submit", response_class=HTMLResponse)
+    async def response_submit_page(request: Request, user=Depends(get_current_user)):
+        return templates.TemplateResponse(
+            "response_submit.html", {"request": request, "user": user}
+        )
+
     @app.get("/assigned", response_class=HTMLResponse)
     async def assigned_page(request: Request, user=Depends(get_current_user)):
         return templates.TemplateResponse(
@@ -487,12 +568,165 @@ def create_app() -> FastAPI:
                 detail="Unable to load hiccup details",
             ) from err
 
+    @app.get("/venepunchere/{record_id}/{token}", response_class=HTMLResponse)
+    @app.get("/Venepunchere/{record_id}/{token}", response_class=HTMLResponse)
+    async def venepunchere_response_form(
+        record_id: str,
+        token: str,
+        request: Request,
+        db: Session = Depends(get_db),
+    ):
+        payload = decode_public_token(token, purpose="response_link")
+        token_record_id = payload.get("hiccup_id")
+        if token_record_id and token_record_id != record_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Token mismatch"
+            )
+        record = _load_venepunchre_record(db, record_id)
+        if not record:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Record not found"
+            )
+        record = _decorate_venipuncture_record(db, record)
+        attachments = _parse_attachment_paths(record.get("attachment_path"))
+        return templates.TemplateResponse(
+            "venepunchere_response.html",
+            {
+                "request": request,
+                "record_id": record_id,
+                "token": token,
+                "record": record,
+                "attachments": attachments,
+                "message": None,
+                "error": None,
+            },
+        )
+
+    @app.post("/venepunchere/{record_id}/{token}", response_class=HTMLResponse)
+    @app.post("/Venepunchere/{record_id}/{token}", response_class=HTMLResponse)
+    async def venepunchere_submit_response(
+        record_id: str,
+        token: str,
+        request: Request,
+        response_text: str = Form(...),
+        db: Session = Depends(get_db),
+    ):
+        payload = decode_public_token(token, purpose="response_link")
+        token_record_id = payload.get("hiccup_id")
+        if token_record_id and token_record_id != record_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="Token mismatch"
+            )
+        record = _load_venepunchre_record(db, record_id)
+        if not record:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Record not found"
+            )
+        record = _decorate_venipuncture_record(db, record)
+
+        cleaned_response = (response_text or "").strip()
+        if not cleaned_response:
+            attachments = _parse_attachment_paths(record.get("attachment_path"))
+            return templates.TemplateResponse(
+                "venepunchere_response.html",
+                {
+                    "request": request,
+                    "record_id": record_id,
+                    "token": token,
+                    "record": record,
+                    "attachments": attachments,
+                    "message": None,
+                    "error": "Response is required.",
+                },
+                status_code=400,
+            )
+
+        if record.get("response_text"):
+            attachments = _parse_attachment_paths(record.get("attachment_path"))
+            return templates.TemplateResponse(
+                "venepunchere_response.html",
+                {
+                    "request": request,
+                    "record_id": record_id,
+                    "token": token,
+                    "record": record,
+                    "attachments": attachments,
+                    "message": "Response already submitted for this record.",
+                    "error": None,
+                },
+            )
+
+        responder_id = payload.get("user_id")
+        responder_name = payload.get("name")
+        if not responder_name and responder_id:
+            staff = db.query(Staff).filter(Staff.id == int(responder_id)).first()
+            if staff and staff.name:
+                responder_name = staff.name
+        if not responder_name:
+            responder_name = "External"
+        venipuncture_cols = _get_columns(db, "venepunchre_records")
+        update_parts = []
+        params = {"record_id": record_id}
+
+        if "response_text" in venipuncture_cols:
+            update_parts.append("response_text = :response_text")
+            params["response_text"] = cleaned_response
+        if "status" in venipuncture_cols:
+            update_parts.append("status = 'Responded'")
+        if "response_by" in venipuncture_cols:
+            update_parts.append("response_by = :response_by")
+            params["response_by"] = responder_id
+        if "response_by_name" in venipuncture_cols:
+            update_parts.append("response_by_name = :response_by_name")
+            params["response_by_name"] = responder_name
+        if "is_response_overdue" in venipuncture_cols:
+            update_parts.append("is_response_overdue = 0")
+        if "is_closure_overdue" in venipuncture_cols:
+            update_parts.append("is_closure_overdue = 0")
+        if "updated_at" in venipuncture_cols:
+            update_parts.append("updated_at = NOW()")
+
+        if not update_parts:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="No updatable response columns found in venepunchre_records",
+            )
+
+        db.execute(
+            text(
+                f"""
+                UPDATE venepunchre_records
+                SET {", ".join(update_parts)}
+                WHERE hiccup_id = :record_id
+                """
+            ),
+            params,
+        )
+        db.commit()
+
+        updated_record = _load_venepunchre_record(db, record_id) or record
+        updated_record = _decorate_venipuncture_record(db, updated_record)
+        attachments = _parse_attachment_paths(updated_record.get("attachment_path"))
+        return templates.TemplateResponse(
+            "venepunchere_response.html",
+            {
+                "request": request,
+                "record_id": record_id,
+                "token": token,
+                "record": updated_record,
+                "attachments": attachments,
+                "message": "Response submitted successfully.",
+                "error": None,
+            },
+        )
+
     @app.get("/wa/redirect/{hiccup_id}")
     async def wa_response_redirect(
         request: Request,
         hiccup_id: str,
         public_token: str | None = Query(None),
         short_token: str | None = Query(None, alias="t"),
+        db: Session = Depends(get_db),
     ):
         token_value = public_token or short_token
         if not token_value:
@@ -505,6 +739,7 @@ def create_app() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Token mismatch"
             )
+        venep_record = _load_venepunchre_record(db, hiccup_id)
         # Prefer the incoming host/proto for redirect; fall back to configured external URLs.
         # Prefer explicitly configured external response base (with port) to avoid
         # proxy host stripping the custom port.
@@ -513,7 +748,10 @@ def create_app() -> FastAPI:
             or settings.whatsapp_response_base_url
             or settings.frontend_base_url
         ).rstrip("/")
-        target = f"{base}/public/hiccups/{hiccup_id}?public_token={quote_plus(token_value)}"
+        if venep_record:
+            target = f"{base}/venepunchere/{hiccup_id}/{quote_plus(token_value)}"
+        else:
+            target = f"{base}/public/hiccups/{hiccup_id}?public_token={quote_plus(token_value)}"
         return RedirectResponse(target)
 
     if os.getenv("SCHEDULER_PRIMARY", "0") == "1":
