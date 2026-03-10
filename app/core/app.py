@@ -13,7 +13,7 @@ from fastapi.exception_handlers import http_exception_handler
 from app.core.logging_config import configure_logging
 from app.db.session import SessionLocal, engine
 from app.db.base import Base
-from sqlalchemy import inspect, text
+from sqlalchemy import case, func, inspect, text
 from sqlalchemy.exc import NoSuchTableError
 from app.api import (
     routes_auth,
@@ -215,6 +215,32 @@ def _ensure_infra_updates_autoincrement(engine):
 if _schema_bootstrap_enabled:
     _ensure_infra_updates_autoincrement(engine)
 
+
+def _ensure_infra_indexes(engine):
+    inspector = inspect(engine)
+    try:
+        existing = {idx["name"] for idx in inspector.get_indexes("infra_tickets")}
+    except NoSuchTableError:
+        return
+
+    statements = {
+        "idx_infra_tickets_status_created": "CREATE INDEX idx_infra_tickets_status_created ON infra_tickets (status, created_at)",
+        "idx_infra_tickets_created_by": "CREATE INDEX idx_infra_tickets_created_by ON infra_tickets (created_by)",
+        "idx_infra_tickets_assigned_to": "CREATE INDEX idx_infra_tickets_assigned_to ON infra_tickets (assigned_to)",
+        "idx_infra_tickets_department": "CREATE INDEX idx_infra_tickets_department ON infra_tickets (department)",
+        "idx_infra_tickets_category": "CREATE INDEX idx_infra_tickets_category ON infra_tickets (category)",
+        "idx_infra_tickets_delayed": "CREATE INDEX idx_infra_tickets_delayed ON infra_tickets (is_delayed_pick)",
+    }
+    with engine.begin() as conn:
+        for index_name, statement in statements.items():
+            if index_name in existing:
+                continue
+            conn.execute(text(statement))
+
+
+if _schema_bootstrap_enabled:
+    _ensure_infra_indexes(engine)
+
 settings = get_settings()
 
 
@@ -227,6 +253,68 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def _aggregate_hiccup_counts(query):
+    row = (
+        query.with_entities(
+            func.count(Hiccup.hiccup_id).label("total"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Open", 1), else_=0)), 0
+            ).label("open"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Responded", 1), else_=0)), 0
+            ).label("responded"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Closed", 1), else_=0)), 0
+            ).label("closed"),
+        )
+        .one()
+    )
+    return {
+        "total": row.total or 0,
+        "open": row.open or 0,
+        "responded": row.responded or 0,
+        "closed": row.closed or 0,
+    }
+
+
+def _aggregate_infra_counts(query):
+    row = (
+        query.with_entities(
+            func.count(InfraTicket.ticket_id).label("total"),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (InfraTicket.status.notin_(["Resolved", "Rejected"]), 1),
+                        else_=0,
+                    )
+                ),
+                0,
+            ).label("open"),
+            func.coalesce(
+                func.sum(case((InfraTicket.status == "Resolved", 1), else_=0)), 0
+            ).label("resolved"),
+            func.coalesce(
+                func.sum(case((InfraTicket.status == "Rejected", 1), else_=0)), 0
+            ).label("rejected"),
+            func.coalesce(
+                func.sum(case((InfraTicket.is_delayed_pick.is_(True), 1), else_=0)), 0
+            ).label("delayed"),
+            func.coalesce(
+                func.sum(case((InfraTicket.is_invalid.is_(True), 1), else_=0)), 0
+            ).label("invalid"),
+        )
+        .one()
+    )
+    return {
+        "total": row.total or 0,
+        "open": row.open or 0,
+        "resolved": row.resolved or 0,
+        "rejected": row.rejected or 0,
+        "delayed": row.delayed or 0,
+        "invalid": row.invalid or 0,
+    }
 
 
 def create_app() -> FastAPI:
@@ -384,21 +472,19 @@ def create_app() -> FastAPI:
             else None
         )
 
-        hiccup_stats = {
-            "total": hiccup_q.count(),
-            "open": hiccup_q.filter(Hiccup.status == "Open").count(),
-            "responded": hiccup_q.filter(Hiccup.status == "Responded").count(),
-            "closed": hiccup_q.filter(Hiccup.status == "Closed").count(),
-        }
-
-        infra_stats = {
-            "total": infra_q.count() if infra_q is not None else 0,
-            "open": infra_q.filter(InfraTicket.status.notin_(["Resolved", "Rejected"])).count() if infra_q is not None else 0,
-            "resolved": infra_q.filter(InfraTicket.status == "Resolved").count() if infra_q is not None else 0,
-            "rejected": infra_q.filter(InfraTicket.status == "Rejected").count() if infra_q is not None else 0,
-            "delayed": infra_q.filter(InfraTicket.is_delayed_pick == True).count() if infra_q is not None else 0,
-            "invalid": infra_q.filter(InfraTicket.is_invalid == True).count() if infra_q is not None else 0,
-        }
+        hiccup_stats = _aggregate_hiccup_counts(hiccup_q)
+        infra_stats = (
+            _aggregate_infra_counts(infra_q)
+            if infra_q is not None
+            else {
+                "total": 0,
+                "open": 0,
+                "resolved": 0,
+                "rejected": 0,
+                "delayed": 0,
+                "invalid": 0,
+            }
+        )
 
         hiccup_recent = hiccup_q.order_by(Hiccup.created_at.desc()).limit(5).all()
         infra_recent = (
@@ -426,26 +512,8 @@ def create_app() -> FastAPI:
     ):
         if not _is_admin_like(user):
             return RedirectResponse(url="/home")
-        hiccup_total = db.query(Hiccup).count()
-        hiccup_open = db.query(Hiccup).filter(Hiccup.status == "Open").count()
-        hiccup_responded = db.query(Hiccup).filter(Hiccup.status == "Responded").count()
-        hiccup_closed = db.query(Hiccup).filter(Hiccup.status == "Closed").count()
-
-        infra_total = db.query(InfraTicket).count()
-        infra_open = (
-            db.query(InfraTicket)
-            .filter(InfraTicket.status.notin_(["Resolved", "Rejected"]))
-            .count()
-        )
-        infra_resolved = (
-            db.query(InfraTicket).filter(InfraTicket.status == "Resolved").count()
-        )
-        infra_delayed = (
-            db.query(InfraTicket).filter(InfraTicket.is_delayed_pick == True).count()
-        )
-        infra_invalid = (
-            db.query(InfraTicket).filter(InfraTicket.is_invalid == True).count()
-        )
+        hiccup_stats = _aggregate_hiccup_counts(db.query(Hiccup))
+        infra_stats = _aggregate_infra_counts(db.query(InfraTicket))
 
         latest_infra = (
             db.query(InfraTicket)
@@ -466,18 +534,13 @@ def create_app() -> FastAPI:
                 "request": request,
                 "user": user,
                 "is_admin_like": _is_admin_like(user),
-                "hiccup": {
-                    "total": hiccup_total,
-                    "open": hiccup_open,
-                    "responded": hiccup_responded,
-                    "closed": hiccup_closed,
-                },
+                "hiccup": hiccup_stats,
                 "infra": {
-                    "total": infra_total,
-                    "open": infra_open,
-                    "resolved": infra_resolved,
-                    "delayed": infra_delayed,
-                    "invalid": infra_invalid,
+                    "total": infra_stats["total"],
+                    "open": infra_stats["open"],
+                    "resolved": infra_stats["resolved"],
+                    "delayed": infra_stats["delayed"],
+                    "invalid": infra_stats["invalid"],
                 },
                 "latest_infra": latest_infra,
                 "latest_hiccups": latest_hiccups,

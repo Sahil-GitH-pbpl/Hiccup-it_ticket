@@ -79,25 +79,29 @@ def is_allowlisted_hiccup_admin(user_id: Optional[int]) -> bool:
     db = MainSessionLocal()
     try:
         staff = db.query(Staff).filter(Staff.id == user_id).first()
-        if not staff:
-            return False
-        # Hiccup admins: explicit allowlist only (no infra override)
-        name = (staff.name or "").strip().lower()
-        contact = _digits(staff.contact)
-        dob_digits = _digits(staff.dob)
-        for entry in ALLOWED_HICCUP_ADMINS:
-            if (
-                name == entry["name"]
-                and contact == entry["contact"]
-                and dob_digits == entry["dob"]
-            ):
-                return True
-        return False
+        return is_allowlisted_hiccup_admin_staff(staff)
     finally:
         try:
             db.close()
         except Exception:
             pass
+
+
+def is_allowlisted_hiccup_admin_staff(staff: Optional[Staff]) -> bool:
+    if not staff:
+        return False
+    # Hiccup admins: explicit allowlist only (no infra override)
+    name = (staff.name or "").strip().lower()
+    contact = _digits(staff.contact)
+    dob_digits = _digits(staff.dob)
+    for entry in ALLOWED_HICCUP_ADMINS:
+        if (
+            name == entry["name"]
+            and contact == entry["contact"]
+            and dob_digits == entry["dob"]
+        ):
+            return True
+    return False
 
 
 class TokenData:

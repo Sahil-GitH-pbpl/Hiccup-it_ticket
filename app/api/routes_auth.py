@@ -7,7 +7,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from app.schemas.auth import LoginRequest, TokenResponse, TokenDataResponse
-from app.core.security import create_jwt, get_current_user, is_allowlisted_hiccup_admin
+from app.core.security import (
+    create_jwt,
+    get_current_user,
+    is_allowlisted_hiccup_admin,
+    is_allowlisted_hiccup_admin_staff,
+)
 from app.core.security import is_allowlisted_infra_admin_by_staff
 from app.db.session import MainSessionLocal
 from app.models.staff import Staff
@@ -101,7 +106,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     # Force-admin for Ankita (infra)
     infra_override = is_allowlisted_infra_admin_by_staff(user)
     # Hiccup admins
-    hiccup_admin = is_allowlisted_hiccup_admin(user.id)
+    hiccup_admin = is_allowlisted_hiccup_admin_staff(user)
     is_admin_like = hiccup_admin  # only hiccup admins get this flag
     is_infra_admin = infra_override
     # If infra-allowlisted, elevate role for token/claims

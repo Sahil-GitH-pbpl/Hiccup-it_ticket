@@ -409,6 +409,9 @@ async function loadHiccupDetail() {
     if (!hiccupId) return;
     if (initialHiccupData) {
         await applyHiccupData(initialHiccupData);
+        if (isPublicResponse) {
+            return;
+        }
     }
     try {
         const hiccup = await fetchJSON(`/api/hiccups/${hiccupId}`);

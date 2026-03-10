@@ -24,13 +24,13 @@ services:
       - WHATSAPP_API_TOKEN=61e3f2cd978650537d9223e7
       - MANAGEMENT_GROUP_NUMBERS=120363141953100908@g.us
       - INTERNAL_SERVICE_TOKEN=internal-token
-      - FRONTEND_BASE_URL=http://192.168.0.71:4001
-      - WHATSAPP_RESPONSE_BASE_URL=http://192.168.0.71:4001
+      - FRONTEND_BASE_URL=http://192.168.0.71:8015
+      - WHATSAPP_RESPONSE_BASE_URL=http://192.168.0.71:8015
       - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
       - TIMEZONE=Asia/Kolkata
       - SCHEDULER_PRIMARY=1
     ports:
-      - "4001:7410"
+      - "8015:7410"
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads

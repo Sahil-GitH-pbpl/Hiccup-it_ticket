@@ -1,7 +1,7 @@
 import json
 import os
 import logging
-from datetime import datetime, date, timedelta
+from datetime import datetime, date, time, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -440,6 +440,111 @@ def list_hiccups_for_user(db: Session, user):
     return with_assigned_staff_names(db, rows)
 
 
+def _apply_common_hiccup_filters(
+    query,
+    *,
+    status: Optional[str] = None,
+    hiccup_type: Optional[str] = None,
+    root_cause_category: Optional[str] = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    escalated_only: bool = False,
+    overdue_only: bool = False,
+    search: Optional[str] = None,
+):
+    if status:
+        query = query.filter(Hiccup.status == status)
+    if hiccup_type:
+        query = query.filter(Hiccup.hiccup_type == hiccup_type)
+    if root_cause_category:
+        query = query.filter(Hiccup.root_cause_category == root_cause_category)
+    if date_from:
+        query = query.filter(Hiccup.created_at >= datetime.combine(date_from, time.min))
+    if date_to:
+        query = query.filter(Hiccup.created_at <= datetime.combine(date_to, time.max))
+    if escalated_only:
+        query = query.filter(
+            or_(
+                Hiccup.status == "Escalated to NC",
+                Hiccup.escalated_by.isnot(None),
+                Hiccup.nc_assigned_staff_id.isnot(None),
+            )
+        )
+    if overdue_only:
+        query = query.filter(
+            or_(
+                Hiccup.is_response_overdue.is_(True),
+                Hiccup.was_response_overdue.is_(True),
+                Hiccup.is_closure_overdue.is_(True),
+            )
+        )
+    if search:
+        term = f"%{search.strip()}%"
+        query = query.filter(
+            or_(
+                Hiccup.hiccup_id.ilike(term),
+                Hiccup.hiccup_type.ilike(term),
+                Hiccup.status.ilike(term),
+                Hiccup.description.ilike(term),
+                Hiccup.immediate_effect.ilike(term),
+                Hiccup.response_text.ilike(term),
+                Hiccup.raised_by_name.ilike(term),
+                Hiccup.raised_against_name.ilike(term),
+                Hiccup.raised_against_department_name.ilike(term),
+                Hiccup.root_cause_category.ilike(term),
+            )
+        )
+    return query
+
+
+def _paginate_hiccup_query(query, db: Session, page: int, page_size: int):
+    total = query.order_by(None).count()
+    total_pages = max((total + page_size - 1) // page_size, 1)
+    current_page = min(max(page, 1), total_pages)
+    rows = (
+        query.order_by(Hiccup.created_at.desc(), Hiccup.hiccup_id.desc())
+        .offset((current_page - 1) * page_size)
+        .limit(page_size)
+        .all()
+    )
+    rows = with_assigned_staff_names(db, rows)
+    return {
+        "items": rows,
+        "page": current_page,
+        "page_size": page_size,
+        "total": total,
+        "total_pages": total_pages,
+    }
+
+
+def list_hiccups_for_user_paginated(
+    db: Session,
+    user,
+    *,
+    page: int,
+    page_size: int,
+    status: Optional[str] = None,
+    hiccup_type: Optional[str] = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    escalated_only: bool = False,
+    overdue_only: bool = False,
+    search: Optional[str] = None,
+):
+    query = db.query(Hiccup).filter(Hiccup.raised_by == user.user_id)
+    query = _apply_common_hiccup_filters(
+        query,
+        status=status,
+        hiccup_type=hiccup_type,
+        date_from=date_from,
+        date_to=date_to,
+        escalated_only=escalated_only,
+        overdue_only=overdue_only,
+        search=search,
+    )
+    return _paginate_hiccup_query(query, db, page, page_size)
+
+
 def list_nc_escalations_for_assigned(db: Session, user):
     rows = (
         db.query(Hiccup)
@@ -453,6 +558,41 @@ def list_nc_escalations_for_assigned(db: Session, user):
         .all()
     )
     return with_assigned_staff_names(db, rows)
+
+
+def list_assigned_hiccups_paginated(
+    db: Session,
+    user,
+    *,
+    page: int,
+    page_size: int,
+    status: Optional[str] = None,
+    hiccup_type: Optional[str] = None,
+    root_cause_category: Optional[str] = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    escalated_only: bool = False,
+    overdue_only: bool = False,
+    search: Optional[str] = None,
+):
+    query = db.query(Hiccup).filter(
+        or_(
+            Hiccup.nc_assigned_staff_id == user.user_id,
+            Hiccup.raised_against == str(user.user_id),
+        )
+    )
+    query = _apply_common_hiccup_filters(
+        query,
+        status=status,
+        hiccup_type=hiccup_type,
+        root_cause_category=root_cause_category,
+        date_from=date_from,
+        date_to=date_to,
+        escalated_only=escalated_only,
+        overdue_only=overdue_only,
+        search=search,
+    )
+    return _paginate_hiccup_query(query, db, page, page_size)
 
 
 def with_assigned_staff_names(db: Session, hiccups: List[Hiccup]) -> List[Hiccup]:
@@ -469,6 +609,35 @@ def with_assigned_staff_names(db: Session, hiccups: List[Hiccup]) -> List[Hiccup
 def list_all_hiccups(db: Session):
     rows = db.query(Hiccup).order_by(Hiccup.created_at.desc()).all()
     return with_assigned_staff_names(db, rows)
+
+
+def list_all_hiccups_paginated(
+    db: Session,
+    *,
+    page: int,
+    page_size: int,
+    status: Optional[str] = None,
+    hiccup_type: Optional[str] = None,
+    root_cause_category: Optional[str] = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    escalated_only: bool = False,
+    overdue_only: bool = False,
+    search: Optional[str] = None,
+):
+    query = db.query(Hiccup)
+    query = _apply_common_hiccup_filters(
+        query,
+        status=status,
+        hiccup_type=hiccup_type,
+        root_cause_category=root_cause_category,
+        date_from=date_from,
+        date_to=date_to,
+        escalated_only=escalated_only,
+        overdue_only=overdue_only,
+        search=search,
+    )
+    return _paginate_hiccup_query(query, db, page, page_size)
 
 
 def _can_view_nc_form(hiccup: Hiccup, user) -> bool:
@@ -572,11 +741,9 @@ def update_status(
     db.refresh(hiccup)
     if status == "Escalated to NC" and hiccup.nc_assigned_staff_id:
         try:
-            from app.services.notification_service import (
-                send_nc_assignment_notice,
-            )
+            from app.services.notification_service import enqueue_nc_assignment_notice
 
-            send_nc_assignment_notice(db, hiccup)
+            enqueue_nc_assignment_notice(hiccup.hiccup_id)
         except Exception as exc:  # pragma: no cover
             logger.exception("Failed to send NC assignment notice: %s", exc)
     return hiccup
@@ -628,37 +795,72 @@ def get_audit_log(db: Session, hiccup_id: str):
 
 
 def mark_overdue_flags(db: Session):
-    now = now_local()
-    open_rows = db.query(Hiccup).filter(Hiccup.status == "Open").all()
-    for hiccup in open_rows:
-        created_at = _ensure_timezone(hiccup.created_at)
-        if not created_at:
-            continue
-        hiccup_age = now - created_at
-        hiccup.is_response_overdue = hiccup_age >= timedelta(
-            minutes=settings.response_overdue_minutes
-        )
-        if hiccup.is_response_overdue:
-            hiccup.was_response_overdue = True
-        hiccup.response_blocked = hiccup_age >= timedelta(
-            minutes=settings.response_escalate_minutes
-        )
-        hiccup.is_closure_overdue = False
-    responded_rows = db.query(Hiccup).filter(Hiccup.status == "Responded").all()
-    for hiccup in responded_rows:
-        hiccup.is_response_overdue = False
-        updated_at = _ensure_timezone(hiccup.updated_at)
-        if updated_at:
-            hiccup.is_closure_overdue = updated_at <= now - timedelta(hours=72)
-        else:
-            hiccup.is_closure_overdue = False
-        hiccup.response_blocked = False
-    other_rows = (
-        db.query(Hiccup).filter(Hiccup.status.notin_(["Open", "Responded"])).all()
+    now_local_naive = now_local().replace(tzinfo=None)
+    overdue_cutoff = now_local_naive - timedelta(
+        minutes=settings.response_overdue_minutes
     )
-    for hiccup in other_rows:
-        hiccup.is_response_overdue = False
-        hiccup.is_closure_overdue = False
+    escalate_cutoff = now_local_naive - timedelta(
+        minutes=settings.response_escalate_minutes
+    )
+    closure_cutoff = now_local_naive - timedelta(hours=72)
+
+    db.query(Hiccup).filter(Hiccup.status == "Open").update(
+        {Hiccup.is_closure_overdue: False}, synchronize_session=False
+    )
+    db.query(Hiccup).filter(
+        Hiccup.status == "Open", Hiccup.created_at <= overdue_cutoff
+    ).update(
+        {
+            Hiccup.is_response_overdue: True,
+            Hiccup.was_response_overdue: True,
+        },
+        synchronize_session=False,
+    )
+    db.query(Hiccup).filter(
+        Hiccup.status == "Open", Hiccup.created_at > overdue_cutoff
+    ).update(
+        {Hiccup.is_response_overdue: False}, synchronize_session=False
+    )
+    db.query(Hiccup).filter(
+        Hiccup.status == "Open", Hiccup.created_at <= escalate_cutoff
+    ).update(
+        {Hiccup.response_blocked: True}, synchronize_session=False
+    )
+    db.query(Hiccup).filter(
+        Hiccup.status == "Open", Hiccup.created_at > escalate_cutoff
+    ).update(
+        {Hiccup.response_blocked: False}, synchronize_session=False
+    )
+
+    db.query(Hiccup).filter(Hiccup.status == "Responded").update(
+        {
+            Hiccup.is_response_overdue: False,
+            Hiccup.response_blocked: False,
+        },
+        synchronize_session=False,
+    )
+    db.query(Hiccup).filter(
+        Hiccup.status == "Responded",
+        Hiccup.updated_at.isnot(None),
+        Hiccup.updated_at <= closure_cutoff,
+    ).update(
+        {Hiccup.is_closure_overdue: True}, synchronize_session=False
+    )
+    db.query(Hiccup).filter(
+        Hiccup.status == "Responded",
+        or_(Hiccup.updated_at.is_(None), Hiccup.updated_at > closure_cutoff),
+    ).update(
+        {Hiccup.is_closure_overdue: False}, synchronize_session=False
+    )
+
+    db.query(Hiccup).filter(Hiccup.status.notin_(["Open", "Responded"])).update(
+        {
+            Hiccup.is_response_overdue: False,
+            Hiccup.is_closure_overdue: False,
+            Hiccup.response_blocked: False,
+        },
+        synchronize_session=False,
+    )
 
 
 def trend_alerts(db: Session) -> List[dict]:

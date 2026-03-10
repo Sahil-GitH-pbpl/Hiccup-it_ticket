@@ -23,10 +23,10 @@ class Settings(BaseSettings):
     management_group_numbers: str = Field("120363141953100908@g.us", env="MANAGEMENT_GROUP_NUMBERS")
     internal_service_token: str = Field("internal-token", env="INTERNAL_SERVICE_TOKEN")
     frontend_base_url: str = Field(
-        "http://192.168.0.71:4001", env="FRONTEND_BASE_URL"
+        "http://192.168.0.173:8015", env="FRONTEND_BASE_URL"
     )
     whatsapp_response_base_url: str = Field(
-        "http://192.168.0.71:4001", env="WHATSAPP_RESPONSE_BASE_URL"
+        "http://192.168.0.173:8015", env="WHATSAPP_RESPONSE_BASE_URL"
     )
     external_whatsapp_response_base_url: str = Field(
         "https://labmate.bhasinpathlabs.com:4666", env="EXTERNAL_WHATSAPP_RESPONSE_BASE_URL"
@@ -40,7 +40,11 @@ class Settings(BaseSettings):
     # response_escalate_minutes: int = Field(4, env="RESPONSE_ESCALATE_MINUTES")
     session_secret: str = Field("change-this-session-secret", env="SESSION_SECRET")
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
 
 @lru_cache()

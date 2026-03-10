@@ -892,3 +892,42 @@ requests.exceptions.ReadTimeout: HTTPConnectionPool(host='192.168.0.71', port=30
 2026-01-28 11:35:14,527 [INFO] app.api.routes_infra: WA[c0ff1fed] -> sendMessage | target=919598226263 | len=159
 2026-01-28 11:35:14,575 [INFO] app.api.routes_infra: WA[c0ff1fed] <- status=200 | body={"success":true}
 2026-01-28 11:35:14,576 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=305 contact=9598226263
+2026-03-09 14:02:15,685 [INFO] app.api.routes_infra: InfraReminder -> processing 6 pending tickets
+2026-03-09 14:02:15,694 [INFO] app.api.routes_infra: WA[983854a8] -> sendMessage | target=120363141953100908@g.us | len=241
+2026-03-09 14:02:16,188 [INFO] app.api.routes_infra: WA[983854a8] <- status=200 | body={"success":true}
+2026-03-09 14:02:16,191 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=478 status=200
+2026-03-09 14:02:16,197 [INFO] app.api.routes_infra: WA[693935aa] -> sendMessage | target=120363141953100908@g.us | len=292
+2026-03-09 14:02:17,096 [INFO] app.api.routes_infra: WA[693935aa] <- status=200 | body={"success":true}
+2026-03-09 14:02:17,098 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=479 status=200
+2026-03-09 14:02:17,099 [INFO] app.api.routes_infra: WA[cb9b2274] -> sendMessage | target=120363141953100908@g.us | len=952
+2026-03-09 14:02:17,332 [INFO] app.api.routes_infra: WA[cb9b2274] <- status=200 | body={"success":true}
+2026-03-09 14:02:17,338 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=484 status=200
+2026-03-09 14:02:17,350 [INFO] app.api.routes_infra: WA[87de0435] -> sendMessage | target=120363141953100908@g.us | len=275
+2026-03-09 14:02:17,749 [INFO] app.api.routes_infra: WA[87de0435] <- status=200 | body={"success":true}
+2026-03-09 14:02:17,758 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=488 status=200
+2026-03-09 14:02:17,760 [INFO] app.api.routes_infra: WA[7f84a331] -> sendMessage | target=120363141953100908@g.us | len=363
+2026-03-09 14:02:17,874 [INFO] app.api.routes_infra: WA[7f84a331] <- status=200 | body={"success":true}
+2026-03-09 14:02:17,876 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=489 status=200
+2026-03-09 14:02:17,877 [INFO] app.api.routes_infra: WA[ac98fc25] -> sendMessage | target=120363141953100908@g.us | len=423
+2026-03-09 14:02:18,410 [INFO] app.api.routes_infra: WA[ac98fc25] <- status=200 | body={"success":true}
+2026-03-09 14:02:18,413 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=490 status=200
+2026-03-09 14:21:04,329 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:21:09,841 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:21:27,555 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:21:34,658 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:22:28,540 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:22:34,114 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:22:46,932 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:23:11,057 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:23:39,854 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 14:25:23,586 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12728); skipping start
+2026-03-09 15:04:33,453 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=24780); skipping start
+2026-03-09 15:22:26,662 [INFO] app.api.routes_infra: WA[a567dad8] -> sendMessage | target=919871366002 | len=122
+2026-03-09 15:22:26,803 [INFO] app.api.routes_infra: WA[a567dad8] <- status=200 | body={"success":true}
+2026-03-09 15:22:26,805 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=307
+2026-03-09 15:22:32,616 [INFO] app.api.routes_infra: WA[4c03408c] -> sendMessage | target=919818247844 | len=122
+2026-03-09 15:22:32,744 [INFO] app.api.routes_infra: WA[4c03408c] <- status=200 | body={"success":true}
+2026-03-09 15:22:32,744 [INFO] app.api.routes_infra: PickNotify sent to 9818247844 | ticket_id=495
+2026-03-09 16:54:24,088 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=16080); skipping start
+2026-03-09 17:02:05,724 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-03-10 14:12:42,388 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=28764); skipping start

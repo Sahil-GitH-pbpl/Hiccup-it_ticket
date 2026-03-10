@@ -3,6 +3,7 @@ from sqlalchemy import (
     Column,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
@@ -72,3 +73,11 @@ class InfraUpdate(Base):
     created_at = Column(DateTime, default=now_local_naive, nullable=False)
 
     ticket = relationship("InfraTicket", back_populates="updates")
+
+
+Index("idx_infra_tickets_status_created", InfraTicket.status, InfraTicket.created_at)
+Index("idx_infra_tickets_created_by", InfraTicket.created_by)
+Index("idx_infra_tickets_assigned_to", InfraTicket.assigned_to)
+Index("idx_infra_tickets_department", InfraTicket.department)
+Index("idx_infra_tickets_category", InfraTicket.category)
+Index("idx_infra_tickets_delayed", InfraTicket.is_delayed_pick)

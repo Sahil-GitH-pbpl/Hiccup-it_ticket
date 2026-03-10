@@ -57,6 +57,14 @@ class HiccupResponse(BaseModel):
         from_attributes = True
 
 
+class HiccupListResponse(BaseModel):
+    items: List[HiccupResponse]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int
+
+
 class RespondRequest(BaseModel):
     response_text: str
     public_token: Optional[str] = None

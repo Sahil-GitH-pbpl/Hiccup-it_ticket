@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block head_extra %}
-    <link rel="stylesheet" href="/static/css/tables.css">
+    <link rel="stylesheet" href="/static/css/tables.css?v=20260310b">
 {% endblock %}
 {% block body %}
 <script>
@@ -15,7 +15,7 @@
     window.currentUserRole = window.currentUser.role || null;
     window.currentUserDesignation = window.currentUser.designation || '';
 </script>
-<main class="w-full mx-auto px-6 py-10 space-y-6">
+<main class="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 md:py-8 space-y-4 md:space-y-6">
     {% block content %}{% endblock %}
 </main>
 {% endblock %}
