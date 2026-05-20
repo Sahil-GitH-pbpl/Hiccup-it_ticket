@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from collections import Counter, defaultdict
-from sqlalchemy import func
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from app.models.hiccup import Hiccup
@@ -74,33 +74,27 @@ def trend_buckets(db: Session):
 def recent_stats(db: Session):
     today = now_local().date()
     start = datetime(today.year, today.month, today.day)
-    base_filter = [Hiccup.created_at >= start]
-    raised_today = (
-        db.query(func.count(Hiccup.hiccup_id)).filter(*base_filter).scalar() or 0
-    )
-    responded_today = (
-        db.query(func.count(Hiccup.hiccup_id))
-        .filter(*(base_filter + [Hiccup.status == "Responded"]))
-        .scalar()
-        or 0
-    )
-    closed_today = (
-        db.query(func.count(Hiccup.hiccup_id))
-        .filter(*(base_filter + [Hiccup.status == "Closed"]))
-        .scalar()
-        or 0
-    )
-    escalated_today = (
-        db.query(func.count(Hiccup.hiccup_id))
-        .filter(*(base_filter + [Hiccup.status == "Escalated to NC"]))
-        .scalar()
-        or 0
+    stats = (
+        db.query(
+            func.count(Hiccup.hiccup_id).label("raised_today"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Responded", 1), else_=0)), 0
+            ).label("responded_today"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Closed", 1), else_=0)), 0
+            ).label("closed_today"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Escalated to NC", 1), else_=0)), 0
+            ).label("escalated_today"),
+        )
+        .filter(Hiccup.created_at >= start)
+        .one()
     )
     return {
-        "raised_today": raised_today,
-        "responded_today": responded_today,
-        "closed_today": closed_today,
-        "escalated_today": escalated_today,
+        "raised_today": stats.raised_today or 0,
+        "responded_today": stats.responded_today or 0,
+        "closed_today": stats.closed_today or 0,
+        "escalated_today": stats.escalated_today or 0,
     }
 
 

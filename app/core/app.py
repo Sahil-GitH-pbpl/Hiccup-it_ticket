@@ -1,11 +1,11 @@
 import logging
 import os
+from datetime import date
 from fastapi import FastAPI, Request, Depends, HTTPException, Query, status, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from fastapi.exception_handlers import http_exception_handler
@@ -13,7 +13,7 @@ from fastapi.exception_handlers import http_exception_handler
 from app.core.logging_config import configure_logging
 from app.db.session import SessionLocal, engine
 from app.db.base import Base
-from sqlalchemy import inspect, text
+from sqlalchemy import case, func, inspect, text
 from sqlalchemy.exc import NoSuchTableError
 from app.api import (
     routes_auth,
@@ -31,11 +31,13 @@ from app.core.security import (
     is_allowlisted_hiccup_admin,
 )
 from app.core.config import get_settings
+from app.core.templating import CompatJinja2Templates
 from urllib.parse import quote_plus
 import json
 from app.models.hiccup import Hiccup
 from app.models.infra import InfraTicket
 from app.models.staff import Staff
+from app.models.followup import FollowupEntry
 from app.schemas.hiccup import HiccupResponse
 
 import app.models  # ensure all models register before metadata creation
@@ -143,6 +145,25 @@ if _schema_bootstrap_enabled:
     _ensure_user_columns(engine)
 
 
+def _ensure_followup_entry_columns(engine):
+    inspector = inspect(engine)
+    try:
+        columns = {col["name"] for col in inspector.get_columns("followup_entries")}
+    except NoSuchTableError:
+        return
+    statements = []
+    if "pincode" not in columns:
+        statements.append("ALTER TABLE followup_entries ADD COLUMN pincode VARCHAR(6) NULL")
+    if statements:
+        with engine.begin() as conn:
+            for stmt in statements:
+                conn.execute(text(stmt))
+
+
+if _schema_bootstrap_enabled:
+    _ensure_followup_entry_columns(engine)
+
+
 def _ensure_infra_ticket_autoincrement(engine):
     inspector = inspect(engine)
     try:
@@ -215,10 +236,36 @@ def _ensure_infra_updates_autoincrement(engine):
 if _schema_bootstrap_enabled:
     _ensure_infra_updates_autoincrement(engine)
 
+
+def _ensure_infra_indexes(engine):
+    inspector = inspect(engine)
+    try:
+        existing = {idx["name"] for idx in inspector.get_indexes("infra_tickets")}
+    except NoSuchTableError:
+        return
+
+    statements = {
+        "idx_infra_tickets_status_created": "CREATE INDEX idx_infra_tickets_status_created ON infra_tickets (status, created_at)",
+        "idx_infra_tickets_created_by": "CREATE INDEX idx_infra_tickets_created_by ON infra_tickets (created_by)",
+        "idx_infra_tickets_assigned_to": "CREATE INDEX idx_infra_tickets_assigned_to ON infra_tickets (assigned_to)",
+        "idx_infra_tickets_department": "CREATE INDEX idx_infra_tickets_department ON infra_tickets (department)",
+        "idx_infra_tickets_category": "CREATE INDEX idx_infra_tickets_category ON infra_tickets (category)",
+        "idx_infra_tickets_delayed": "CREATE INDEX idx_infra_tickets_delayed ON infra_tickets (is_delayed_pick)",
+    }
+    with engine.begin() as conn:
+        for index_name, statement in statements.items():
+            if index_name in existing:
+                continue
+            conn.execute(text(statement))
+
+
+if _schema_bootstrap_enabled:
+    _ensure_infra_indexes(engine)
+
 settings = get_settings()
 
 
-templates = Jinja2Templates(directory="app/templates")
+templates = CompatJinja2Templates(directory="app/templates")
 
 
 def get_db():
@@ -227,6 +274,68 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def _aggregate_hiccup_counts(query):
+    row = (
+        query.with_entities(
+            func.count(Hiccup.hiccup_id).label("total"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Open", 1), else_=0)), 0
+            ).label("open"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Responded", 1), else_=0)), 0
+            ).label("responded"),
+            func.coalesce(
+                func.sum(case((Hiccup.status == "Closed", 1), else_=0)), 0
+            ).label("closed"),
+        )
+        .one()
+    )
+    return {
+        "total": row.total or 0,
+        "open": row.open or 0,
+        "responded": row.responded or 0,
+        "closed": row.closed or 0,
+    }
+
+
+def _aggregate_infra_counts(query):
+    row = (
+        query.with_entities(
+            func.count(InfraTicket.ticket_id).label("total"),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (InfraTicket.status.notin_(["Resolved", "Rejected"]), 1),
+                        else_=0,
+                    )
+                ),
+                0,
+            ).label("open"),
+            func.coalesce(
+                func.sum(case((InfraTicket.status == "Resolved", 1), else_=0)), 0
+            ).label("resolved"),
+            func.coalesce(
+                func.sum(case((InfraTicket.status == "Rejected", 1), else_=0)), 0
+            ).label("rejected"),
+            func.coalesce(
+                func.sum(case((InfraTicket.is_delayed_pick.is_(True), 1), else_=0)), 0
+            ).label("delayed"),
+            func.coalesce(
+                func.sum(case((InfraTicket.is_invalid.is_(True), 1), else_=0)), 0
+            ).label("invalid"),
+        )
+        .one()
+    )
+    return {
+        "total": row.total or 0,
+        "open": row.open or 0,
+        "resolved": row.resolved or 0,
+        "rejected": row.rejected or 0,
+        "delayed": row.delayed or 0,
+        "invalid": row.invalid or 0,
+    }
 
 
 def create_app() -> FastAPI:
@@ -257,6 +366,36 @@ def create_app() -> FastAPI:
             return RedirectResponse(url="/login")
         return await http_exception_handler(request, exc)
 
+    @app.middleware("http")
+    async def restrict_form_only_user(request: Request, call_next):
+        token = request.cookies.get("token")
+        if not token:
+            return await call_next(request)
+        try:
+            decoded = decode_jwt(token)
+        except HTTPException:
+            return await call_next(request)
+        if not _is_form_only_user(decoded):
+            return await call_next(request)
+        path = request.url.path
+        allowed_prefixes = (
+            "/followup-form",
+            "/api/auth/login",
+            "/api/auth/logout",
+            "/api/auth/me",
+            "/static/",
+        )
+        if path == "/" or path == "/login":
+            return RedirectResponse(url="/followup-form")
+        if path.startswith(allowed_prefixes):
+            return await call_next(request)
+        if path.startswith("/api/"):
+            return JSONResponse(
+                {"detail": "Form-only access"},
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
+        return RedirectResponse(url="/followup-form")
+
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
     app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
@@ -270,6 +409,9 @@ def create_app() -> FastAPI:
 
     def _can_view_all_hiccups(user):
         return _is_admin_like(user)
+
+    def _is_form_only_user(user):
+        return bool(getattr(user, "form_only", False)) or getattr(user, "role", None) == "form_only"
 
     def _parse_attachment_paths(raw_value):
         if not raw_value:
@@ -351,7 +493,10 @@ def create_app() -> FastAPI:
         if token:
             try:
                 decoded = decode_jwt(token)
-                target = "/dashboard" if _is_admin_like(decoded) else "/home"
+                if _is_form_only_user(decoded):
+                    target = "/followup-form"
+                else:
+                    target = "/dashboard" if _is_admin_like(decoded) else "/home"
                 return RedirectResponse(url=target)
             except HTTPException:
                 pass
@@ -363,7 +508,10 @@ def create_app() -> FastAPI:
         if token:
             try:
                 decoded = decode_jwt(token)
-                target = "/dashboard" if _is_admin_like(decoded) else "/home"
+                if _is_form_only_user(decoded):
+                    target = "/followup-form"
+                else:
+                    target = "/dashboard" if _is_admin_like(decoded) else "/home"
                 return RedirectResponse(url=target)
             except HTTPException:
                 pass
@@ -375,6 +523,8 @@ def create_app() -> FastAPI:
     async def home_page(
         request: Request, db: Session = Depends(get_db), user=Depends(get_current_user)
     ):
+        if _is_form_only_user(user):
+            return RedirectResponse(url="/followup-form")
         if _is_admin_like(user):
             return RedirectResponse(url="/dashboard")
         hiccup_q = db.query(Hiccup).filter(Hiccup.raised_by == user.user_id)
@@ -384,21 +534,19 @@ def create_app() -> FastAPI:
             else None
         )
 
-        hiccup_stats = {
-            "total": hiccup_q.count(),
-            "open": hiccup_q.filter(Hiccup.status == "Open").count(),
-            "responded": hiccup_q.filter(Hiccup.status == "Responded").count(),
-            "closed": hiccup_q.filter(Hiccup.status == "Closed").count(),
-        }
-
-        infra_stats = {
-            "total": infra_q.count() if infra_q is not None else 0,
-            "open": infra_q.filter(InfraTicket.status.notin_(["Resolved", "Rejected"])).count() if infra_q is not None else 0,
-            "resolved": infra_q.filter(InfraTicket.status == "Resolved").count() if infra_q is not None else 0,
-            "rejected": infra_q.filter(InfraTicket.status == "Rejected").count() if infra_q is not None else 0,
-            "delayed": infra_q.filter(InfraTicket.is_delayed_pick == True).count() if infra_q is not None else 0,
-            "invalid": infra_q.filter(InfraTicket.is_invalid == True).count() if infra_q is not None else 0,
-        }
+        hiccup_stats = _aggregate_hiccup_counts(hiccup_q)
+        infra_stats = (
+            _aggregate_infra_counts(infra_q)
+            if infra_q is not None
+            else {
+                "total": 0,
+                "open": 0,
+                "resolved": 0,
+                "rejected": 0,
+                "delayed": 0,
+                "invalid": 0,
+            }
+        )
 
         hiccup_recent = hiccup_q.order_by(Hiccup.created_at.desc()).limit(5).all()
         infra_recent = (
@@ -424,28 +572,12 @@ def create_app() -> FastAPI:
     async def dashboard(
         request: Request, db: Session = Depends(get_db), user=Depends(get_current_user)
     ):
+        if _is_form_only_user(user):
+            return RedirectResponse(url="/followup-form")
         if not _is_admin_like(user):
             return RedirectResponse(url="/home")
-        hiccup_total = db.query(Hiccup).count()
-        hiccup_open = db.query(Hiccup).filter(Hiccup.status == "Open").count()
-        hiccup_responded = db.query(Hiccup).filter(Hiccup.status == "Responded").count()
-        hiccup_closed = db.query(Hiccup).filter(Hiccup.status == "Closed").count()
-
-        infra_total = db.query(InfraTicket).count()
-        infra_open = (
-            db.query(InfraTicket)
-            .filter(InfraTicket.status.notin_(["Resolved", "Rejected"]))
-            .count()
-        )
-        infra_resolved = (
-            db.query(InfraTicket).filter(InfraTicket.status == "Resolved").count()
-        )
-        infra_delayed = (
-            db.query(InfraTicket).filter(InfraTicket.is_delayed_pick == True).count()
-        )
-        infra_invalid = (
-            db.query(InfraTicket).filter(InfraTicket.is_invalid == True).count()
-        )
+        hiccup_stats = _aggregate_hiccup_counts(db.query(Hiccup))
+        infra_stats = _aggregate_infra_counts(db.query(InfraTicket))
 
         latest_infra = (
             db.query(InfraTicket)
@@ -466,18 +598,13 @@ def create_app() -> FastAPI:
                 "request": request,
                 "user": user,
                 "is_admin_like": _is_admin_like(user),
-                "hiccup": {
-                    "total": hiccup_total,
-                    "open": hiccup_open,
-                    "responded": hiccup_responded,
-                    "closed": hiccup_closed,
-                },
+                "hiccup": hiccup_stats,
                 "infra": {
-                    "total": infra_total,
-                    "open": infra_open,
-                    "resolved": infra_resolved,
-                    "delayed": infra_delayed,
-                    "invalid": infra_invalid,
+                    "total": infra_stats["total"],
+                    "open": infra_stats["open"],
+                    "resolved": infra_stats["resolved"],
+                    "delayed": infra_stats["delayed"],
+                    "invalid": infra_stats["invalid"],
                 },
                 "latest_infra": latest_infra,
                 "latest_hiccups": latest_hiccups,
@@ -486,30 +613,214 @@ def create_app() -> FastAPI:
 
     @app.get("/raise", response_class=HTMLResponse)
     async def raise_hiccup_page(request: Request, user=Depends(get_current_user)):
+        if _is_form_only_user(user):
+            return RedirectResponse(url="/followup-form")
         return templates.TemplateResponse(
             "raise_hiccup.html", {"request": request, "user": user}
         )
 
+    def _load_followup_entries_for_user(db: Session, user):
+        if not _is_form_only_user(user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Follow-up form is available only for form-only users",
+            )
+        query = db.query(FollowupEntry)
+        query = query.filter(FollowupEntry.created_by_name == getattr(user, "name", None))
+        return query.order_by(FollowupEntry.id.desc()).limit(50).all()
+
+    @app.get("/followup-form", response_class=HTMLResponse)
+    async def followup_form_page(
+        request: Request,
+        db: Session = Depends(get_db),
+        user=Depends(get_current_user),
+    ):
+        if not _is_form_only_user(user):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Follow-up form is restricted")
+        return templates.TemplateResponse(
+            "followup_form.html",
+            {
+                "request": request,
+                "user": user,
+                "entries": _load_followup_entries_for_user(db, user),
+            },
+        )
+
+    @app.post("/followup-form", response_class=HTMLResponse)
+    async def submit_followup_form(
+        request: Request,
+        name: str = Form(...),
+        mobile_number: str = Form(...),
+        confirmed: str = Form(...),
+        transport: str = Form(...),
+        pincode: str = Form(None),
+        vs_to_call: str = Form(...),
+        my_followup: str = Form(...),
+        followup_date: str = Form(None),
+        db: Session = Depends(get_db),
+        user=Depends(get_current_user),
+    ):
+        if not _is_form_only_user(user):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Follow-up form is restricted")
+
+        def _parse_yes_no(value: str) -> bool:
+            normalized = (value or "").strip().lower()
+            if normalized == "yes":
+                return True
+            if normalized == "no":
+                return False
+            raise ValueError("Invalid yes/no value")
+
+        form_data = {
+            "name": name,
+            "mobile_number": mobile_number,
+            "confirmed": confirmed,
+            "transport": transport,
+            "pincode": pincode or "",
+            "vs_to_call": vs_to_call,
+            "my_followup": my_followup,
+            "followup_date": followup_date or "",
+        }
+        normalized_mobile = (mobile_number or "").strip()
+        if not (normalized_mobile.isdigit() and len(normalized_mobile) == 10):
+            return templates.TemplateResponse(
+                "followup_form.html",
+                {
+                    "request": request,
+                    "user": user,
+                    "form_data": form_data,
+                    "entries": _load_followup_entries_for_user(db, user),
+                    "error": "Mobile number must be exactly 10 digits.",
+                },
+                status_code=400,
+            )
+
+        try:
+            confirmed_bool = _parse_yes_no(confirmed)
+            transport_bool = _parse_yes_no(transport)
+            vs_to_call_bool = _parse_yes_no(vs_to_call)
+            my_followup_bool = _parse_yes_no(my_followup)
+        except ValueError:
+            return templates.TemplateResponse(
+                "followup_form.html",
+                {
+                    "request": request,
+                    "user": user,
+                    "form_data": form_data,
+                    "entries": _load_followup_entries_for_user(db, user),
+                    "error": "Please select Yes or No for every option.",
+                },
+                status_code=400,
+            )
+
+        normalized_pincode = (pincode or "").strip()
+        if transport_bool and not (
+            normalized_pincode.isdigit() and len(normalized_pincode) == 6
+        ):
+            return templates.TemplateResponse(
+                "followup_form.html",
+                {
+                    "request": request,
+                    "user": user,
+                    "form_data": form_data,
+                    "entries": _load_followup_entries_for_user(db, user),
+                    "error": "Pincode must be exactly 6 digits when Transport is Yes.",
+                },
+                status_code=400,
+            )
+        if not transport_bool:
+            normalized_pincode = None
+
+        if my_followup_bool and not followup_date:
+            return templates.TemplateResponse(
+                "followup_form.html",
+                {
+                    "request": request,
+                    "user": user,
+                    "form_data": form_data,
+                    "entries": _load_followup_entries_for_user(db, user),
+                    "error": "Follow-up date is required when My Follow-up is Yes.",
+                },
+                status_code=400,
+            )
+
+        parsed_followup_date = None
+        if followup_date:
+            try:
+                parsed_followup_date = date.fromisoformat(followup_date)
+            except ValueError:
+                return templates.TemplateResponse(
+                    "followup_form.html",
+                    {
+                        "request": request,
+                        "user": user,
+                        "form_data": form_data,
+                        "entries": _load_followup_entries_for_user(db, user),
+                        "error": "Please select a valid follow-up date.",
+                    },
+                    status_code=400,
+                )
+
+        if not my_followup_bool:
+            parsed_followup_date = None
+
+        entry = FollowupEntry(
+            name=name.strip(),
+            mobile_number=normalized_mobile,
+            confirmed=confirmed_bool,
+            transport=transport_bool,
+            pincode=normalized_pincode,
+            vs_to_call=vs_to_call_bool,
+            my_followup=my_followup_bool,
+            followup_date=parsed_followup_date,
+            created_by_id=None if _is_form_only_user(user) else getattr(user, "user_id", None),
+            created_by_name=getattr(user, "name", None),
+        )
+        db.add(entry)
+        db.commit()
+        db.refresh(entry)
+
+        return templates.TemplateResponse(
+            "followup_form.html",
+            {
+                "request": request,
+                "user": user,
+                "submitted": True,
+                "entry": entry,
+                "form_data": form_data,
+                "entries": _load_followup_entries_for_user(db, user),
+                "active_tab": "entries",
+            },
+        )
+
     @app.get("/my-hiccups", response_class=HTMLResponse)
     async def my_hiccups_page(request: Request, user=Depends(get_current_user)):
+        if _is_form_only_user(user):
+            return RedirectResponse(url="/followup-form")
         return templates.TemplateResponse(
             "list_hiccups.html", {"request": request, "user": user}
         )
 
     @app.get("/response-submit", response_class=HTMLResponse)
     async def response_submit_page(request: Request, user=Depends(get_current_user)):
+        if _is_form_only_user(user):
+            return RedirectResponse(url="/followup-form")
         return templates.TemplateResponse(
             "response_submit.html", {"request": request, "user": user}
         )
 
     @app.get("/assigned", response_class=HTMLResponse)
     async def assigned_page(request: Request, user=Depends(get_current_user)):
+        if _is_form_only_user(user):
+            return RedirectResponse(url="/followup-form")
         return templates.TemplateResponse(
             "assigned_hiccups.html", {"request": request, "user": user}
         )
 
     @app.get("/management", response_class=HTMLResponse)
     async def management_page(request: Request, user=Depends(get_current_user)):
+        if _is_form_only_user(user):
+            return RedirectResponse(url="/followup-form")
         if not _can_view_all_hiccups(user):
             return RedirectResponse(url="/home")
         return templates.TemplateResponse(

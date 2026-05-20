@@ -1,0 +1,282 @@
+{% extends 'layout.html' %}
+{% set saved = form_data if form_data is defined else {} %}
+{% block body_attrs %}class="text-slate-900 min-h-screen{% if user is defined and user and (user.form_only if user.form_only is defined else false) %} no-nav{% endif %}"{% endblock %}
+{% macro yes_no_group(name, label, selected) -%}
+<fieldset class="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+  <legend class="text-sm font-semibold text-slate-700">{{ label }} <span class="text-rose-500">*</span></legend>
+  <div class="grid grid-cols-2 gap-2">
+    {% for option in ['Yes', 'No'] %}
+    <label class="cursor-pointer">
+      <input
+        class="peer sr-only"
+        type="radio"
+        name="{{ name }}"
+        value="{{ option }}"
+        required
+        {% if selected == option %}checked{% endif %}
+      >
+      <span class="flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition peer-checked:border-tealbrand peer-checked:bg-tealbrand peer-checked:text-white">
+        {{ option }}
+      </span>
+    </label>
+    {% endfor %}
+  </div>
+</fieldset>
+{%- endmacro %}
+{% block content %}
+<section class="mx-auto max-w-5xl space-y-6">
+  <div class="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
+    <div class="grid grid-cols-2 gap-1">
+      <button id="tab-form" type="button" class="rounded-xl px-4 py-3 text-sm font-semibold transition" data-tab-target="form">Form</button>
+      <button id="tab-entries" type="button" class="rounded-xl px-4 py-3 text-sm font-semibold transition" data-tab-target="entries">My Entries</button>
+    </div>
+  </div>
+
+  <div id="panel-form" data-tab-panel="form" class="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-xl shadow-slate-200/60 sm:p-6 md:p-8">
+    <div class="flex flex-col gap-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-tealbrand">Quick Form</p>
+      <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Follow-up Details</h1>
+      <p class="text-sm text-slate-500">Capture name, confirmation, transport, VS call, and follow-up date details.</p>
+    </div>
+
+    {% if submitted is defined and submitted %}
+    <div class="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+      Form submitted successfully{% if entry is defined and entry %}. Entry #{{ entry.id }} has been saved{% endif %}.
+    </div>
+    {% endif %}
+
+    {% if error is defined and error %}
+    <div class="mt-5 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post" action="/followup-form" id="followup-form" class="mt-6 space-y-5">
+      <div class="space-y-2">
+        <label for="name" class="text-sm font-semibold text-slate-700">Name <span class="text-rose-500">*</span></label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          required
+          autocomplete="name"
+          value="{{ saved.name if saved.name is defined else '' }}"
+          placeholder="Enter name"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/30"
+        >
+      </div>
+
+      <div class="space-y-2">
+        <label for="mobile-number" class="text-sm font-semibold text-slate-700">Mobile Number <span class="text-rose-500">*</span></label>
+        <input
+          id="mobile-number"
+          name="mobile_number"
+          type="tel"
+          inputmode="numeric"
+          pattern="[0-9]{10}"
+          minlength="10"
+          maxlength="10"
+          required
+          autocomplete="tel"
+          value="{{ saved.mobile_number if saved.mobile_number is defined else '' }}"
+          placeholder="Enter 10 digit mobile number"
+          aria-describedby="mobile-number-help"
+          class="w-full rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-base text-slate-900 outline-none transition focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/30"
+        >
+        <p id="mobile-number-help" class="text-xs font-medium text-slate-500">Only 10 digits are allowed.</p>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        {{ yes_no_group('confirmed', 'Confirmed', saved.confirmed if saved.confirmed is defined else 'Yes') }}
+        {{ yes_no_group('transport', 'Transport', saved.transport if saved.transport is defined else 'No') }}
+        {{ yes_no_group('vs_to_call', 'VS to Call', saved.vs_to_call if saved.vs_to_call is defined else 'No') }}
+        {{ yes_no_group('my_followup', 'My Follow-up', saved.my_followup if saved.my_followup is defined else 'No') }}
+      </div>
+
+      <div id="pincode-wrap" class="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+        <label for="pincode" class="text-sm font-semibold text-slate-700">Pincode <span class="text-rose-500">*</span></label>
+        <input
+          id="pincode"
+          name="pincode"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          minlength="6"
+          maxlength="6"
+          value="{{ saved.pincode if saved.pincode is defined else '' }}"
+          placeholder="Enter 6 digit pincode"
+          aria-describedby="pincode-help"
+          class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 outline-none transition focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/30"
+        >
+        <p id="pincode-help" class="text-xs font-medium text-slate-500">Required when Transport is Yes.</p>
+      </div>
+
+      <div id="followup-date-wrap" class="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+        <label for="followup-date" class="text-sm font-semibold text-slate-700">Follow-up Date <span class="text-rose-500">*</span></label>
+        <div class="relative">
+          <input
+            id="followup-date"
+            name="followup_date"
+            type="date"
+            value="{{ saved.followup_date if saved.followup_date is defined else '' }}"
+            aria-describedby="followup-date-help"
+            class="peer w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-base text-slate-900 outline-none transition focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/30"
+          >
+          <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-xs font-bold uppercase tracking-[0.14em] text-slate-400 peer-focus:text-tealbrand" aria-hidden="true">Date</span>
+        </div>
+        <p id="followup-date-help" class="text-xs font-medium text-slate-500">Tap this field to select a date.</p>
+      </div>
+
+      <button id="followup-submit" type="submit" class="w-full rounded-2xl bg-tealbrand px-5 py-3 text-sm font-semibold uppercase tracking-[0.22em] text-white shadow-lg shadow-tealbrand/25 transition hover:bg-tealbrand-dark disabled:cursor-not-allowed disabled:bg-slate-400 disabled:shadow-none">
+        Submit
+      </button>
+    </form>
+  </div>
+
+  <div id="panel-entries" data-tab-panel="entries" class="rounded-3xl border border-slate-200 bg-white/95 p-4 shadow-xl shadow-slate-200/60 sm:p-6">
+    <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.25em] text-tealbrand">My Entries</p>
+        <h2 class="text-xl font-semibold text-slate-900">Submitted Follow-up Details</h2>
+      </div>
+      <p class="text-sm font-medium text-slate-500">{{ entries|length if entries is defined else 0 }} saved</p>
+    </div>
+
+    {% if entries is defined and entries %}
+    <p class="mt-3 text-xs font-medium text-slate-500 sm:hidden">Swipe horizontally to view all columns.</p>
+    <div class="mt-4 overflow-x-auto rounded-2xl border border-slate-200">
+      <table class="min-w-[1020px] divide-y divide-slate-200 text-left text-sm">
+        <thead class="bg-slate-50 text-xs uppercase tracking-[0.16em] text-slate-500">
+          <tr>
+            <th class="px-4 py-3 font-semibold">ID</th>
+            <th class="px-4 py-3 font-semibold">Name</th>
+            <th class="px-4 py-3 font-semibold">Mobile</th>
+            <th class="px-4 py-3 font-semibold">Confirmed</th>
+            <th class="px-4 py-3 font-semibold">Transport</th>
+            <th class="px-4 py-3 font-semibold">Pincode</th>
+            <th class="px-4 py-3 font-semibold">VS Call</th>
+            <th class="px-4 py-3 font-semibold">Follow-up</th>
+            <th class="px-4 py-3 font-semibold">Date</th>
+            <th class="px-4 py-3 font-semibold">Submitted</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+          {% for item in entries %}
+          <tr>
+            <td class="px-4 py-3 font-semibold text-slate-900">#{{ item.id }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ item.name }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ item.mobile_number }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ 'Yes' if item.confirmed else 'No' }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ 'Yes' if item.transport else 'No' }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ item.pincode if item.pincode else '-' }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ 'Yes' if item.vs_to_call else 'No' }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ 'Yes' if item.my_followup else 'No' }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ item.followup_date.strftime('%d-%b-%Y') if item.followup_date else '-' }}</td>
+            <td class="px-4 py-3 text-slate-700">{{ item.created_at.strftime('%d-%b %I:%M %p') if item.created_at else '-' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="mt-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 p-5 text-sm font-medium text-slate-500">
+      No entries submitted yet.
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('followup-form');
+    const submitButton = document.getElementById('followup-submit');
+    const mobileInput = document.getElementById('mobile-number');
+    const pincodeWrap = document.getElementById('pincode-wrap');
+    const pincodeInput = document.getElementById('pincode');
+    const dateWrap = document.getElementById('followup-date-wrap');
+    const dateInput = document.getElementById('followup-date');
+    const transportRadios = Array.from(document.querySelectorAll('input[name="transport"]'));
+    const followupRadios = Array.from(document.querySelectorAll('input[name="my_followup"]'));
+    const tabButtons = Array.from(document.querySelectorAll('[data-tab-target]'));
+    const tabPanels = Array.from(document.querySelectorAll('[data-tab-panel]'));
+    let activeTab = "{{ active_tab if active_tab is defined else 'form' }}";
+
+    function setActiveTab(tabName) {
+      activeTab = tabName || 'form';
+      tabButtons.forEach((button) => {
+        const isActive = button.dataset.tabTarget === activeTab;
+        button.classList.toggle('bg-tealbrand', isActive);
+        button.classList.toggle('text-white', isActive);
+        button.classList.toggle('shadow-sm', isActive);
+        button.classList.toggle('text-slate-600', !isActive);
+        button.classList.toggle('hover:bg-slate-50', !isActive);
+      });
+      tabPanels.forEach((panel) => {
+        panel.classList.toggle('hidden', panel.dataset.tabPanel !== activeTab);
+      });
+    }
+
+    function selectedFollowupValue() {
+      return followupRadios.find((radio) => radio.checked)?.value || 'No';
+    }
+
+    function selectedTransportValue() {
+      return transportRadios.find((radio) => radio.checked)?.value || 'No';
+    }
+
+    function syncPincode() {
+      const needsPincode = selectedTransportValue() === 'Yes';
+      pincodeWrap.classList.toggle('hidden', !needsPincode);
+      pincodeInput.required = needsPincode;
+      if (!needsPincode) {
+        pincodeInput.value = '';
+      }
+    }
+
+    function syncFollowupDate() {
+      const needsDate = selectedFollowupValue() === 'Yes';
+      dateWrap.classList.toggle('hidden', !needsDate);
+      dateInput.required = needsDate;
+      if (!needsDate) {
+        dateInput.value = '';
+      }
+    }
+
+    transportRadios.forEach((radio) => radio.addEventListener('change', syncPincode));
+    followupRadios.forEach((radio) => radio.addEventListener('change', syncFollowupDate));
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => setActiveTab(button.dataset.tabTarget));
+    });
+    mobileInput?.addEventListener('input', () => {
+      mobileInput.value = mobileInput.value.replace(/\D/g, '').slice(0, 10);
+    });
+    pincodeInput?.addEventListener('input', () => {
+      pincodeInput.value = pincodeInput.value.replace(/\D/g, '').slice(0, 6);
+    });
+    form.addEventListener('submit', (event) => {
+      if (mobileInput && !/^\d{10}$/.test(mobileInput.value)) {
+        event.preventDefault();
+        mobileInput.focus();
+        return;
+      }
+      if (selectedTransportValue() === 'Yes' && (!pincodeInput || !/^\d{6}$/.test(pincodeInput.value))) {
+        event.preventDefault();
+        pincodeInput?.focus();
+        return;
+      }
+      if (selectedFollowupValue() === 'Yes' && !dateInput.value) {
+        event.preventDefault();
+        dateInput.focus();
+        return;
+      }
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Submitting...';
+      }
+    });
+    syncPincode();
+    syncFollowupDate();
+    setActiveTab(activeTab);
+  });
+</script>
+{% endblock %}

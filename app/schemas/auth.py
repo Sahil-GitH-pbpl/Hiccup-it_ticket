@@ -17,6 +17,7 @@ class TokenResponse(BaseModel):
     designation: Optional[str] = None
     is_admin_like: bool = False
     is_infra_admin: bool = False
+    form_only: bool = False
 
 
 class TokenDataResponse(BaseModel):
@@ -27,3 +28,4 @@ class TokenDataResponse(BaseModel):
     designation: Optional[str] = None
     is_admin_like: bool = False
     is_infra_admin: bool = False
+    form_only: bool = False

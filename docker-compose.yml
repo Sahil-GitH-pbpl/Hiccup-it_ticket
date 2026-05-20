@@ -20,17 +20,17 @@ services:
       - MAIN_DB_NAME=lead_management
       - JWT_SECRET=supersecret
       - JWT_ALGO=HS256
-      - WHATSAPP_API_URL=http://192.168.0.71:3004/api/messages/send
+      - WHATSAPP_API_URL=http://10.1.1.44:3004/api/messages/send
       - WHATSAPP_API_TOKEN=61e3f2cd978650537d9223e7
       - MANAGEMENT_GROUP_NUMBERS=120363141953100908@g.us
       - INTERNAL_SERVICE_TOKEN=internal-token
-      - FRONTEND_BASE_URL=http://192.168.0.71:4001
-      - WHATSAPP_RESPONSE_BASE_URL=http://192.168.0.71:4001
+      - FRONTEND_BASE_URL=http://192.168.0.71:3010
+      - WHATSAPP_RESPONSE_BASE_URL=http://192.168.0.71:3010
       - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
       - TIMEZONE=Asia/Kolkata
       - SCHEDULER_PRIMARY=1
     ports:
-      - "4001:7410"
+      - "3010:3010"
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads

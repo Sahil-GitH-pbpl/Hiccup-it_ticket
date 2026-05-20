@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 
 from app.db.session import MainSessionLocal
 from app.models.staff import Staff
@@ -38,7 +38,9 @@ def get_db():
 def suggest_staff(q: str | None = None, limit: int = 10, db: Session = Depends(get_db)):
     department_rows = db.query(Department.id, Department.name).all()
     department_map = {dept_id: dept_name for dept_id, dept_name in department_rows}
-    query = db.query(Staff.id, Staff.name, Staff.department_id, Staff.departments, Staff.designation)
+    query = db.query(
+        Staff.id, Staff.name, Staff.department_id, Staff.departments, Staff.designation
+    ).filter(func.lower(Staff.status) == "active")
     if q:
         ilike = f"%{q}%"
         query = query.filter(

@@ -20,6 +20,16 @@ const mgmtResetFilters = document.getElementById('mgmt-reset-filters');
 const summaryColumnCount = 6;
 const actionsColumnCount = 1;
 const listColumnCount = summaryColumnCount + actionsColumnCount;
+const hiccupPageSize = 10;
+let raisedListState = { items: [], page: 1, page_size: hiccupPageSize, total: 0, total_pages: 1 };
+let assignedListState = { items: [], page: 1, page_size: hiccupPageSize, total: 0, total_pages: 1 };
+let managementListState = { items: [], page: 1, page_size: hiccupPageSize, total: 0, total_pages: 1 };
+const paginationState = {
+    raised: 1,
+    against: 1,
+    management: 1,
+    assigned: 1,
+};
 const showManagementActions = Boolean(window.managementActionsEnabled);
 const managementColumnCount = summaryColumnCount + (showManagementActions ? actionsColumnCount : 0);
 const assignedViewMode = Boolean(window.assignedView);
@@ -30,6 +40,319 @@ const hasHiccupTables =
     Boolean(document.querySelector('#my-hiccups-table')) ||
     Boolean(document.querySelector('#management-table')) ||
     Boolean(document.querySelector('#assigned-table'));
+let activeFilterDrawerId = null;
+const DENSITY_STORAGE_KEY = 'hiccupDensityMode';
+const SEARCH_INPUT_DEBOUNCE = 180;
+let mySearchTimer = null;
+let mgmtSearchTimer = null;
+let latestLoadRequestId = 0;
+
+function getSavedDensityMode() {
+    const saved = window.localStorage.getItem(DENSITY_STORAGE_KEY);
+    return saved === 'compact' ? 'compact' : 'comfortable';
+}
+
+function applyDensityMode(mode) {
+    const compact = mode === 'compact';
+    document.body.classList.toggle('hiccup-density-compact', compact);
+    window.localStorage.setItem(DENSITY_STORAGE_KEY, compact ? 'compact' : 'comfortable');
+    document.querySelectorAll('[data-density-label]').forEach((el) => {
+        el.textContent = compact ? 'Comfort' : 'Compact';
+    });
+}
+
+function toggleDensityMode() {
+    const current = getSavedDensityMode();
+    applyDensityMode(current === 'compact' ? 'comfortable' : 'compact');
+}
+
+function debounceRender(timerRefName, callback, delay = SEARCH_INPUT_DEBOUNCE) {
+    const existingTimer = timerRefName === 'my' ? mySearchTimer : mgmtSearchTimer;
+    if (existingTimer) {
+        window.clearTimeout(existingTimer);
+    }
+    const nextTimer = window.setTimeout(() => {
+        callback();
+        if (timerRefName === 'my') {
+            mySearchTimer = null;
+        } else {
+            mgmtSearchTimer = null;
+        }
+    }, delay);
+    if (timerRefName === 'my') {
+        mySearchTimer = nextTimer;
+    } else {
+        mgmtSearchTimer = nextTimer;
+    }
+}
+
+function defaultListState(page = 1) {
+    return {
+        items: [],
+        page,
+        page_size: hiccupPageSize,
+        total: 0,
+        total_pages: 1,
+        start: 0,
+        end: 0,
+    };
+}
+
+function parseBooleanParam(value) {
+    if (typeof value !== 'string') {
+        return false;
+    }
+    const normalized = value.trim().toLowerCase();
+    return normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'on';
+}
+
+function hydrateManagementStateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const pageValue = Number(params.get('page') || '1');
+    const safePage = Number.isFinite(pageValue) && pageValue > 0 ? pageValue : 1;
+    if (assignedViewMode) {
+        paginationState.assigned = safePage;
+    } else if (window.managementView) {
+        paginationState.management = safePage;
+    }
+    if (mgmtStatusFilter && params.has('status')) mgmtStatusFilter.value = params.get('status') || '';
+    if (mgmtTypeFilter && params.has('hiccup_type')) mgmtTypeFilter.value = params.get('hiccup_type') || '';
+    if (mgmtRootFilter && params.has('root_cause_category')) mgmtRootFilter.value = params.get('root_cause_category') || '';
+    if (mgmtDateFromFilter && params.has('date_from')) mgmtDateFromFilter.value = params.get('date_from') || '';
+    if (mgmtDateToFilter && params.has('date_to')) mgmtDateToFilter.value = params.get('date_to') || '';
+    if (mgmtEscalatedFilter) mgmtEscalatedFilter.checked = parseBooleanParam(params.get('escalated') || '');
+    if (mgmtOverdueFilter) mgmtOverdueFilter.checked = parseBooleanParam(params.get('overdue') || '');
+    if (mgmtGlobalSearchInput && params.has('search')) mgmtGlobalSearchInput.value = params.get('search') || '';
+}
+
+function buildManagementPageUrl(page) {
+    const params = buildManagementFilters(page);
+    params.delete('_ts');
+    return `${window.location.pathname}?${params.toString()}`;
+}
+
+function syncManagementPageUrl(page) {
+    if (!(window.managementView || assignedViewMode) || !window.history?.replaceState) {
+        return;
+    }
+    const nextUrl = buildManagementPageUrl(page);
+    window.history.replaceState({ page }, '', nextUrl);
+}
+
+function getUrlPageParam(fallback = 1) {
+    const params = new URLSearchParams(window.location.search);
+    const raw = Number(params.get('page') || '');
+    return Number.isFinite(raw) && raw > 0 ? raw : fallback;
+}
+
+function buildMyFilters(page = paginationState.raised || 1) {
+    const params = new URLSearchParams({
+        page: String(page),
+        page_size: String(hiccupPageSize),
+    });
+    if (statusFilter?.value) params.set('status', statusFilter.value);
+    if (typeFilter?.value) params.set('hiccup_type', typeFilter.value);
+    if (dateFromFilter?.value) params.set('date_from', dateFromFilter.value);
+    if (dateToFilter?.value) params.set('date_to', dateToFilter.value);
+    if (escalatedFilter?.checked) params.set('escalated', 'true');
+    if (overdueFilter?.checked) params.set('overdue', 'true');
+    const searchValue = globalSearchInput?.value?.trim();
+    if (searchValue) params.set('search', searchValue);
+    return params;
+}
+
+function buildManagementFilters(page = paginationState.management || 1) {
+    const pageKey = assignedViewMode ? paginationState.assigned || 1 : page;
+    const params = new URLSearchParams({
+        page: String(pageKey),
+        page_size: String(hiccupPageSize),
+    });
+    if (mgmtStatusFilter?.value) params.set('status', mgmtStatusFilter.value);
+    if (mgmtTypeFilter?.value) params.set('hiccup_type', mgmtTypeFilter.value);
+    if (mgmtRootFilter?.value) params.set('root_cause_category', mgmtRootFilter.value);
+    if (mgmtDateFromFilter?.value) params.set('date_from', mgmtDateFromFilter.value);
+    if (mgmtDateToFilter?.value) params.set('date_to', mgmtDateToFilter.value);
+    if (mgmtEscalatedFilter?.checked) params.set('escalated', 'true');
+    if (mgmtOverdueFilter?.checked) params.set('overdue', 'true');
+    const searchValue = mgmtGlobalSearchInput?.value?.trim();
+    if (searchValue) params.set('search', searchValue);
+    return params;
+}
+
+async function fetchHiccupList(endpoint, params) {
+    const requestParams = params instanceof URLSearchParams ? new URLSearchParams(params) : new URLSearchParams();
+    requestParams.set('_ts', String(Date.now()));
+    const query = `?${requestParams.toString()}`;
+    const payload = await fetchJSON(`${endpoint}${query}`);
+    const items = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.items)
+        ? payload.items
+        : [];
+    const page = payload?.page || 1;
+    const pageSize = payload?.page_size || hiccupPageSize;
+    const total = Array.isArray(payload) ? items.length : payload?.total || 0;
+    const totalPages = Array.isArray(payload)
+        ? Math.max(Math.ceil(total / pageSize), 1)
+        : payload?.total_pages || 1;
+    await hydrateRaisedAgainstNames(items);
+    return {
+        items,
+        page,
+        page_size: pageSize,
+        total,
+        total_pages: totalPages,
+        start: items.length ? (page - 1) * pageSize + 1 : 0,
+        end: items.length ? (page - 1) * pageSize + items.length : 0,
+    };
+}
+
+function syncVisibleRows() {
+    const visibleRows = [
+        ...(raisedListState.items || []),
+        ...(assignedListState.items || []),
+        ...(managementListState.items || []),
+    ];
+    const unique = new Map();
+    visibleRows.forEach((row) => {
+        if (row?.hiccup_id) {
+            unique.set(row.hiccup_id, row);
+        }
+    });
+    myHiccupsData = Array.from(unique.values());
+}
+
+function closeFilterDrawer(drawerId = null) {
+    const selector = drawerId
+        ? `[data-filter-drawer="${drawerId}"]`
+        : '.hiccup-filter-drawer.is-open';
+    const drawers = Array.from(document.querySelectorAll(selector));
+    drawers.forEach((drawer) => {
+        drawer.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+    });
+    activeFilterDrawerId = null;
+    document.body.classList.remove('hiccup-filter-drawer-open');
+}
+
+function openFilterDrawer(drawerId) {
+    if (!drawerId) return;
+    const drawer = document.querySelector(`[data-filter-drawer="${drawerId}"]`);
+    if (!drawer) return;
+    closeFilterDrawer();
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    activeFilterDrawerId = drawerId;
+    document.body.classList.add('hiccup-filter-drawer-open');
+}
+
+function renderActiveFilterChips(containerId, chips, scope) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    if (!chips.length) {
+        container.innerHTML = '';
+        return;
+    }
+    const chipHtml = chips
+        .map(
+            (chip) => `
+                <button type="button" class="hiccup-active-filter-chip" data-filter-chip-clear="${scope}:${chip.key}">
+                    <span>${escapeHtml(chip.label)}</span>
+                    <strong>&times;</strong>
+                </button>
+            `
+        )
+        .join('');
+    container.innerHTML = `
+        <div class="hiccup-active-filter-row">
+            ${chipHtml}
+            <button type="button" class="hiccup-active-filter-clearall" data-filter-chip-clear="${scope}:all">Clear all</button>
+        </div>
+    `;
+}
+
+function renderMyActiveFilters() {
+    const chips = [];
+    const statusValue = statusFilter?.value?.trim();
+    const typeValue = typeFilter?.value?.trim();
+    const fromValue = dateFromFilter?.value?.trim();
+    const toValue = dateToFilter?.value?.trim();
+    const searchValue = globalSearchInput?.value?.trim();
+    if (statusValue) chips.push({ key: 'status', label: `Status: ${statusValue}` });
+    if (typeValue) chips.push({ key: 'type', label: `Type: ${typeValue}` });
+    if (fromValue) chips.push({ key: 'from', label: `From: ${fromValue}` });
+    if (toValue) chips.push({ key: 'to', label: `To: ${toValue}` });
+    if (escalatedFilter?.checked) chips.push({ key: 'escalated', label: 'Escalated' });
+    if (overdueFilter?.checked) chips.push({ key: 'overdue', label: 'Overdue' });
+    if (searchValue) chips.push({ key: 'search', label: `Search: ${searchValue}` });
+    renderActiveFilterChips('my-active-filters', chips, 'my');
+}
+
+function renderMgmtActiveFilters() {
+    const chips = [];
+    const statusValue = mgmtStatusFilter?.value?.trim();
+    const typeValue = mgmtTypeFilter?.value?.trim();
+    const rootValue = mgmtRootFilter?.value?.trim();
+    const fromValue = mgmtDateFromFilter?.value?.trim();
+    const toValue = mgmtDateToFilter?.value?.trim();
+    const searchValue = mgmtGlobalSearchInput?.value?.trim();
+    if (statusValue) chips.push({ key: 'status', label: `Status: ${statusValue}` });
+    if (typeValue) chips.push({ key: 'type', label: `Type: ${typeValue}` });
+    if (rootValue) chips.push({ key: 'root', label: `Cause: ${rootValue}` });
+    if (fromValue) chips.push({ key: 'from', label: `From: ${fromValue}` });
+    if (toValue) chips.push({ key: 'to', label: `To: ${toValue}` });
+    if (mgmtEscalatedFilter?.checked) chips.push({ key: 'escalated', label: 'Escalated' });
+    if (mgmtOverdueFilter?.checked) chips.push({ key: 'overdue', label: 'Overdue' });
+    if (searchValue) chips.push({ key: 'search', label: `Search: ${searchValue}` });
+    renderActiveFilterChips('mgmt-active-filters', chips, 'mgmt');
+}
+
+function clearMyFilterChip(key) {
+    if (key === 'all') {
+        if (statusFilter) statusFilter.value = '';
+        if (typeFilter) typeFilter.value = '';
+        if (dateFromFilter) dateFromFilter.value = '';
+        if (dateToFilter) dateToFilter.value = '';
+        if (escalatedFilter) escalatedFilter.checked = false;
+        if (overdueFilter) overdueFilter.checked = false;
+        if (globalSearchInput) globalSearchInput.value = '';
+    } else if (key === 'status' && statusFilter) statusFilter.value = '';
+    else if (key === 'type' && typeFilter) typeFilter.value = '';
+    else if (key === 'from' && dateFromFilter) dateFromFilter.value = '';
+    else if (key === 'to' && dateToFilter) dateToFilter.value = '';
+    else if (key === 'escalated' && escalatedFilter) escalatedFilter.checked = false;
+    else if (key === 'overdue' && overdueFilter) overdueFilter.checked = false;
+    else if (key === 'search' && globalSearchInput) globalSearchInput.value = '';
+    paginationState.raised = 1;
+    paginationState.against = 1;
+    loadMyHiccups();
+}
+
+function clearMgmtFilterChip(key) {
+    if (key === 'all') {
+        if (mgmtStatusFilter) mgmtStatusFilter.value = '';
+        if (mgmtTypeFilter) mgmtTypeFilter.value = '';
+        if (mgmtRootFilter) mgmtRootFilter.value = '';
+        if (mgmtDateFromFilter) mgmtDateFromFilter.value = '';
+        if (mgmtDateToFilter) mgmtDateToFilter.value = '';
+        if (mgmtEscalatedFilter) mgmtEscalatedFilter.checked = false;
+        if (mgmtOverdueFilter) mgmtOverdueFilter.checked = false;
+        if (mgmtGlobalSearchInput) mgmtGlobalSearchInput.value = '';
+    } else if (key === 'status' && mgmtStatusFilter) mgmtStatusFilter.value = '';
+    else if (key === 'type' && mgmtTypeFilter) mgmtTypeFilter.value = '';
+    else if (key === 'root' && mgmtRootFilter) mgmtRootFilter.value = '';
+    else if (key === 'from' && mgmtDateFromFilter) mgmtDateFromFilter.value = '';
+    else if (key === 'to' && mgmtDateToFilter) mgmtDateToFilter.value = '';
+    else if (key === 'escalated' && mgmtEscalatedFilter) mgmtEscalatedFilter.checked = false;
+    else if (key === 'overdue' && mgmtOverdueFilter) mgmtOverdueFilter.checked = false;
+    else if (key === 'search' && mgmtGlobalSearchInput) mgmtGlobalSearchInput.value = '';
+    if (assignedViewMode) {
+        paginationState.assigned = 1;
+    } else {
+        paginationState.management = 1;
+    }
+    loadMyHiccups();
+}
 
 async function ensureDepartmentCache() {
     if (departmentCache) {
@@ -103,6 +426,85 @@ function inDateRange(createdAt, fromValue, toValue) {
     return true;
 }
 
+function paginateRows(rows, stateKey) {
+    const total = rows.length;
+    if (!total) {
+        paginationState[stateKey] = 1;
+        return {
+            pagedRows: [],
+            meta: {
+                page: 1,
+                totalPages: 1,
+                total,
+                start: 0,
+                end: 0,
+            },
+        };
+    }
+    const totalPages = Math.max(Math.ceil(total / hiccupPageSize), 1);
+    const currentPage = Math.min(Math.max(paginationState[stateKey] || 1, 1), totalPages);
+    paginationState[stateKey] = currentPage;
+    const startIndex = (currentPage - 1) * hiccupPageSize;
+    const endIndex = Math.min(startIndex + hiccupPageSize, total);
+    return {
+        pagedRows: rows.slice(startIndex, endIndex),
+        meta: {
+            page: currentPage,
+            totalPages,
+            total,
+            start: startIndex + 1,
+            end: endIndex,
+        },
+    };
+}
+
+function renderPagination(containerId, stateKey, meta, label = 'hiccups') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const hasRows = meta.total > 0;
+    if (!hasRows) {
+        container.innerHTML = '';
+        return;
+    }
+    const totalPages = meta.totalPages || meta.total_pages || 1;
+    const disablePrev = meta.page <= 1;
+    const disableNext = meta.page >= totalPages;
+    const prevPage = Math.max((meta.page || 1) - 1, 1);
+    const nextPage = Math.min((meta.page || 1) + 1, totalPages);
+    const prevControl = `<button
+            type="button"
+            class="hiccup-pagination-btn"
+            data-pagination-action="prev"
+            data-pagination-target="${stateKey}"
+            data-pagination-page="${prevPage}"
+            ${disablePrev ? 'disabled' : ''}
+        >
+            Previous
+        </button>`;
+    const nextControl = `<button
+            type="button"
+            class="hiccup-pagination-btn"
+            data-pagination-action="next"
+            data-pagination-target="${stateKey}"
+            data-pagination-page="${nextPage}"
+            ${disableNext ? 'disabled' : ''}
+        >
+            Next
+        </button>`;
+    container.innerHTML = `
+        <div class="hiccup-pagination-controls">
+            <p class="hiccup-pagination-summary">
+                Showing ${meta.start}-${meta.end} of ${meta.total} ${label}
+            </p>
+            <div class="hiccup-pagination-actions">
+                ${prevControl}
+                <span class="hiccup-pagination-page">Page ${meta.page} of ${totalPages}</span>
+                ${nextControl}
+            </div>
+        </div>
+    `;
+}
+
 function managementActionButtons(hiccup) {
     const { hiccup_id: id, status, escalated_by } = hiccup;
     const hasEscalation = Boolean(escalated_by);
@@ -122,7 +524,7 @@ function managementActionButtons(hiccup) {
     const escalationAction =
         status === 'Escalated to NC' || (status === 'Closed' && hasEscalation)
             ? {
-                  label: 'View NC',
+                  label: 'View NC Form',
                   classes: 'text-amber-600 border-amber-300',
                   behavior: 'view-nc',
               }
@@ -137,7 +539,11 @@ function managementActionButtons(hiccup) {
         .map((action) => {
             const statusAttr = action.status ? `data-status="${action.status}"` : '';
             const behaviorAttr = action.behavior ? `data-behavior="${action.behavior}"` : '';
-            return `<button type="button" class="mgmt-pill ${action.classes}" data-hiccup="${id}" ${statusAttr} ${behaviorAttr}>${action.label}</button>`;
+            const readonlyAttr =
+                action.behavior === 'view-nc' && status === 'Closed'
+                    ? 'data-nc-readonly="true"'
+                    : '';
+            return `<button type="button" class="mgmt-pill ${action.classes}" data-hiccup="${id}" ${statusAttr} ${behaviorAttr} ${readonlyAttr}>${action.label}</button>`;
         })
         .join('');
 }
@@ -177,7 +583,56 @@ function actionCellHtml(h, includeMgmtActions = false, options = {}) {
     </td>`;
 }
 
-function detailMarkup(h, ncForm) {
+function getActiveDetailCollection() {
+    if (assignedViewMode || window.managementView) {
+        return Array.isArray(managementListState.items) ? managementListState.items : [];
+    }
+    const againstTab = document.getElementById('tab-against-me');
+    const isAgainstActive = Boolean(againstTab && againstTab.classList.contains('is-active'));
+    if (isAgainstActive) {
+        return Array.isArray(assignedListState.items) ? assignedListState.items : [];
+    }
+    return Array.isArray(raisedListState.items) ? raisedListState.items : [];
+}
+
+function buildDetailNavigation(h, collection = []) {
+    const rows = Array.isArray(collection) ? collection : [];
+    const currentIndex = rows.findIndex((entry) => entry?.hiccup_id === h.hiccup_id);
+    if (currentIndex === -1 || rows.length <= 1) {
+        return {
+            markup: '',
+            prevHiccup: null,
+            nextHiccup: null,
+        };
+    }
+    const prevHiccup = currentIndex > 0 ? rows[currentIndex - 1] : null;
+    const nextHiccup = currentIndex < rows.length - 1 ? rows[currentIndex + 1] : null;
+    const markup = `
+        <div class="hiccup-detail-nav">
+            <button
+                type="button"
+                class="detail-btn"
+                data-detail-nav="prev"
+                ${prevHiccup ? '' : 'disabled'}
+            >
+                Prev
+            </button>
+            <span class="hiccup-detail-nav__meta">Item ${currentIndex + 1} of ${rows.length}</span>
+            <button
+                type="button"
+                class="detail-btn"
+                data-detail-nav="next"
+                ${nextHiccup ? '' : 'disabled'}
+            >
+                Next
+            </button>
+        </div>
+    `;
+    return { markup, prevHiccup, nextHiccup };
+}
+
+function detailMarkup(h, ncForm, collection = []) {
+    const navigation = buildDetailNavigation(h, collection);
     const summaryCards = [
         { title: 'Created By', value: formatPersonDisplay(h.raised_by_name) },
         { title: 'Created Against', value: formatPersonDisplay(h.raised_against_name) },
@@ -208,32 +663,32 @@ function detailMarkup(h, ncForm) {
         cards
             .map(
                 ({ title, value }) => `
-                    <div class="rounded-2xl border border-slate-100 bg-white/90 p-2 text-sm text-slate-900">
-                        <p class="text-[10px] uppercase tracking-[0.3em] text-slate-500">${title}</p>
-                        <p class="mt-2 text-lg font-semibold text-slate-900">${value ?? '-'}</p>
+                    <div class="hiccup-detail-kv">
+                        <p class="hiccup-detail-kv__label">${title}</p>
+                        <p class="hiccup-detail-kv__value">${value ?? '-'}</p>
                     </div>
                 `
             )
             .join('');
     const narrative = `
-        <div class="grid gap-2 sm:grid-cols-2">
-            <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
-                <p class="text-xs uppercase tracking-[0.4em] text-slate-500">Description</p>
-                <div class="mt-2 text-[12px] leading-relaxed text-slate-800 whitespace-pre-line break-words max-h-56 overflow-y-auto normal-case">
+        <div class="hiccup-detail-story-grid">
+            <div class="hiccup-detail-panel">
+                <p class="hiccup-detail-panel__title">Description</p>
+                <div class="hiccup-detail-panel__body hiccup-detail-panel__body--lg">
                     ${escapeHtml(h.description || '-')}
                 </div>
             </div>
-            <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
-                <p class="text-xs uppercase tracking-[0.4em] text-slate-500">Immediate Effect</p>
-                <div class="mt-2 text-[12px] leading-relaxed text-slate-800 whitespace-pre-line break-words max-h-56 overflow-y-auto normal-case">
+            <div class="hiccup-detail-panel">
+                <p class="hiccup-detail-panel__title">Immediate Effect</p>
+                <div class="hiccup-detail-panel__body hiccup-detail-panel__body--lg">
                     ${escapeHtml(h.immediate_effect || '-')}
                 </div>
             </div>
             ${
                 h.status === 'Closed' && h.closure_notes
-                    ? `<div class="rounded-2xl border border-slate-100 bg-emerald-50/70 p-3 sm:col-span-2">
-                        <p class="text-xs uppercase tracking-[0.4em] text-emerald-700">Closure Notes</p>
-                        <p class="mt-2 text-sm text-emerald-900">${truncatedText(h.closure_notes, 260)}</p>
+                    ? `<div class="hiccup-detail-panel hiccup-detail-panel--success hiccup-detail-panel--wide">
+                        <p class="hiccup-detail-panel__title">Closure Notes</p>
+                        <p class="hiccup-detail-panel__body">${truncatedText(h.closure_notes, 260)}</p>
                        </div>`
                     : ''
             }
@@ -241,45 +696,89 @@ function detailMarkup(h, ncForm) {
     `;
     const responseHtml = h.response_text
         ? `
-            <div class="rounded-3xl border border-teal-200 bg-teal-50/70 p-3 shadow-sm mx-auto w-full">
-                <p class="text-[10px] uppercase tracking-[0.4em] text-tealbrand">Response</p>
-                <p class="mt-2 text-lg font-semibold text-slate-900 leading-relaxed">${escapeHtml(h.response_text)}</p>
-                <p class="text-xs mt-2 text-slate-500">Responded by <span class="font-semibold text-slate-900">${formatPersonDisplay(h.response_by_name, h.response_by)}</span></p>
+            <div class="hiccup-detail-response">
+                <p class="hiccup-detail-response__title">Response</p>
+                <p class="hiccup-detail-response__text">${escapeHtml(h.response_text)}</p>
+                <p class="hiccup-detail-response__meta">Responded by <span>${formatPersonDisplay(h.response_by_name, h.response_by)}</span></p>
             </div>`
         : '';
     const badges = `
-        <div class="flex flex-wrap gap-2 text-[10px] uppercase tracking-[0.3em] text-slate-500">
+        <div class="hiccup-detail-badges">
             ${formatOverdueBadges(h)}
-            <span class="rounded-full border border-slate-200 px-3 py-1">Auto: ${h.is_auto_generated ? 'Yes' : 'No'}</span>
-            <span class="rounded-full border border-slate-200 px-3 py-1">Confidential: ${h.confidential_flag ? 'Yes' : 'No'}</span>
+            <span class="hiccup-detail-pill">Auto: ${h.is_auto_generated ? 'Yes' : 'No'}</span>
+            <span class="hiccup-detail-pill">Confidential: ${h.confidential_flag ? 'Yes' : 'No'}</span>
         </div>
     `;
+    const chronology = `
+        <div class="hiccup-detail-chronology">
+            <span class="hiccup-detail-chip"><strong>Created</strong> ${formatDate(h.created_at)}</span>
+            <span class="hiccup-detail-chip"><strong>Updated</strong> ${formatDate(h.updated_at)}</span>
+            <span class="hiccup-detail-chip"><strong>Type</strong> ${normalizeText(h.hiccup_type)}</span>
+        </div>
+    `;
+    const modalActionButtons = showManagementActions ? managementActionButtons(h) : '';
+    const modalActions = modalActionButtons
+        ? `
+            <div class="hiccup-detail-actionbar">
+                ${modalActionButtons}
+            </div>
+        `
+        : '';
     return `
-        <div class="space-y-3 text-slate-700 text-sm max-w-[620px]">
-            <div class="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-                ${renderCards(summaryCards)}
-            </div>
-            <div class="grid gap-2 sm:grid-cols-2 md:grid-cols-4">
-                ${renderCards(detailCards)}
-            </div>
-            ${narrative}
-            ${responseHtml}
-            ${badges}
-            <div class="grid gap-3 md:grid-cols-2">
-                <div class="rounded-2xl border border-slate-100 bg-white/80 p-3">
-                    <p class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Attachments</p>
-                    <div class="mt-2 text-sm text-slate-900 attachment-stack">
-                        ${formatAttachment(attachmentSource)}
+        <div class="hiccup-detail-canvas">
+            <div class="hiccup-detail-modal hiccup-detail-modal--compact">
+                <div class="hiccup-detail-head">
+                    <div>
+                        <div class="hiccup-detail-id">#${escapeHtml(h.hiccup_id)}</div>
+                        <p class="hiccup-detail-sub">Hiccup Incident Snapshot</p>
                     </div>
+                    <div class="hiccup-detail-status">${normalizeText(h.status)}</div>
                 </div>
-                <div class="rounded-2xl border border-slate-100 bg-white/80 p-3">
-                    <p class="text-[10px] uppercase tracking-[0.3em] text-slate-500">Follow-up</p>
-                    <p class="mt-2 text-sm text-slate-900">${normalizeText(h.followup_status)} ${normalizeText(h.followup_comment)}</p>
+                <div class="hiccup-detail-topline">
+                    ${chronology}
+                    ${badges}
+                </div>
+                ${navigation.markup}
+                <div class="hiccup-detail-viewport">
+                    <div class="hiccup-detail-column hiccup-detail-column--meta">
+                        <div class="hiccup-detail-kv-grid">
+                            ${renderCards(summaryCards)}
+                            ${renderCards(detailCards)}
+                        </div>
+                    </div>
+                    <div class="hiccup-detail-column hiccup-detail-column--story">
+                        ${narrative}
+                        ${responseHtml}
+                        <div class="hiccup-detail-bottom-grid">
+                            <div class="hiccup-detail-panel">
+                                <p class="hiccup-detail-panel__title">Attachments</p>
+                                <div class="hiccup-detail-panel__body attachment-stack">
+                                    ${formatAttachment(attachmentSource)}
+                                </div>
+                            </div>
+                            <div class="hiccup-detail-panel">
+                                <p class="hiccup-detail-panel__title">Follow-up</p>
+                                <p class="hiccup-detail-panel__body">${normalizeText(h.followup_status)} ${normalizeText(h.followup_comment)}</p>
+                            </div>
+                        </div>
+                        ${modalActions}
+                    </div>
                 </div>
             </div>
         </div>
     `;
 }
+
+function closeOverlayModals() {
+    const ncSummaryModal = document.getElementById('nc-view-modal');
+    if (ncSummaryModal) {
+        ncSummaryModal.remove();
+    }
+    if (typeof Swal !== 'undefined' && Swal.isVisible()) {
+        Swal.close();
+    }
+}
+
 async function fetchNCEscalationForm(hiccupId) {
     try {
         return await fetchJSON(`/api/hiccups/${hiccupId}/nc-form`);
@@ -289,20 +788,44 @@ async function fetchNCEscalationForm(hiccupId) {
     }
 }
 
-async function presentHiccupDetails(h) {
+async function presentHiccupDetails(h, collection = getActiveDetailCollection()) {
+    closeOverlayModals();
     let ncForm = null;
     if (h.status === 'Escalated to NC') {
         ncForm = await fetchNCEscalationForm(h.hiccup_id);
     }
+    const navigation = buildDetailNavigation(h, collection);
     Swal.fire({
-        title: `Hiccup ${escapeHtml(h.hiccup_id)}`,
-        html: detailMarkup(h, ncForm),
-        width: 640,
-        showCloseButton: true,
-        confirmButtonText: 'Close',
-        background: '#fff',
+        title: '',
+        html: detailMarkup(h, ncForm, collection),
+        width: 1120,
+        heightAuto: false,
+        showCloseButton: false,
+        allowEscapeKey: true,
+        confirmButtonText: 'Close (Press ESC key)',
+        background: '#f8fafc',
         customClass: {
+            container: 'swal-detail-container',
             popup: 'swal-detail-popup',
+            htmlContainer: 'swal-detail-html',
+        },
+        didOpen: () => {
+            const popup = Swal.getPopup();
+            if (!popup) {
+                return;
+            }
+            const prevBtn = popup.querySelector('[data-detail-nav="prev"]');
+            const nextBtn = popup.querySelector('[data-detail-nav="next"]');
+            prevBtn?.addEventListener('click', () => {
+                if (navigation.prevHiccup) {
+                    presentHiccupDetails(navigation.prevHiccup, collection);
+                }
+            });
+            nextBtn?.addEventListener('click', () => {
+                if (navigation.nextHiccup) {
+                    presentHiccupDetails(navigation.nextHiccup, collection);
+                }
+            });
         },
     });
 }
@@ -434,46 +957,23 @@ function renderHiccupCards(containerId, data, options = {}) {
 function renderMyHiccupsTable() {
     const tbody = document.querySelector('#my-hiccups-table tbody');
     if (!tbody && !document.getElementById('raised-by-cards')) return;
-    let filtered = myHiccupsData;
-    filtered = filtered.filter((entry) =>
-        matchesCurrentUser(entry.raised_by, entry.raised_by_name)
-    );
-    const statusValue = statusFilter?.value;
-    const typeValue = typeFilter?.value;
-    if (statusValue) {
-        filtered = filtered.filter((entry) => entry.status === statusValue);
-    }
-    if (typeValue) {
-        filtered = filtered.filter((entry) => entry.hiccup_type === typeValue);
-    }
-    const fromValue = dateFromFilter?.value;
-    const toValue = dateToFilter?.value;
-    if (fromValue || toValue) {
-        filtered = filtered.filter((entry) => inDateRange(entry.created_at, fromValue, toValue));
-    }
-    if (escalatedFilter?.checked) {
-        filtered = filtered.filter((entry) => isEscalated(entry));
-    }
-    if (overdueFilter?.checked) {
-        filtered = filtered.filter((entry) => isOverdue(entry));
-    }
-    const searchValue = globalSearchInput?.value?.trim();
-    if (searchValue) {
-        filtered = filtered.filter((entry) => matchesGlobalSearch(entry, searchValue));
-    }
+    const filtered = Array.isArray(raisedListState.items) ? raisedListState.items : [];
+    const visibleRows = filtered.slice(0, hiccupPageSize);
     const allowNcForCreator = (h) =>
         h.status === 'Escalated to NC' || h.escalated_by || h.nc_assigned_staff_id;
-    renderHiccupCards('raised-by-cards', filtered, {
+    renderMyActiveFilters();
+    renderHiccupCards('raised-by-cards', visibleRows, {
         displayRaisedAgainst: true,
         allowNcView: allowNcForCreator,
         ncReadonly: true,
         showNcButton: true,
     });
+    renderPagination('pagination-raised', 'raised', raisedListState);
     if (tbody) {
         if (filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
         } else {
-            tbody.innerHTML = filtered
+            tbody.innerHTML = visibleRows
                 .map((h) =>
                     summaryRowHtml(h, true, false, {
                         allowNcView: allowNcForCreator(h),
@@ -486,48 +986,22 @@ function renderMyHiccupsTable() {
     }
 }
 
-function renderAssignedTable(data) {
-    const assignedBody = assignedViewMode
-        ? document.querySelector('#management-table tbody')
-        : document.querySelector('#assigned-table tbody');
-    const assignedCardsId = assignedViewMode ? 'assigned-nc-cards' : 'against-me-cards';
+function renderAssignedTable() {
+    const assignedBody = document.querySelector('#assigned-table tbody');
+    const assignedCardsId = 'against-me-cards';
     if (!assignedBody && !document.getElementById(assignedCardsId)) return;
-    const rows = Array.isArray(data) ? data : [];
-    const assigned = assignedViewMode
-        ? rows.filter((h) => {
-              const isNcAssigned =
-                  h.nc_assigned_staff_id &&
-                  currentUserId &&
-                  String(h.nc_assigned_staff_id) === String(currentUserId);
-              const isRaisedAgainst = matchesCurrentUser(h.raised_against, h.raised_against_name);
-              return isNcAssigned || isRaisedAgainst;
-          })
-        : rows.filter((h) => matchesCurrentUser(h.raised_against, h.raised_against_name));
-    const fromValue = dateFromFilter?.value;
-    const toValue = dateToFilter?.value;
-    let filteredAssigned = assigned;
-    if (fromValue || toValue) {
-        filteredAssigned = filteredAssigned.filter((entry) => inDateRange(entry.created_at, fromValue, toValue));
-    }
-    if (escalatedFilter?.checked) {
-        filteredAssigned = filteredAssigned.filter((entry) => isEscalated(entry));
-    }
-    if (overdueFilter?.checked) {
-        filteredAssigned = filteredAssigned.filter((entry) => isOverdue(entry));
-    }
-    if (assigned.length === 0) {
+    const filteredAssigned = Array.isArray(assignedListState.items) ? assignedListState.items : [];
+    const visibleRows = filteredAssigned.slice(0, hiccupPageSize);
+    if (assignedListState.total === 0) {
         if (assignedBody) {
             assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
         }
         renderHiccupCards(assignedCardsId, [], {
             displayRaisedAgainst: false,
         });
+        renderPagination('pagination-against', 'against', assignedListState, 'assignments');
         return;
     }
-    const searchValue = globalSearchInput?.value?.trim();
-    filteredAssigned = searchValue
-        ? filteredAssigned.filter((entry) => matchesGlobalSearch(entry, searchValue))
-        : filteredAssigned;
     if (filteredAssigned.length === 0) {
         if (assignedBody) {
             assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
@@ -535,6 +1009,7 @@ function renderAssignedTable(data) {
         renderHiccupCards(assignedCardsId, [], {
             displayRaisedAgainst: false,
         });
+        renderPagination('pagination-against', 'against', assignedListState, 'assignments');
         return;
     }
     const isAssignedNc = (entry) =>
@@ -543,7 +1018,7 @@ function renderAssignedTable(data) {
         currentUserId &&
         String(entry.nc_assigned_staff_id) === String(currentUserId);
     const ncReadonlyForAssigned = (h) => h.status === 'Closed';
-    renderHiccupCards(assignedCardsId, filteredAssigned, {
+    renderHiccupCards(assignedCardsId, visibleRows, {
         displayRaisedAgainst: false,
         allowRespond: (h) => h.status !== 'Closed' && !h.response_text,
         allowNcView: (h) =>
@@ -551,8 +1026,9 @@ function renderAssignedTable(data) {
         ncReadonly: ncReadonlyForAssigned, // editable when open, read-only when closed
         showNcButton: true,
     });
+    renderPagination('pagination-against', 'against', assignedListState, 'assignments');
     if (assignedBody) {
-        assignedBody.innerHTML = filteredAssigned
+        assignedBody.innerHTML = visibleRows
             .map((h) => {
                 const canRespond = h.status !== 'Closed' && !h.response_text;
                 return summaryRowHtml(h, true, false, {
@@ -595,26 +1071,15 @@ function applyManagementFilters(rows) {
     return filtered;
 }
 
-function renderManagementTable(data) {
+function renderManagementTable() {
     const mgmtBody = document.querySelector('#management-table tbody');
-    if (!mgmtBody) return;
-    const rows = Array.isArray(data) ? data : [];
-    const filtered = applyManagementFilters(rows);
-    const assignedFiltered = assignedViewMode
-        ? filtered.filter((entry) => {
-              const isAssignedNc =
-                  entry.nc_assigned_staff_id &&
-                  currentUserId &&
-                  String(entry.nc_assigned_staff_id) === String(currentUserId);
-              const isRaisedAgainst = matchesCurrentUser(entry.raised_against, entry.raised_against_name);
-              const isNcStatus = entry.status === 'Escalated to NC' || entry.status === 'Closed';
-              return isNcStatus && (isAssignedNc || isRaisedAgainst);
-          })
-        : filtered;
-    const mgmtSearchValue = mgmtGlobalSearchInput?.value?.trim();
-    const finalFiltered = mgmtSearchValue
-        ? assignedFiltered.filter((entry) => matchesGlobalSearch(entry, mgmtSearchValue))
-        : assignedFiltered;
+    const mgmtCardsId = assignedViewMode ? 'assigned-nc-cards' : 'management-cards';
+    if (!mgmtBody && !document.getElementById(mgmtCardsId)) return;
+    const finalFiltered = Array.isArray(managementListState.items) ? managementListState.items : [];
+    const visibleRows = finalFiltered.slice(0, hiccupPageSize);
+    renderMgmtActiveFilters();
+    const paginationKey = assignedViewMode ? 'assigned' : 'management';
+    const paginationContainerId = assignedViewMode ? 'pagination-assigned' : 'pagination-management';
     const isAssignedNc = (entry) =>
         entry &&
         entry.nc_assigned_staff_id &&
@@ -627,17 +1092,19 @@ function renderManagementTable(data) {
         if (showManagementActions) return false; // management (Dr Vipul/Dr Vishu) can edit/close
         return !isAssignedNc(h);
     };
-    renderHiccupCards('assigned-nc-cards', assignedViewMode ? finalFiltered : [], {
+    renderHiccupCards(mgmtCardsId, visibleRows, {
         displayRaisedAgainst: true,
         includeMgmtActions: showManagementActions,
         allowNcView: allowNcViewFn,
         ncReadonly: ncReadonlyFor,
+        showNcButton: true,
     });
-    if (finalFiltered.length === 0) {
+    renderPagination(paginationContainerId, paginationKey, managementListState);
+    if (managementListState.total === 0 || finalFiltered.length === 0) {
         mgmtBody.innerHTML = `<tr><td colspan="${managementColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
         return;
     }
-    mgmtBody.innerHTML = finalFiltered
+    mgmtBody.innerHTML = visibleRows
         .map((h) =>
             summaryRowHtml(h, showManagementActions, showManagementActions, {
                 allowNcView: allowNcViewFn(h),
@@ -647,35 +1114,48 @@ function renderManagementTable(data) {
         .join('');
 }
 
-function renderAllTables(data) {
-    const rows = Array.isArray(data) ? data : [];
-    myHiccupsData = rows;
+function renderAllTables() {
+    syncVisibleRows();
     renderMyHiccupsTable();
-    renderAssignedTable(rows);
-    renderManagementTable(rows);
+    if (!assignedViewMode) {
+        renderAssignedTable();
+    }
+    renderManagementTable();
 }
 
 if (statusFilter) {
-    statusFilter.addEventListener('change', renderMyHiccupsTable);
+    statusFilter.addEventListener('change', () => {
+        paginationState.raised = 1;
+        paginationState.against = 1;
+        loadMyHiccups();
+    });
 }
 if (typeFilter) {
-    typeFilter.addEventListener('change', renderMyHiccupsTable);
+    typeFilter.addEventListener('change', () => {
+        paginationState.raised = 1;
+        paginationState.against = 1;
+        loadMyHiccups();
+    });
 }
 dateFromFilter?.addEventListener('change', () => {
-    renderMyHiccupsTable();
-    renderAssignedTable(myHiccupsData);
+    paginationState.raised = 1;
+    paginationState.against = 1;
+    loadMyHiccups();
 });
 dateToFilter?.addEventListener('change', () => {
-    renderMyHiccupsTable();
-    renderAssignedTable(myHiccupsData);
+    paginationState.raised = 1;
+    paginationState.against = 1;
+    loadMyHiccups();
 });
 escalatedFilter?.addEventListener('change', () => {
-    renderMyHiccupsTable();
-    renderAssignedTable(myHiccupsData);
+    paginationState.raised = 1;
+    paginationState.against = 1;
+    loadMyHiccups();
 });
 overdueFilter?.addEventListener('change', () => {
-    renderMyHiccupsTable();
-    renderAssignedTable(myHiccupsData);
+    paginationState.raised = 1;
+    paginationState.against = 1;
+    loadMyHiccups();
 });
 resetFilters?.addEventListener('click', () => {
     if (statusFilter) statusFilter.value = '';
@@ -685,25 +1165,74 @@ resetFilters?.addEventListener('click', () => {
     if (escalatedFilter) escalatedFilter.checked = false;
     if (overdueFilter) overdueFilter.checked = false;
     if (globalSearchInput) globalSearchInput.value = '';
-    renderMyHiccupsTable();
-    renderAssignedTable(myHiccupsData);
+    paginationState.raised = 1;
+    paginationState.against = 1;
+    loadMyHiccups();
+    closeFilterDrawer();
 });
 
 const mgmtSelectFilters = [mgmtStatusFilter, mgmtTypeFilter, mgmtRootFilter];
 mgmtSelectFilters.forEach((filterEl) => {
     if (filterEl) {
-        filterEl.addEventListener('change', () => renderManagementTable(myHiccupsData));
+        filterEl.addEventListener('change', () => {
+            if (assignedViewMode) {
+                paginationState.assigned = 1;
+            } else {
+                paginationState.management = 1;
+            }
+            loadMyHiccups();
+        });
     }
 });
-mgmtDateFromFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
-mgmtDateToFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
-mgmtEscalatedFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
-mgmtOverdueFilter?.addEventListener('change', () => renderManagementTable(myHiccupsData));
-globalSearchInput?.addEventListener('input', () => {
-    renderMyHiccupsTable();
-    renderAssignedTable(myHiccupsData);
+mgmtDateFromFilter?.addEventListener('change', () => {
+    if (assignedViewMode) {
+        paginationState.assigned = 1;
+    } else {
+        paginationState.management = 1;
+    }
+    loadMyHiccups();
 });
-mgmtGlobalSearchInput?.addEventListener('input', () => renderManagementTable(myHiccupsData));
+mgmtDateToFilter?.addEventListener('change', () => {
+    if (assignedViewMode) {
+        paginationState.assigned = 1;
+    } else {
+        paginationState.management = 1;
+    }
+    loadMyHiccups();
+});
+mgmtEscalatedFilter?.addEventListener('change', () => {
+    if (assignedViewMode) {
+        paginationState.assigned = 1;
+    } else {
+        paginationState.management = 1;
+    }
+    loadMyHiccups();
+});
+mgmtOverdueFilter?.addEventListener('change', () => {
+    if (assignedViewMode) {
+        paginationState.assigned = 1;
+    } else {
+        paginationState.management = 1;
+    }
+    loadMyHiccups();
+});
+globalSearchInput?.addEventListener('input', () => {
+    debounceRender('my', () => {
+        paginationState.raised = 1;
+        paginationState.against = 1;
+        loadMyHiccups();
+    });
+});
+mgmtGlobalSearchInput?.addEventListener('input', () =>
+    debounceRender('mgmt', () => {
+        if (assignedViewMode) {
+            paginationState.assigned = 1;
+        } else {
+            paginationState.management = 1;
+        }
+        loadMyHiccups();
+    })
+);
 mgmtResetFilters?.addEventListener('click', () => {
     if (mgmtStatusFilter) mgmtStatusFilter.value = '';
     if (mgmtTypeFilter) mgmtTypeFilter.value = '';
@@ -713,7 +1242,13 @@ mgmtResetFilters?.addEventListener('click', () => {
     if (mgmtEscalatedFilter) mgmtEscalatedFilter.checked = false;
     if (mgmtOverdueFilter) mgmtOverdueFilter.checked = false;
     if (mgmtGlobalSearchInput) mgmtGlobalSearchInput.value = '';
-    renderManagementTable(myHiccupsData);
+    if (assignedViewMode) {
+        paginationState.assigned = 1;
+    } else {
+        paginationState.management = 1;
+    }
+    loadMyHiccups();
+    closeFilterDrawer();
 });
 
 function toggleHiccupTab(target) {
@@ -721,6 +1256,8 @@ function toggleHiccupTab(target) {
     const againstSection = document.getElementById('against-me-section');
     const raisedCards = document.getElementById('raised-by-cards');
     const againstCards = document.getElementById('against-me-cards');
+    const raisedPagination = document.getElementById('pagination-raised');
+    const againstPagination = document.getElementById('pagination-against');
     const raisedTab = document.getElementById('tab-raised-by');
     const againstTab = document.getElementById('tab-against-me');
     const isRaised = target === 'raised';
@@ -728,14 +1265,12 @@ function toggleHiccupTab(target) {
     if (againstSection) againstSection.classList.toggle('hidden', isRaised);
     if (raisedCards) raisedCards.classList.toggle('hidden', !isRaised);
     if (againstCards) againstCards.classList.toggle('hidden', isRaised);
+    if (raisedPagination) raisedPagination.classList.toggle('hidden', !isRaised);
+    if (againstPagination) againstPagination.classList.toggle('hidden', isRaised);
     const updateTabStyles = (tabEl, active) => {
         if (!tabEl) return;
-        tabEl.classList.toggle('bg-tealbrand', active);
-        tabEl.classList.toggle('text-white', active);
-        tabEl.classList.toggle('border-tealbrand', active);
-        tabEl.classList.toggle('bg-white', !active);
-        tabEl.classList.toggle('text-slate-700', !active);
-        tabEl.classList.toggle('border-slate-200', !active);
+        tabEl.classList.toggle('is-active', active);
+        tabEl.setAttribute('aria-selected', active ? 'true' : 'false');
     };
     updateTabStyles(raisedTab, isRaised);
     updateTabStyles(againstTab, !isRaised);
@@ -752,21 +1287,72 @@ function setupHiccupTabs() {
     toggleHiccupTab('raised');
 }
 
+function setupDensityControls() {
+    applyDensityMode(getSavedDensityMode());
+    document.querySelectorAll('[data-density-toggle]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            toggleDensityMode();
+        });
+    });
+}
+
 async function loadMyHiccups() {
     if (!hasHiccupTables) {
         return;
     }
+    const requestId = ++latestLoadRequestId;
     showLoading('Loading hiccups...');
     try {
-        const endpoint = assignedViewMode
-            ? '/api/hiccups/assigned'
-            : window.managementView
-            ? '/api/hiccups/all'
-            : '/api/hiccups';
-        const data = await fetchJSON(endpoint);
-        await hydrateRaisedAgainstNames(data);
-        renderAllTables(data);
+        let nextRaisedState = defaultListState();
+        let nextAssignedState = defaultListState();
+        let nextManagementState = defaultListState();
+        if (assignedViewMode) {
+            const requestedPage = paginationState.assigned || getUrlPageParam(1);
+            nextManagementState = await fetchHiccupList(
+                '/api/hiccups/assigned',
+                buildManagementFilters(requestedPage)
+            );
+        } else if (window.managementView) {
+            const requestedPage = paginationState.management || getUrlPageParam(1);
+            nextManagementState = await fetchHiccupList(
+                '/api/hiccups/all',
+                buildManagementFilters(requestedPage)
+            );
+        } else {
+            const [raisedResult, assignedResult] = await Promise.allSettled([
+                fetchHiccupList('/api/hiccups', buildMyFilters(paginationState.raised || 1)),
+                fetchHiccupList('/api/hiccups/for-me', buildMyFilters(paginationState.against || 1)),
+            ]);
+            nextRaisedState =
+                raisedResult.status === 'fulfilled'
+                    ? raisedResult.value
+                    : defaultListState(paginationState.raised || 1);
+            nextAssignedState =
+                assignedResult.status === 'fulfilled'
+                    ? assignedResult.value
+                    : defaultListState(paginationState.against || 1);
+            if (raisedResult.status === 'rejected' && assignedResult.status === 'rejected') {
+                throw (raisedResult.reason || assignedResult.reason);
+            }
+        }
+        if (requestId !== latestLoadRequestId) {
+            return;
+        }
+        raisedListState = nextRaisedState;
+        assignedListState = nextAssignedState;
+        managementListState = nextManagementState;
+        if (assignedViewMode) {
+            paginationState.assigned = managementListState.page || 1;
+            syncManagementPageUrl(paginationState.assigned);
+        } else if (window.managementView) {
+            paginationState.management = managementListState.page || 1;
+            syncManagementPageUrl(paginationState.management);
+        }
+        renderAllTables();
     } catch (err) {
+        if (requestId !== latestLoadRequestId) {
+            return;
+        }
         console.error('Unable to load hiccups', err);
         if (err?.status === 401) {
             clearAuthState();
@@ -774,17 +1360,25 @@ async function loadMyHiccups() {
             return;
         }
         if (err?.status === 404 || err?.status === 204) {
-            renderAllTables([]);
+            raisedListState = defaultListState();
+            assignedListState = defaultListState();
+            managementListState = defaultListState();
+            renderAllTables();
             return;
         }
-        renderAllTables([]);
+        raisedListState = defaultListState();
+        assignedListState = defaultListState();
+        managementListState = defaultListState();
+        renderAllTables();
         await showAlert({
             icon: 'error',
             title: 'Unable to load hiccups',
             text: err?.message || 'Please refresh the page.',
         });
     } finally {
-        closeLoading();
+        if (requestId === latestLoadRequestId) {
+            closeLoading();
+        }
     }
 }
 
@@ -1394,6 +1988,7 @@ function renderNCSummary(formData) {
 }
 
 function showNCSummaryModal(formData) {
+    closeOverlayModals();
     const existing = document.getElementById('nc-view-modal');
     if (existing) existing.remove();
     const wrapper = document.createElement('div');
@@ -1691,11 +2286,53 @@ if (form) {
 }
 
 document.addEventListener('click', async (event) => {
+    const filterChip = event.target.closest('[data-filter-chip-clear]');
+    if (filterChip) {
+        event.preventDefault();
+        const payload = filterChip.dataset.filterChipClear || '';
+        const [scope, key] = payload.split(':');
+        if (scope === 'my') {
+            clearMyFilterChip(key);
+        } else if (scope === 'mgmt') {
+            clearMgmtFilterChip(key);
+        }
+        return;
+    }
+
+    const filterOpenButton = event.target.closest('[data-filter-drawer-open]');
+    if (filterOpenButton) {
+        event.preventDefault();
+        openFilterDrawer(filterOpenButton.dataset.filterDrawerOpen);
+        return;
+    }
+
+    const filterCloseButton = event.target.closest('[data-filter-drawer-close]');
+    if (filterCloseButton) {
+        event.preventDefault();
+        const parentDrawer = filterCloseButton.closest('[data-filter-drawer]');
+        closeFilterDrawer(parentDrawer ? parentDrawer.dataset.filterDrawer : null);
+        return;
+    }
+
+    const paginationButton = event.target.closest('[data-pagination-action]');
+    if (paginationButton) {
+        event.preventDefault();
+        const target = paginationButton.dataset.paginationTarget;
+        const requestedPage = Number(paginationButton.dataset.paginationPage || '1');
+        if (target && Object.prototype.hasOwnProperty.call(paginationState, target)) {
+            paginationState[target] = Math.max(requestedPage, 1);
+            await loadMyHiccups();
+        }
+        return;
+    }
+
     const ncTrigger = event.target.closest('[data-behavior="view-nc"]');
     if (ncTrigger) {
         event.preventDefault();
+        closeOverlayModals();
         const hiccupId = ncTrigger.dataset.hiccup;
-        const readonly = ncTrigger.dataset.ncReadonly === 'true';
+        const hiccup = myHiccupsData.find((entry) => entry.hiccup_id === hiccupId);
+        const readonly = ncTrigger.dataset.ncReadonly === 'true' || hiccup?.status === 'Closed';
         await openNCEscalationForm(hiccupId, { readonly });
         return;
     }
@@ -1720,6 +2357,7 @@ document.addEventListener('click', async (event) => {
         const group = actionButton.closest('.mgmt-action-group');
         group?.classList.remove('open');
         group?.querySelector('.mgmt-toggle')?.setAttribute('aria-expanded', 'false');
+        closeOverlayModals();
         if (status) {
             await quickStatus(hiccupId, status);
         }
@@ -1729,9 +2367,10 @@ document.addEventListener('click', async (event) => {
     if (detailBtn) {
         event.preventDefault();
         const hiccupId = detailBtn.dataset.hiccupDetail;
-        const hiccup = myHiccupsData.find((h) => h.hiccup_id === hiccupId);
+        const activeCollection = getActiveDetailCollection();
+        const hiccup = activeCollection.find((h) => h.hiccup_id === hiccupId) || myHiccupsData.find((h) => h.hiccup_id === hiccupId);
         if (hiccup) {
-            presentHiccupDetails(hiccup);
+            presentHiccupDetails(hiccup, activeCollection);
         }
         document.querySelectorAll('.mgmt-action-group.open').forEach((group) => {
             group.classList.remove('open');
@@ -1764,8 +2403,25 @@ document.addEventListener('click', async (event) => {
     }
 });
 
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && activeFilterDrawerId) {
+        closeFilterDrawer(activeFilterDrawerId);
+    }
+});
+
+window.addEventListener('popstate', () => {
+    if (assignedViewMode) {
+        paginationState.assigned = getUrlPageParam(1);
+    } else if (window.managementView) {
+        paginationState.management = getUrlPageParam(1);
+    }
+    loadMyHiccups();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
+    setupDensityControls();
     setupHiccupTabs();
+    hydrateManagementStateFromUrl();
     if (typeof loadMyHiccups === 'function') {
         loadMyHiccups();
     }

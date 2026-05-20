@@ -12,6 +12,6 @@ RUN pip install --no-cache-dir -r requirements
 COPY . /app
 RUN mkdir -p /app/logs /app/uploads
 
-EXPOSE 7410
+EXPOSE 3010
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7410", "--workers", "3"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3010", "--workers", "3"]

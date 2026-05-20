@@ -10,11 +10,11 @@ import uuid
 import requests
 from fastapi import APIRouter, Depends, Form, Request, UploadFile, File, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
-from sqlalchemy import func, or_
+from sqlalchemy.orm import Session, selectinload
+from sqlalchemy import case, func, or_
 
 from app.core.config import get_settings
+from app.core.templating import CompatJinja2Templates
 from app.core.security import is_allowlisted_infra_admin_by_staff
 from app.db.session import MainSessionLocal
 from app.core.security import TokenData, get_current_user
@@ -25,7 +25,7 @@ from app.utils.time_utils import now_local_naive
 
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
+templates = CompatJinja2Templates(directory="app/templates")
 settings = get_settings()
 
 
@@ -48,6 +48,9 @@ WHATSAPP_GROUP_TARGET = (
 )
 REMINDER_THRESHOLD_HOURS = 24
 REMINDER_INTERVAL_SECONDS = 60 * 60  # 1 hour
+DELAYED_FLAGS_REFRESH_INTERVAL_SECONDS = 30
+_delayed_flags_lock = threading.Lock()
+_last_delayed_flags_refresh = 0.0
 
 
 def _is_admin(user: TokenData) -> bool:
@@ -335,7 +338,7 @@ def _pid_alive(pid: int) -> bool:
         # On Windows and Unix, signal 0 checks existence.
         os.kill(pid, 0)
         return True
-    except OSError:
+    except Exception:
         return False
 
 
@@ -396,6 +399,14 @@ def _update_delayed_flags(db: Session):
     - status is not Resolved
     - is_delayed_pick is still False
     """
+    global _last_delayed_flags_refresh
+
+    now_ts = time.monotonic()
+    with _delayed_flags_lock:
+        if now_ts - _last_delayed_flags_refresh < DELAYED_FLAGS_REFRESH_INTERVAL_SECONDS:
+            return
+        _last_delayed_flags_refresh = now_ts
+
     now = now_local_naive()
 
     updated_rows = (
@@ -412,7 +423,25 @@ def _update_delayed_flags(db: Session):
     if updated_rows:
         db.commit()
 
-    _send_pick_reminders(db)
+
+def _infra_status_counts(query, status_column, *, open_excludes_rejected: bool = False):
+    open_status_filter = status_column != "Resolved"
+    if open_excludes_rejected:
+        open_status_filter = status_column.notin_(["Resolved", "Rejected"])
+
+    row = query.with_entities(
+        func.count().label("total"),
+        func.sum(case((open_status_filter, 1), else_=0)).label("open_count"),
+        func.sum(case((status_column == "Resolved", 1), else_=0)).label("resolved_count"),
+        func.sum(case((status_column == "Rejected", 1), else_=0)).label("rejected_count"),
+    ).one()
+
+    return {
+        "total": int(row.total or 0),
+        "open": int(row.open_count or 0),
+        "resolved": int(row.resolved_count or 0),
+        "rejected": int(row.rejected_count or 0),
+    }
 
 
 # -------------------------------------------------------------
@@ -553,6 +582,8 @@ async def create_ticket(
 @router.get("/my-tickets", response_class=HTMLResponse)
 def my_tickets(
     request: Request,
+    page: int = Query(1, ge=1),
+    search: str = "",
     db: Session = Depends(get_db),
     user: TokenData = Depends(get_current_user),
 ):
@@ -561,10 +592,44 @@ def my_tickets(
     # update delayed flags before showing user's tickets
     _update_delayed_flags(db)
 
+    base_q = db.query(InfraTicket).filter(InfraTicket.created_by == username)
+
+    normalized_search = (search or "").strip()
+    if normalized_search:
+        ilike_term = f"%{normalized_search}%"
+        search_filters = [
+            InfraTicket.description.ilike(ilike_term),
+            InfraTicket.department.ilike(ilike_term),
+            InfraTicket.category.ilike(ilike_term),
+            InfraTicket.subcategory.ilike(ilike_term),
+            InfraTicket.status.ilike(ilike_term),
+            InfraTicket.assigned_to.ilike(ilike_term),
+            InfraTicket.workstation.ilike(ilike_term),
+        ]
+        if normalized_search.isdigit():
+            search_filters.append(InfraTicket.ticket_id == int(normalized_search))
+        base_q = base_q.filter(or_(*search_filters))
+
+    counts = _infra_status_counts(
+        base_q,
+        InfraTicket.status,
+        open_excludes_rejected=True,
+    )
+    total_count = counts["total"]
+    open_count = counts["open"]
+    resolved_count = counts["resolved"]
+    rejected_count = counts["rejected"]
+
+    page_size = 15
+    total_pages = max((total_count + page_size - 1) // page_size, 1)
+    current_page = min(page, total_pages) if total_count else 1
+    offset = (current_page - 1) * page_size if total_count else 0
+
     tickets = (
-        db.query(InfraTicket)
-        .filter(InfraTicket.created_by == username)
+        base_q.options(selectinload(InfraTicket.images))
         .order_by(InfraTicket.ticket_id.desc())
+        .offset(offset)
+        .limit(page_size)
         .all()
     )
 
@@ -575,6 +640,25 @@ def my_tickets(
             "username": username,
             "user": user,
             "tickets": tickets,
+            "stats": {
+                "total": total_count,
+                "open": open_count,
+                "resolved": resolved_count,
+                "rejected": rejected_count,
+            },
+            "pagination": {
+                "page": current_page,
+                "page_size": page_size,
+                "total": total_count,
+                "total_pages": total_pages if total_count else 1,
+                "has_prev": current_page > 1,
+                "has_next": current_page < total_pages if total_count else False,
+                "start": offset + 1 if total_count else 0,
+                "end": min(offset + len(tickets), total_count),
+            },
+            "filters": {
+                "search": normalized_search,
+            },
         },
     )
 
@@ -605,7 +689,7 @@ def all_tickets(
     # update delayed flags before listing
     _update_delayed_flags(db)
 
-    q = db.query(InfraTicket)
+    q = db.query(InfraTicket).options(selectinload(InfraTicket.images))
 
     if status:
         q = q.filter(InfraTicket.status == status)
@@ -710,10 +794,17 @@ def infra_dashboard(
     # update delayed flags before computing stats
     _update_delayed_flags(db)
 
-    total = db.query(InfraTicket).count()
-    open_count = db.query(InfraTicket).filter(InfraTicket.status != "Resolved").count()
-    resolved = db.query(InfraTicket).filter(InfraTicket.status == "Resolved").count()
-    delayed = db.query(InfraTicket).filter(InfraTicket.is_delayed_pick == True).count()
+    summary = db.query(
+        func.count().label("total"),
+        func.sum(case((InfraTicket.status != "Resolved", 1), else_=0)).label("open_count"),
+        func.sum(case((InfraTicket.status == "Resolved", 1), else_=0)).label("resolved_count"),
+        func.sum(case((InfraTicket.is_delayed_pick.is_(True), 1), else_=0)).label("delayed_count"),
+    ).one()
+
+    total = int(summary.total or 0)
+    open_count = int(summary.open_count or 0)
+    resolved = int(summary.resolved_count or 0)
+    delayed = int(summary.delayed_count or 0)
 
     dept_data = (
         db.query(InfraTicket.department, func.count())

@@ -75,14 +75,10 @@ function truncatedText(value, max = 120) {
 }
 
 function formatOverdueBadges(hiccup) {
-    const badges = [];
-    if (hiccup.is_response_overdue || hiccup.was_response_overdue) {
-        badges.push('<span class="rounded-full bg-rose-100 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-[0.3em] text-rose-600">Response overdue</span>');
+    if (!(hiccup.is_response_overdue || hiccup.was_response_overdue)) {
+        return '';
     }
-    if (hiccup.is_closure_overdue) {
-        badges.push('<span class="rounded-full bg-amber-100 px-3 py-0.5 text-[10px] font-semibold uppercase tracking-[0.3em] text-amber-600">Closure overdue</span>');
-    }
-    return badges.join(' ');
+    return '<span class="rounded-full bg-rose-100/90 border border-rose-200 px-2 py-0.5 text-[9px] font-semibold tracking-[0.08em] text-rose-700">Response overdue</span>';
 }
 
 function statusWithBadges(h) {

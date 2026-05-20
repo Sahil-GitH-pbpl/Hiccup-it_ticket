@@ -3,68 +3,106 @@
 {% set _designation = (user.designation | default('', true) | lower) if user is defined else '' %}
 {% set _role = (user.role | default('', true) | lower) if user is defined else '' %}
 {% set management_actions_allowed = ('management' in _designation) or ('manager' in _designation) or ('admin' in _designation) or ('supervisor' in _designation) or ('lead' in _designation) or (_role in ['admin', 'management']) %}
-<section class="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/60">
-    <div class="flex flex-col gap-2">
-        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Management</p>
-        <h2 class="text-2xl font-semibold text-slate-900">Management View</h2>
-    </div>
-    <div class="table-gradient-heading mt-6">
-        <div class="flex flex-wrap items-center gap-4">
-            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                Status
-                <select id="mgmt-filter-status" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                    <option value="">All</option>
-                    <option>Open</option>
-                    <option>Responded</option>
-                    <option>Under Review</option>
-                    <option>Closed</option>
-                    <option>Escalated to NC</option>
-                </select>
-            </label>
-            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                Type
-                <select id="mgmt-filter-type" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                    <option value="">All</option>
-                    <option>Person Related</option>
-                    <option>System Related</option>
-                </select>
-            </label>
-            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                Cause
-                <select id="mgmt-filter-root" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                    <option value="">All</option>
-                    <option>Training Need</option>
-                    <option>Process Gap</option>
-                    <option>Negligence</option>
-                    <option>System Error</option>
-                    <option>External Factor</option>
-                    <option>Resource Shortage</option>
-                </select>
-            </label>
-            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                From
-                <input id="mgmt-date-from" type="date" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-            </label>
-            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                To
-                <input id="mgmt-date-to" type="date" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-            </label>
-            <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                <input id="mgmt-filter-escalated" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-tealbrand focus:ring-tealbrand">
-                Escalated
-            </label>
-            <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                <input id="mgmt-filter-overdue" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-tealbrand focus:ring-tealbrand">
-                Overdue
-            </label>
-            <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                Search
-                <input id="mgmt-global-hiccup-search" type="search" placeholder="Search hiccups" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-            </label>
-            <button id="mgmt-reset-filters" class="ml-auto rounded-2xl border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600 shadow-sm transition hover:border-tealbrand hover:text-tealbrand">Reset</button>
+<section class="hiccup-shell rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/60">
+    <div class="hiccup-sticky-toolbar">
+        <div class="flex flex-col gap-2">
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">Management</p>
+            <h2 class="text-2xl font-semibold text-slate-900">Management View</h2>
+        </div>
+        <div class="flex items-center justify-end gap-2">
+            <button type="button" class="hiccup-filter-trigger" data-density-toggle>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"></path>
+                </svg>
+                <span data-density-label>Compact</span>
+            </button>
+            <button type="button" class="hiccup-filter-trigger" data-filter-drawer-open="management-hiccup-filters">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"></path>
+                </svg>
+                Filters
+            </button>
         </div>
     </div>
-    <div class="table-scroll mt-4">
+    <div id="mgmt-active-filters" class="hiccup-active-filters mt-3"></div>
+    <div class="hiccup-filter-drawer" data-filter-drawer="management-hiccup-filters" aria-hidden="true">
+        <button type="button" class="hiccup-filter-drawer__backdrop" data-filter-drawer-close></button>
+        <aside class="hiccup-filter-drawer__panel" role="dialog" aria-modal="true" aria-label="Management hiccup filters">
+            <div class="hiccup-filter-drawer__header">
+                <h3>Filters</h3>
+                <button type="button" class="hiccup-filter-drawer__close" data-filter-drawer-close>&times;</button>
+            </div>
+            <div class="hiccup-filter-drawer__body">
+                <div class="table-gradient-heading mt-2">
+                    <div class="hiccup-filter-sections">
+                        <div class="hiccup-filter-section">
+                            <p class="hiccup-filter-section__title">Basic</p>
+                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            Status
+                            <select id="mgmt-filter-status" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                                <option value="">All</option>
+                                <option>Open</option>
+                                <option>Responded</option>
+                                <option>Under Review</option>
+                                <option>Closed</option>
+                                <option>Escalated to NC</option>
+                            </select>
+                        </label>
+                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            Type
+                            <select id="mgmt-filter-type" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                                <option value="">All</option>
+                                <option>Person Related</option>
+                                <option>System Related</option>
+                            </select>
+                        </label>
+                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            Cause
+                            <select id="mgmt-filter-root" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                                <option value="">All</option>
+                                <option>Training Need</option>
+                                <option>Process Gap</option>
+                                <option>Negligence</option>
+                                <option>System Error</option>
+                                <option>External Factor</option>
+                                <option>Resource Shortage</option>
+                            </select>
+                        </label>
+                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            Search
+                            <input id="mgmt-global-hiccup-search" type="search" placeholder="Search hiccups" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                        </label>
+                        </div>
+                        <div class="hiccup-filter-section">
+                            <p class="hiccup-filter-section__title">Date</p>
+                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            From
+                            <input id="mgmt-date-from" type="date" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                        </label>
+                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            To
+                            <input id="mgmt-date-to" type="date" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
+                        </label>
+                        </div>
+                        <div class="hiccup-filter-section">
+                            <p class="hiccup-filter-section__title">Flags</p>
+                        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            <input id="mgmt-filter-escalated" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-tealbrand focus:ring-tealbrand">
+                            Escalated
+                        </label>
+                        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+                            <input id="mgmt-filter-overdue" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-tealbrand focus:ring-tealbrand">
+                            Overdue
+                        </label>
+                        </div>
+                        <button id="mgmt-reset-filters" class="ml-auto rounded-2xl border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600 shadow-sm transition hover:border-tealbrand hover:text-tealbrand">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+    <div id="management-cards" class="space-y-3 mt-4 md:hidden"></div>
+    <div class="table-scroll mt-4 hidden md:block">
         <table id="management-table" class="enhanced-table">
             <thead class="bg-slate-50 text-xs uppercase tracking-[0.3em] text-slate-400">
                 <tr>
@@ -82,11 +120,12 @@
             <tbody class="divide-y divide-slate-100 bg-white text-sm text-slate-600"></tbody>
         </table>
     </div>
+    <div id="pagination-management" class="mt-4"></div>
     <script>
         window.managementActionsEnabled = {{ 'true' if management_actions_allowed else 'false' }};
         window.managementView = true;
     </script>
 </section>
-<script src="/static/js/hiccups-helpers.js"></script>
-<script src="/static/js/hiccups.js"></script>
+<script src="/static/js/hiccups-helpers.js?v=20260309c"></script>
+<script src="/static/js/hiccups.js?v=20260309c"></script>
 {% endblock %}

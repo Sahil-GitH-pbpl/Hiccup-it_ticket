@@ -244,7 +244,7 @@
       <div id="page-loader" aria-hidden="true">
         <div class="loader-ring" role="presentation"></div>
       </div>
-      <header class="sticky top-0 z-20 backdrop-blur-xl bg-white/90 border-b border-slate-200 shadow-sm">
+      <header class="sticky top-0 z-20 bg-white/95 border-b border-slate-200 shadow-sm">
         <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-6">
           <a href="/" class="flex items-center gap-3">
             <img src="/static/img/Logoicon.png" alt="Dr Bhasin logo" class="h-10 w-10" />
@@ -362,7 +362,7 @@
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/static/js/main.js" defer></script>
+    <script src="/static/js/main.js?v=20260310b" defer></script>
     <script>
       const authLinks = {
         login: document.getElementById("nav-login"),
@@ -472,21 +472,28 @@
         });
       }
 
+      let pinnedDropdownMenu = null;
+
       dropdowns.forEach(({ toggle, menu }) => {
         if (!toggle || !menu) return;
         toggle.addEventListener("click", (event) => {
           event.preventDefault();
-          const isHidden = menu.classList.contains("hidden");
+          pinnedDropdownMenu = menu;
           closeDropdowns(menu);
-          menu.classList.toggle("hidden", !isHidden);
+          menu.classList.remove("hidden");
         });
 
-        // Hover support: keep menu open while hovering toggle or menu
         const showMenu = () => {
+          if (pinnedDropdownMenu && pinnedDropdownMenu !== menu) {
+            return;
+          }
           closeDropdowns(menu);
           menu.classList.remove("hidden");
         };
         const maybeHideMenu = () => {
+          if (pinnedDropdownMenu === menu) {
+            return;
+          }
           setTimeout(() => {
             const stillHovering =
               toggle.matches(":hover") || menu.matches(":hover");
@@ -501,6 +508,7 @@
 
       document.addEventListener("click", (event) => {
         if (!event.target.closest(".nav-dropdown-parent")) {
+          pinnedDropdownMenu = null;
           closeDropdowns();
         }
       });
@@ -576,7 +584,6 @@
       });
 
       const loader = document.getElementById("page-loader");
-      const transitionDelay = 220;
       function shouldIntercept(link) {
         if (!link || !link.href) return false;
         if (link.target && link.target !== "_self") return false;
@@ -591,9 +598,9 @@
       function startTransition(href) {
         document.body.classList.add("page-exiting");
         loader?.classList.add("active");
-        setTimeout(() => {
+        requestAnimationFrame(() => {
           window.location.href = href;
-        }, transitionDelay);
+        });
       }
       document.addEventListener("click", (event) => {
         if (event.defaultPrevented) return;
@@ -610,6 +617,3 @@
     {% block scripts %}{% endblock %}
   </body>
 </html>
-
-
-

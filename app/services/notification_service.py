@@ -1,4 +1,5 @@
 import logging
+import threading
 from collections import Counter
 from datetime import datetime, timedelta
 from typing import List, Optional
@@ -8,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.integrations.whatsapp_client import send_bulk
 from app.core.config import get_settings
+from app.db.session import SessionLocal
 from app.services.report_service import recent_stats
 from app.services.hiccup_service import trend_alerts
 from app.models.department import Department
@@ -95,12 +97,27 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
         f"Time: {hiccup.created_at.strftime('%Y-%m-%d %H:%M')}",
         f"Summary: {(hiccup.description or '').strip()[:120] or 'N/A'}",
         "Tap to respond (choose link based on location):",
-        f"- In office (192.168.0.71): {internal_url}",
+        f"- In office (192.168.0.173): {internal_url}",
         f"- Outside office (internet): {external_url}",
         "Copy-paste the text box, submit it, and you're done.",
     ]
 
     send_bulk(_dedup_numbers(numbers), "\n".join(message_lines))
+
+
+def enqueue_creation_notification(hiccup_id: str) -> None:
+    def _worker():
+        db = SessionLocal()
+        try:
+            hiccup = db.query(Hiccup).filter(Hiccup.hiccup_id == hiccup_id).first()
+            if hiccup:
+                notify_on_creation(db, hiccup)
+        except Exception as exc:  # pragma: no cover
+            logger.exception("Creation notification failed for %s: %s", hiccup_id, exc)
+        finally:
+            db.close()
+
+    threading.Thread(target=_worker, daemon=True).start()
 
 
 def _build_response_token(staff: Staff, hiccup: Hiccup) -> str:
@@ -243,7 +260,7 @@ def send_nc_assignment_notice(db: Session, hiccup: Hiccup):
         "- Login to the portal.",
         "- Open 'Assigned to Me' and use the Hiccup ID above.",
         "Assigned list:",
-        f"- In office (192.168.0.71): {assigned_link_internal}",
+        f"- In office (192.168.0.173): {assigned_link_internal}",
         f"- Outside office (internet): {assigned_link_external}",
         f"Hiccup page: {hiccup_link}",
     ]
@@ -253,17 +270,105 @@ def send_nc_assignment_notice(db: Session, hiccup: Hiccup):
     send_bulk(_dedup_numbers([staff.contact]), "\n".join(message_lines))
 
 
+def send_nc_escalated_notice_to_target(db: Session, hiccup: Hiccup):
+    """
+    Notify the staff member against whom the hiccup was raised when it is escalated to NC.
+    """
+    target_staff = _get_staff(db, hiccup.raised_against)
+    if not target_staff or not target_staff.contact:
+        logger.info(
+            "NC target notice skipped: no contact for raised_against=%s",
+            hiccup.raised_against,
+        )
+        return
+
+    assigned_staff_name = "Not assigned"
+    if getattr(hiccup, "nc_assigned_staff_id", None):
+        assigned_staff = (
+            db.query(Staff).filter(Staff.id == hiccup.nc_assigned_staff_id).first()
+        )
+        if assigned_staff and assigned_staff.name:
+            assigned_staff_name = assigned_staff.name
+
+    escalated_by_name = "Unknown"
+    if getattr(hiccup, "escalated_by", None):
+        escalated_by_staff = db.query(Staff).filter(Staff.id == hiccup.escalated_by).first()
+        if escalated_by_staff and escalated_by_staff.name:
+            escalated_by_name = escalated_by_staff.name
+
+    summary = (hiccup.description or "").strip()
+    if len(summary) > 140:
+        summary = f"{summary[:137].rstrip()}..."
+
+    message_lines = [
+        "Hiccup Update",
+        "",
+        f"Hiccup #{hiccup.hiccup_id} related to you has been escalated to NC for further review.",
+        "",
+        f"Escalated by: {escalated_by_name}",
+        f"Raised by: {hiccup.raised_by_name or 'Unknown'}",
+        f"Type: {hiccup.hiccup_type or 'N/A'}",
+        f"Summary: {summary or 'N/A'}",
+        f"Assigned to: {assigned_staff_name}",
+    ]
+    logger.info(
+        "Sending NC target notice for %s to %s",
+        hiccup.hiccup_id,
+        target_staff.contact,
+    )
+    send_bulk(_dedup_numbers([target_staff.contact]), "\n".join(message_lines))
+
+
+def enqueue_nc_assignment_notice(hiccup_id: str) -> None:
+    def _worker():
+        db = SessionLocal()
+        try:
+            hiccup = db.query(Hiccup).filter(Hiccup.hiccup_id == hiccup_id).first()
+            if hiccup:
+                send_nc_assignment_notice(db, hiccup)
+                send_nc_escalated_notice_to_target(db, hiccup)
+        except Exception as exc:  # pragma: no cover
+            logger.exception(
+                "NC assignment notification failed for %s: %s", hiccup_id, exc
+            )
+        finally:
+            db.close()
+
+    threading.Thread(target=_worker, daemon=True).start()
+
+
 def send_response_reminders(db: Session):
     now = now_local()
-    hinges = db.query(Hiccup).filter(Hiccup.status == "Open").all()
+    hinges = (
+        db.query(Hiccup)
+        .filter(
+            Hiccup.status == "Open",
+            Hiccup.raised_against.isnot(None),
+            (Hiccup.reminder_sent.is_(False))
+            | (Hiccup.overdue_msg_sent.is_(False))
+            | (Hiccup.escalate_msg_sent.is_(False)),
+        )
+        .all()
+    )
     logger.info("send_response_reminders triggered for %d open hiccups", len(hinges))
     management_numbers = [
         n.strip() for n in settings.management_group_numbers.split(",") if n.strip()
     ]
+    staff_ids = set()
     for hiccup in hinges:
-        if not hiccup.raised_against:
+        try:
+            staff_ids.add(int(hiccup.raised_against))
+        except (TypeError, ValueError):
             continue
-        staff = _get_staff(db, hiccup.raised_against)
+    staff_map = {}
+    if staff_ids:
+        staff_rows = db.query(Staff).filter(Staff.id.in_(staff_ids)).all()
+        staff_map = {staff.id: staff for staff in staff_rows}
+    for hiccup in hinges:
+        try:
+            staff = staff_map.get(int(hiccup.raised_against))
+        except (TypeError, ValueError):
+            staff = None
         if not staff or not staff.contact:
             continue
         created_at = _localize_timestamp(hiccup.created_at)
@@ -285,7 +390,7 @@ def send_response_reminders(db: Session):
                     "Management will escalate to NC soon.",
                     f"Overdue flag: {hiccup.is_response_overdue}",
                     "Respond here (choose based on location):",
-                    f"- In office (192.168.0.71): {internal_url}",
+                    f"- In office (192.168.0.173): {internal_url}",
                     f"- Outside office (internet): {external_url}",
                 ]
             )
@@ -324,7 +429,7 @@ def send_response_reminders(db: Session):
                     f"Hiccup {hiccup.hiccup_id} is overdue (24h).",
                     "This hiccup is now marked response_overdue.",
                     "Please respond (choose based on location):",
-                    f"- In office (192.168.0.71): {internal_url}",
+                    f"- In office (192.168.0.173): {internal_url}",
                     f"- Outside office (internet): {external_url}",
                 ]
             )
@@ -349,7 +454,7 @@ def send_response_reminders(db: Session):
                     f"Reminder: Hiccup {hiccup.hiccup_id} needs response soon.",
                     "Submit within 24 hours to avoid overdue flag.",
                     "Respond here (choose based on location):",
-                    f"- In office (192.168.0.71): {internal_url}",
+                    f"- In office (192.168.0.173): {internal_url}",
                     f"- Outside office (internet): {external_url}",
                 ]
             )

@@ -2,9 +2,95 @@
 
 {% block title %}All Infra Tickets{% endblock %}
 
+{% block head_extra %}
+<style>
+  .all-tickets-page-wrap {
+    width: calc(100vw - 12px);
+    max-width: none;
+    margin-left: calc(50% - 50vw + 6px);
+    margin-right: calc(50% - 50vw + 6px);
+  }
+
+  .all-tickets-page .glass-card {
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+  }
+
+  #ticketsContainer {
+    contain: layout paint;
+  }
+
+  .all-tickets-scroll {
+    overflow: auto;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
+    contain: layout paint style;
+    transform: translateZ(0);
+  }
+
+  .all-tickets-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: auto;
+    background: #fff;
+    font-size: 13px;
+  }
+
+  .all-tickets-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8fafc;
+    white-space: nowrap;
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+
+  .all-tickets-table tbody tr {
+    transition: background-color 0.12s ease;
+  }
+
+  .all-tickets-table tbody td {
+    background: #fff;
+    padding: 10px 10px;
+    font-size: 13px;
+    line-height: 1.35;
+    vertical-align: top;
+  }
+
+  .all-tickets-table .line-clamp-3 {
+    -webkit-line-clamp: 2;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .all-ticket-action-btn {
+    box-shadow: none !important;
+    transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease !important;
+    transform: none !important;
+  }
+
+  .all-ticket-action-btn:hover {
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  .all-ticket-card {
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    transition: border-color 0.12s ease, background-color 0.12s ease;
+  }
+
+  .all-ticket-card:hover {
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 
-<div class="page-wrapper px-4 md:px-8">
+<div class="page-wrapper px-3 md:px-4 all-tickets-page all-tickets-page-wrap">
 
     <!-- CARD -->
     <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
@@ -304,6 +390,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const invalidForm = document.getElementById('invalidForm');
 
     let currentTicketId = null;
+    let ticketsRequestController = null;
 
     function openPickModalFor(ticketId) {
         currentTicketId = ticketId;
@@ -356,8 +443,14 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.set('page', targetPage);
         const params = new URLSearchParams(formData);
         try {
+            if (ticketsRequestController) {
+                ticketsRequestController.abort();
+            }
+            ticketsRequestController = new AbortController();
             const response = await fetch(`${window.location.pathname}?${params.toString()}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                cache: 'no-store',
+                signal: ticketsRequestController.signal,
             });
             if (!response.ok) throw new Error('Failed to fetch tickets');
             const data = await response.json();
@@ -365,8 +458,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (pageInput) pageInput.value = targetPage;
             attachTicketButtons(ticketsContainer);
         } catch (err) {
+            if (err.name === 'AbortError') return;
             console.error('Pagination request failed', err);
             filterForm.submit();
+        } finally {
+            ticketsRequestController = null;
         }
     }
 
@@ -591,5 +687,3 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 {% endblock %}
-
-

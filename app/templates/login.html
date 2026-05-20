@@ -42,6 +42,10 @@ function isAdminLike(user){
     return role === 'admin' || adminKeywords.some(k => role.includes(k) || designation.includes(k));
 }
 
+function isFormOnly(user) {
+    return Boolean(user?.form_only) || user?.role === 'form_only';
+}
+
 async function verifyTokenAndRedirect(){
     try {
         const res = await fetch('/api/auth/me', {
@@ -50,7 +54,7 @@ async function verifyTokenAndRedirect(){
         });
         if(res.ok){
             const user = await res.json();
-            const target = isAdminLike(user) ? '/dashboard' : '/home';
+            const target = isFormOnly(user) ? '/followup-form' : (isAdminLike(user) ? '/dashboard' : '/home');
             window.location.href = target;
             return;
         }
@@ -113,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     timer: 1200,
                     showConfirmButton: false,
                 });
-                const target = isAdminLike(data) ? '/dashboard' : '/home';
+                const target = isFormOnly(data) ? '/followup-form' : (isAdminLike(data) ? '/dashboard' : '/home');
                 window.location.href = target;
                 return;
             }

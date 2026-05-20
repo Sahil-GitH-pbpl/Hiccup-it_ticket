@@ -7,7 +7,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_, func
 
 from app.schemas.auth import LoginRequest, TokenResponse, TokenDataResponse
-from app.core.security import create_jwt, get_current_user, is_allowlisted_hiccup_admin
+from app.core.security import (
+    create_jwt,
+    get_current_user,
+    is_allowlisted_hiccup_admin,
+    is_allowlisted_hiccup_admin_staff,
+)
 from app.core.security import is_allowlisted_infra_admin_by_staff
 from app.db.session import MainSessionLocal
 from app.models.staff import Staff
@@ -77,10 +82,49 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username and password required"
         )
+    if username.lower() == "virendar" and password == "24031985":
+        token = create_jwt(
+            {
+                "user_id": -1,
+                "role": "form_only",
+                "department_id": None,
+                "name": "Virendar",
+                "designation": "Follow-up Form",
+                "is_admin_like": False,
+                "is_infra_admin": False,
+                "form_only": True,
+            }
+        )
+        token_response = TokenResponse(
+            access_token=token,
+            role="form_only",
+            name="Virendar",
+            department_id=None,
+            user_id=-1,
+            designation="Follow-up Form",
+            is_admin_like=False,
+            is_infra_admin=False,
+            form_only=True,
+        )
+        response.set_cookie(
+            "token",
+            token,
+            httponly=True,
+            secure=False,
+            samesite="lax",
+            path="/",
+        )
+        logger.info(
+            "form-only login response %s",
+            token_response.dict(exclude={"access_token"}),
+        )
+        return token_response
+
     contact_digits = digits_only(username)
     user = (
         db.query(Staff)
         .filter(
+            func.lower(Staff.status) == "active",
             or_(
                 func.lower(Staff.name) == func.lower(username),
                 Staff.contact == username,
@@ -101,7 +145,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     # Force-admin for Ankita (infra)
     infra_override = is_allowlisted_infra_admin_by_staff(user)
     # Hiccup admins
-    hiccup_admin = is_allowlisted_hiccup_admin(user.id)
+    hiccup_admin = is_allowlisted_hiccup_admin_staff(user)
     is_admin_like = hiccup_admin  # only hiccup admins get this flag
     is_infra_admin = infra_override
     # If infra-allowlisted, elevate role for token/claims
@@ -145,7 +189,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
 
 @router.get("/users", response_model=list[str])
 def list_users(q: str | None = None, limit: int = 50, db: Session = Depends(get_db)):
-    query = db.query(Staff.name)
+    query = db.query(Staff.name).filter(func.lower(Staff.status) == "active")
     if q:
         query = query.filter(Staff.name.ilike(f"%{q}%"))
     names = query.order_by(Staff.name).limit(limit).all()
@@ -154,6 +198,17 @@ def list_users(q: str | None = None, limit: int = 50, db: Session = Depends(get_
 
 @router.get("/me", response_model=TokenDataResponse)
 def me(user=Depends(get_current_user)):
+    if getattr(user, "form_only", False):
+        return TokenDataResponse(
+            user_id=user.user_id,
+            role=user.role,
+            name=user.name,
+            department_id=user.department_id,
+            designation=user.designation,
+            is_admin_like=False,
+            is_infra_admin=False,
+            form_only=True,
+        )
     return TokenDataResponse(
         user_id=user.user_id,
         role=user.role,
@@ -162,6 +217,7 @@ def me(user=Depends(get_current_user)):
         designation=user.designation,
         is_admin_like=is_allowlisted_hiccup_admin(user.user_id),
         is_infra_admin=getattr(user, "is_infra_admin", False),
+        form_only=getattr(user, "form_only", False),
     )
 
 

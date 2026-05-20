@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from typing import List
@@ -12,6 +14,7 @@ from app.core.security import (
 from app.db.session import SessionLocal
 from app.schemas.hiccup import (
     HiccupCreate,
+    HiccupListResponse,
     HiccupResponse,
     NCEscalationFormPayload,
     NCEscalationFormResponse,
@@ -21,7 +24,7 @@ from app.schemas.hiccup import (
     AuditLogEntry,
 )
 from app.services import hiccup_service
-from app.services.notification_service import notify_on_creation
+from app.services.notification_service import enqueue_creation_notification
 from app.models.staff import Staff
 
 router = APIRouter(prefix="/api/hiccups", tags=["hiccups"])
@@ -62,23 +65,127 @@ def create_hiccup(
         root_cause_category=root_cause_category,
     )
     hiccup = hiccup_service.create_hiccup(db, user, data, attachments or [])
-    notify_on_creation(db, hiccup)
+    enqueue_creation_notification(hiccup.hiccup_id)
     return hiccup
 
 
-@router.get("", response_model=List[HiccupResponse])
-def list_hiccups(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return hiccup_service.list_hiccups_for_user(db, user)
+@router.get("", response_model=HiccupListResponse)
+def list_hiccups(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    status: str | None = Query(None),
+    hiccup_type: str | None = Query(None),
+    date_from: date | None = Query(None),
+    date_to: date | None = Query(None),
+    escalated: bool = Query(False),
+    overdue: bool = Query(False),
+    search: str | None = Query(None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    return hiccup_service.list_hiccups_for_user_paginated(
+        db,
+        user,
+        page=page,
+        page_size=page_size,
+        status=status,
+        hiccup_type=hiccup_type,
+        date_from=date_from,
+        date_to=date_to,
+        escalated_only=escalated,
+        overdue_only=overdue,
+        search=search,
+    )
 
 
-@router.get("/assigned", response_model=List[HiccupResponse])
-def list_assigned_hiccups(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return hiccup_service.list_nc_escalations_for_assigned(db, user)
+@router.get("/assigned", response_model=HiccupListResponse)
+def list_assigned_hiccups(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    status: str | None = Query(None),
+    hiccup_type: str | None = Query(None),
+    root_cause_category: str | None = Query(None),
+    date_from: date | None = Query(None),
+    date_to: date | None = Query(None),
+    escalated: bool = Query(False),
+    overdue: bool = Query(False),
+    search: str | None = Query(None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    return hiccup_service.list_assigned_hiccups_paginated(
+        db,
+        user,
+        page=page,
+        page_size=page_size,
+        status=status,
+        hiccup_type=hiccup_type,
+        root_cause_category=root_cause_category,
+        date_from=date_from,
+        date_to=date_to,
+        escalated_only=escalated,
+        overdue_only=overdue,
+        search=search,
+    )
 
 
-@router.get("/all", response_model=List[HiccupResponse])
-def list_all_hiccups(db: Session = Depends(get_db), user=Depends(require_management)):
-    return hiccup_service.list_all_hiccups(db)
+@router.get("/for-me", response_model=HiccupListResponse)
+def list_hiccups_for_me(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    status: str | None = Query(None),
+    hiccup_type: str | None = Query(None),
+    date_from: date | None = Query(None),
+    date_to: date | None = Query(None),
+    escalated: bool = Query(False),
+    overdue: bool = Query(False),
+    search: str | None = Query(None),
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    return hiccup_service.list_hiccups_for_me_paginated(
+        db,
+        user,
+        page=page,
+        page_size=page_size,
+        status=status,
+        hiccup_type=hiccup_type,
+        date_from=date_from,
+        date_to=date_to,
+        escalated_only=escalated,
+        overdue_only=overdue,
+        search=search,
+    )
+
+
+@router.get("/all", response_model=HiccupListResponse)
+def list_all_hiccups(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    status: str | None = Query(None),
+    hiccup_type: str | None = Query(None),
+    root_cause_category: str | None = Query(None),
+    date_from: date | None = Query(None),
+    date_to: date | None = Query(None),
+    escalated: bool = Query(False),
+    overdue: bool = Query(False),
+    search: str | None = Query(None),
+    db: Session = Depends(get_db),
+    user=Depends(require_management),
+):
+    return hiccup_service.list_all_hiccups_paginated(
+        db,
+        page=page,
+        page_size=page_size,
+        status=status,
+        hiccup_type=hiccup_type,
+        root_cause_category=root_cause_category,
+        date_from=date_from,
+        date_to=date_to,
+        escalated_only=escalated,
+        overdue_only=overdue,
+        search=search,
+    )
 
 
 @router.get("/{hiccup_id}", response_model=HiccupResponse)

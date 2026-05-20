@@ -79,25 +79,29 @@ def is_allowlisted_hiccup_admin(user_id: Optional[int]) -> bool:
     db = MainSessionLocal()
     try:
         staff = db.query(Staff).filter(Staff.id == user_id).first()
-        if not staff:
-            return False
-        # Hiccup admins: explicit allowlist only (no infra override)
-        name = (staff.name or "").strip().lower()
-        contact = _digits(staff.contact)
-        dob_digits = _digits(staff.dob)
-        for entry in ALLOWED_HICCUP_ADMINS:
-            if (
-                name == entry["name"]
-                and contact == entry["contact"]
-                and dob_digits == entry["dob"]
-            ):
-                return True
-        return False
+        return is_allowlisted_hiccup_admin_staff(staff)
     finally:
         try:
             db.close()
         except Exception:
             pass
+
+
+def is_allowlisted_hiccup_admin_staff(staff: Optional[Staff]) -> bool:
+    if not staff:
+        return False
+    # Hiccup admins: explicit allowlist only (no infra override)
+    name = (staff.name or "").strip().lower()
+    contact = _digits(staff.contact)
+    dob_digits = _digits(staff.dob)
+    for entry in ALLOWED_HICCUP_ADMINS:
+        if (
+            name == entry["name"]
+            and contact == entry["contact"]
+            and dob_digits == entry["dob"]
+        ):
+            return True
+    return False
 
 
 class TokenData:
@@ -110,6 +114,7 @@ class TokenData:
         designation: Optional[str] = None,
         is_admin_like: bool = False,
         is_infra_admin: bool = False,
+        form_only: bool = False,
     ):
         self.user_id = user_id
         self.role = role
@@ -118,6 +123,7 @@ class TokenData:
         self.designation = designation or ""
         self.is_admin_like = is_admin_like
         self.is_infra_admin = is_infra_admin
+        self.form_only = form_only
 
 
 def create_jwt(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -181,6 +187,7 @@ def decode_jwt(token: str) -> TokenData:
             designation=payload.get("designation"),
             is_admin_like=bool(payload.get("is_admin_like")),
             is_infra_admin=bool(payload.get("is_infra_admin")),
+            form_only=bool(payload.get("form_only")),
         )
     except JWTError:
         raise HTTPException(
