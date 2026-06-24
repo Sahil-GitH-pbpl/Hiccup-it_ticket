@@ -7393,3 +7393,1064 @@ requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='10.1.1.44', port=30
 2026-06-11 11:28:55,735 [INFO] app.api.routes_infra: WA[2129efdd] -> sendMessage | target=918448546358 | len=160
 2026-06-11 11:28:56,071 [INFO] app.api.routes_infra: WA[2129efdd] <- status=200 | body={"success":true}
 2026-06-11 11:28:56,071 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=884 contact=8448546358
+2026-06-12 22:29:15,701 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-06-12 22:29:15,703 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-06-12 22:29:15,703 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-06-12 22:29:48,175 [INFO] app.api.routes_infra: InfraReminder -> processing 43 pending tickets
+2026-06-12 22:29:48,177 [INFO] app.api.routes_infra: WA[c7f33567] -> sendMessage | target=120363141953100908@g.us | len=272
+2026-06-12 22:29:48,232 [INFO] app.api.routes_infra: WA[c7f33567] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,244 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=797 status=200
+2026-06-12 22:29:48,250 [INFO] app.api.routes_infra: WA[dc9f991f] -> sendMessage | target=120363141953100908@g.us | len=254
+2026-06-12 22:29:48,272 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-12 22:29:48,302 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-12 22:29:48,350 [INFO] app.api.routes_infra: WA[dc9f991f] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,351 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=800 status=200
+2026-06-12 22:29:48,352 [INFO] app.api.routes_infra: WA[48dfa41d] -> sendMessage | target=120363141953100908@g.us | len=261
+2026-06-12 22:29:48,457 [INFO] app.api.routes_infra: WA[48dfa41d] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,458 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=803 status=200
+2026-06-12 22:29:48,458 [INFO] app.api.routes_infra: WA[2f8b1e38] -> sendMessage | target=120363141953100908@g.us | len=298
+2026-06-12 22:29:48,545 [INFO] app.api.routes_infra: WA[2f8b1e38] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,546 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=814 status=200
+2026-06-12 22:29:48,546 [INFO] app.api.routes_infra: WA[ed954c79] -> sendMessage | target=120363141953100908@g.us | len=252
+2026-06-12 22:29:48,630 [INFO] app.api.routes_infra: WA[ed954c79] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,630 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=816 status=200
+2026-06-12 22:29:48,631 [INFO] app.api.routes_infra: WA[1c0df14e] -> sendMessage | target=120363141953100908@g.us | len=311
+2026-06-12 22:29:48,703 [INFO] app.api.routes_infra: WA[1c0df14e] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,703 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=821 status=200
+2026-06-12 22:29:48,703 [INFO] app.api.routes_infra: WA[1d3eaa65] -> sendMessage | target=120363141953100908@g.us | len=326
+2026-06-12 22:29:48,789 [INFO] app.api.routes_infra: WA[1d3eaa65] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,790 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=824 status=200
+2026-06-12 22:29:48,790 [INFO] app.api.routes_infra: WA[ab0090aa] -> sendMessage | target=120363141953100908@g.us | len=269
+2026-06-12 22:29:48,907 [INFO] app.api.routes_infra: WA[ab0090aa] <- status=200 | body={"success":true}
+2026-06-12 22:29:48,907 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=833 status=200
+2026-06-12 22:29:48,908 [INFO] app.api.routes_infra: WA[dcab0701] -> sendMessage | target=120363141953100908@g.us | len=352
+2026-06-12 22:29:49,056 [INFO] app.api.routes_infra: WA[dcab0701] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,056 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=834 status=200
+2026-06-12 22:29:49,057 [INFO] app.api.routes_infra: WA[6d2a1bff] -> sendMessage | target=120363141953100908@g.us | len=259
+2026-06-12 22:29:49,135 [INFO] app.api.routes_infra: WA[6d2a1bff] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,136 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=835 status=200
+2026-06-12 22:29:49,136 [INFO] app.api.routes_infra: WA[50ce13fb] -> sendMessage | target=120363141953100908@g.us | len=454
+2026-06-12 22:29:49,218 [INFO] app.api.routes_infra: WA[50ce13fb] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,219 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=836 status=200
+2026-06-12 22:29:49,219 [INFO] app.api.routes_infra: WA[70e0694f] -> sendMessage | target=120363141953100908@g.us | len=284
+2026-06-12 22:29:49,325 [INFO] app.api.routes_infra: WA[70e0694f] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,326 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=842 status=200
+2026-06-12 22:29:49,326 [INFO] app.api.routes_infra: WA[b2e02a63] -> sendMessage | target=120363141953100908@g.us | len=372
+2026-06-12 22:29:49,393 [INFO] app.api.routes_infra: WA[b2e02a63] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,394 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=843 status=200
+2026-06-12 22:29:49,394 [INFO] app.api.routes_infra: WA[4d9d6b9a] -> sendMessage | target=120363141953100908@g.us | len=302
+2026-06-12 22:29:49,472 [INFO] app.api.routes_infra: WA[4d9d6b9a] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,473 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=846 status=200
+2026-06-12 22:29:49,473 [INFO] app.api.routes_infra: WA[545fc7a5] -> sendMessage | target=120363141953100908@g.us | len=310
+2026-06-12 22:29:49,570 [INFO] app.api.routes_infra: WA[545fc7a5] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,570 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=847 status=200
+2026-06-12 22:29:49,570 [INFO] app.api.routes_infra: WA[f2c35827] -> sendMessage | target=120363141953100908@g.us | len=262
+2026-06-12 22:29:49,635 [INFO] app.api.routes_infra: WA[f2c35827] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,635 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=850 status=200
+2026-06-12 22:29:49,636 [INFO] app.api.routes_infra: WA[688b9d22] -> sendMessage | target=120363141953100908@g.us | len=288
+2026-06-12 22:29:49,712 [INFO] app.api.routes_infra: WA[688b9d22] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,713 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=851 status=200
+2026-06-12 22:29:49,713 [INFO] app.api.routes_infra: WA[f0886927] -> sendMessage | target=120363141953100908@g.us | len=287
+2026-06-12 22:29:49,776 [INFO] app.api.routes_infra: WA[f0886927] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,776 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=852 status=200
+2026-06-12 22:29:49,776 [INFO] app.api.routes_infra: WA[b3e1cc7d] -> sendMessage | target=120363141953100908@g.us | len=262
+2026-06-12 22:29:49,838 [INFO] app.api.routes_infra: WA[b3e1cc7d] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,838 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=853 status=200
+2026-06-12 22:29:49,839 [INFO] app.api.routes_infra: WA[2fb82b96] -> sendMessage | target=120363141953100908@g.us | len=260
+2026-06-12 22:29:49,873 [INFO] app.api.routes_infra: WA[2fb82b96] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,873 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=854 status=200
+2026-06-12 22:29:49,874 [INFO] app.api.routes_infra: WA[871f28bc] -> sendMessage | target=120363141953100908@g.us | len=257
+2026-06-12 22:29:49,908 [INFO] app.api.routes_infra: WA[871f28bc] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,909 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=855 status=200
+2026-06-12 22:29:49,909 [INFO] app.api.routes_infra: WA[6435ce18] -> sendMessage | target=120363141953100908@g.us | len=260
+2026-06-12 22:29:49,949 [INFO] app.api.routes_infra: WA[6435ce18] <- status=200 | body={"success":true}
+2026-06-12 22:29:49,950 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=856 status=200
+2026-06-12 22:29:49,950 [INFO] app.api.routes_infra: WA[6dd7f6e1] -> sendMessage | target=120363141953100908@g.us | len=277
+2026-06-12 22:29:50,013 [INFO] app.api.routes_infra: WA[6dd7f6e1] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,013 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=857 status=200
+2026-06-12 22:29:50,013 [INFO] app.api.routes_infra: WA[294e935b] -> sendMessage | target=120363141953100908@g.us | len=254
+2026-06-12 22:29:50,050 [INFO] app.api.routes_infra: WA[294e935b] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,050 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=858 status=200
+2026-06-12 22:29:50,050 [INFO] app.api.routes_infra: WA[31b25d76] -> sendMessage | target=120363141953100908@g.us | len=258
+2026-06-12 22:29:50,089 [INFO] app.api.routes_infra: WA[31b25d76] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,090 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=859 status=200
+2026-06-12 22:29:50,090 [INFO] app.api.routes_infra: WA[0bf653b3] -> sendMessage | target=120363141953100908@g.us | len=264
+2026-06-12 22:29:50,134 [INFO] app.api.routes_infra: WA[0bf653b3] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,134 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=860 status=200
+2026-06-12 22:29:50,134 [INFO] app.api.routes_infra: WA[c4c924ff] -> sendMessage | target=120363141953100908@g.us | len=284
+2026-06-12 22:29:50,173 [INFO] app.api.routes_infra: WA[c4c924ff] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,174 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=861 status=200
+2026-06-12 22:29:50,174 [INFO] app.api.routes_infra: WA[fcc81ad4] -> sendMessage | target=120363141953100908@g.us | len=260
+2026-06-12 22:29:50,215 [INFO] app.api.routes_infra: WA[fcc81ad4] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,215 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=862 status=200
+2026-06-12 22:29:50,216 [INFO] app.api.routes_infra: WA[8d2e32b7] -> sendMessage | target=120363141953100908@g.us | len=257
+2026-06-12 22:29:50,275 [INFO] app.api.routes_infra: WA[8d2e32b7] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,275 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=863 status=200
+2026-06-12 22:29:50,275 [INFO] app.api.routes_infra: WA[adb6043e] -> sendMessage | target=120363141953100908@g.us | len=296
+2026-06-12 22:29:50,349 [INFO] app.api.routes_infra: WA[adb6043e] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,349 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=864 status=200
+2026-06-12 22:29:50,349 [INFO] app.api.routes_infra: WA[108363c5] -> sendMessage | target=120363141953100908@g.us | len=254
+2026-06-12 22:29:50,392 [INFO] app.api.routes_infra: WA[108363c5] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,392 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=865 status=200
+2026-06-12 22:29:50,392 [INFO] app.api.routes_infra: WA[d9f5bd5d] -> sendMessage | target=120363141953100908@g.us | len=263
+2026-06-12 22:29:50,435 [INFO] app.api.routes_infra: WA[d9f5bd5d] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,435 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=866 status=200
+2026-06-12 22:29:50,435 [INFO] app.api.routes_infra: WA[8ea4ca64] -> sendMessage | target=120363141953100908@g.us | len=263
+2026-06-12 22:29:50,488 [INFO] app.api.routes_infra: WA[8ea4ca64] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,488 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=867 status=200
+2026-06-12 22:29:50,488 [INFO] app.api.routes_infra: WA[fb7c2cae] -> sendMessage | target=120363141953100908@g.us | len=263
+2026-06-12 22:29:50,672 [INFO] app.api.routes_infra: WA[fb7c2cae] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,672 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=868 status=200
+2026-06-12 22:29:50,673 [INFO] app.api.routes_infra: WA[d60cef72] -> sendMessage | target=120363141953100908@g.us | len=291
+2026-06-12 22:29:50,744 [INFO] app.api.routes_infra: WA[d60cef72] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,744 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=873 status=200
+2026-06-12 22:29:50,744 [INFO] app.api.routes_infra: WA[e28ea49d] -> sendMessage | target=120363141953100908@g.us | len=263
+2026-06-12 22:29:50,812 [INFO] app.api.routes_infra: WA[e28ea49d] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,813 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=875 status=200
+2026-06-12 22:29:50,813 [INFO] app.api.routes_infra: WA[8fd63843] -> sendMessage | target=120363141953100908@g.us | len=254
+2026-06-12 22:29:50,881 [INFO] app.api.routes_infra: WA[8fd63843] <- status=200 | body={"success":true}
+2026-06-12 22:29:50,881 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=876 status=200
+2026-06-12 22:29:50,881 [INFO] app.api.routes_infra: WA[49866e5c] -> sendMessage | target=120363141953100908@g.us | len=284
+2026-06-12 22:29:51,102 [INFO] app.api.routes_infra: WA[49866e5c] <- status=200 | body={"success":true}
+2026-06-12 22:29:51,103 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=878 status=200
+2026-06-12 22:29:51,103 [INFO] app.api.routes_infra: WA[ee520930] -> sendMessage | target=120363141953100908@g.us | len=285
+2026-06-12 22:29:51,362 [INFO] app.api.routes_infra: WA[ee520930] <- status=200 | body={"success":true}
+2026-06-12 22:29:51,363 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=879 status=200
+2026-06-12 22:29:51,364 [INFO] app.api.routes_infra: WA[97542e02] -> sendMessage | target=120363141953100908@g.us | len=247
+2026-06-12 22:29:51,790 [INFO] app.api.routes_infra: WA[97542e02] <- status=200 | body={"success":true}
+2026-06-12 22:29:51,790 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=880 status=200
+2026-06-12 22:29:51,791 [INFO] app.api.routes_infra: WA[94b3a5f7] -> sendMessage | target=120363141953100908@g.us | len=263
+2026-06-12 22:29:51,904 [INFO] app.api.routes_infra: WA[94b3a5f7] <- status=200 | body={"success":true}
+2026-06-12 22:29:51,905 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=881 status=200
+2026-06-12 22:29:51,905 [INFO] app.api.routes_infra: WA[a0048118] -> sendMessage | target=120363141953100908@g.us | len=291
+2026-06-12 22:29:51,972 [INFO] app.api.routes_infra: WA[a0048118] <- status=200 | body={"success":true}
+2026-06-12 22:29:51,973 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=882 status=200
+2026-06-12 22:29:51,973 [INFO] app.api.routes_infra: WA[dfd805fa] -> sendMessage | target=120363141953100908@g.us | len=312
+2026-06-12 22:29:52,005 [INFO] app.api.routes_infra: WA[dfd805fa] <- status=200 | body={"success":true}
+2026-06-12 22:29:52,005 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=883 status=200
+2026-06-13 10:52:46,028 [INFO] app.api.routes_infra: WA[a46eaaf3] -> sendMessage | target=918076741165 | len=122
+2026-06-13 10:52:46,401 [INFO] app.api.routes_infra: WA[a46eaaf3] <- status=200 | body={"success":true}
+2026-06-13 10:52:46,402 [INFO] app.api.routes_infra: PickNotify sent to 8076741165 | ticket_id=883
+2026-06-13 10:53:42,139 [INFO] app.api.routes_infra: WA[c2496f28] -> sendMessage | target=918076741165 | len=160
+2026-06-13 10:53:42,434 [INFO] app.api.routes_infra: WA[c2496f28] <- status=200 | body={"success":true}
+2026-06-13 10:53:42,435 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=883 contact=8076741165
+2026-06-13 11:58:48,889 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=889 created_by=ANKITA dept=Other category=Software
+2026-06-13 11:58:48,890 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=889 | msg_len=339
+2026-06-13 11:58:48,890 [INFO] app.api.routes_infra: WA[8346a363] -> sendMessage | target=120363141953100908@g.us | len=339
+2026-06-13 11:58:48,936 [INFO] app.api.routes_infra: WA[8346a363] <- status=200 | body={"success":true}
+2026-06-13 11:58:48,937 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-13 12:01:41,244 [INFO] app.api.routes_infra: WA[7239ba44] -> sendMessage | target=918700004157 | len=116
+2026-06-13 12:01:41,561 [INFO] app.api.routes_infra: WA[7239ba44] <- status=200 | body={"success":true}
+2026-06-13 12:01:41,561 [INFO] app.api.routes_infra: PickNotify sent to 8700004157 | ticket_id=889
+2026-06-13 12:01:46,444 [INFO] app.api.routes_infra: WA[1f9a970f] -> sendMessage | target=918700004157 | len=154
+2026-06-13 12:01:47,195 [INFO] app.api.routes_infra: WA[1f9a970f] <- status=200 | body={"success":true}
+2026-06-13 12:01:47,195 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=889 contact=8700004157
+2026-06-13 12:30:33,131 [INFO] app.api.routes_infra: WA[8854fda1] -> sendMessage | target=919910773271 | len=122
+2026-06-13 12:30:33,449 [INFO] app.api.routes_infra: WA[8854fda1] <- status=200 | body={"success":true}
+2026-06-13 12:30:33,449 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=882
+2026-06-13 12:30:42,114 [INFO] app.api.routes_infra: WA[f2353cec] -> sendMessage | target=919910773271 | len=160
+2026-06-13 12:30:42,409 [INFO] app.api.routes_infra: WA[f2353cec] <- status=200 | body={"success":true}
+2026-06-13 12:30:42,410 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=882 contact=9910773271
+2026-06-13 13:12:17,059 [INFO] app.api.routes_infra: WA[d77f708b] -> sendMessage | target=916203999124 | len=122
+2026-06-13 13:12:17,456 [INFO] app.api.routes_infra: WA[d77f708b] <- status=200 | body={"success":true}
+2026-06-13 13:12:17,457 [INFO] app.api.routes_infra: PickNotify sent to 6203999124 | ticket_id=876
+2026-06-13 13:12:30,611 [INFO] app.api.routes_infra: WA[9a09abbf] -> sendMessage | target=916203999124 | len=160
+2026-06-13 13:12:30,934 [INFO] app.api.routes_infra: WA[9a09abbf] <- status=200 | body={"success":true}
+2026-06-13 13:12:30,934 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=876 contact=6203999124
+2026-06-13 16:30:12,157 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-13 16:30:12,188 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-13 16:30:12,206 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-13 16:30:12,207 [INFO] app.api.routes_infra: WA[a0ec3205] -> sendMessage | target=120363141953100908@g.us | len=277
+2026-06-13 16:30:12,265 [INFO] app.api.routes_infra: WA[a0ec3205] <- status=200 | body={"success":true}
+2026-06-13 16:30:12,282 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=887 status=200
+2026-06-13 16:33:16,492 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=890 created_by=SUMIT SINGH dept=Home Collection category=Software
+2026-06-13 16:33:16,493 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=890 | msg_len=263
+2026-06-13 16:33:16,494 [INFO] app.api.routes_infra: WA[cffe91c6] -> sendMessage | target=120363141953100908@g.us | len=263
+2026-06-13 16:33:16,542 [INFO] app.api.routes_infra: WA[cffe91c6] <- status=200 | body={"success":true}
+2026-06-13 16:33:16,542 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-13 16:34:05,684 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=891 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-06-13 16:34:05,684 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=891 | msg_len=324
+2026-06-13 16:34:05,686 [INFO] app.api.routes_infra: WA[c12bf43f] -> sendMessage | target=120363141953100908@g.us | len=324
+2026-06-13 16:34:05,726 [INFO] app.api.routes_infra: WA[c12bf43f] <- status=200 | body={"success":true}
+2026-06-13 16:34:05,726 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-13 16:36:12,321 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=892 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-06-13 16:36:12,322 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=892 | msg_len=308
+2026-06-13 16:36:12,323 [INFO] app.api.routes_infra: WA[d6f21471] -> sendMessage | target=120363141953100908@g.us | len=308
+2026-06-13 16:36:12,373 [INFO] app.api.routes_infra: WA[d6f21471] <- status=200 | body={"success":true}
+2026-06-13 16:36:12,374 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-13 16:48:17,043 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=893 created_by=ANKITA dept=Other category=Software
+2026-06-13 16:48:17,045 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=893 | msg_len=328
+2026-06-13 16:48:17,047 [INFO] app.api.routes_infra: WA[eebf747e] -> sendMessage | target=120363141953100908@g.us | len=328
+2026-06-13 16:48:17,092 [INFO] app.api.routes_infra: WA[eebf747e] <- status=200 | body={"success":true}
+2026-06-13 16:48:17,092 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-13 16:49:01,730 [INFO] app.api.routes_infra: WA[be8eb9b0] -> sendMessage | target=918700004157 | len=116
+2026-06-13 16:49:02,048 [INFO] app.api.routes_infra: WA[be8eb9b0] <- status=200 | body={"success":true}
+2026-06-13 16:49:02,049 [INFO] app.api.routes_infra: PickNotify sent to 8700004157 | ticket_id=893
+2026-06-13 16:49:06,355 [INFO] app.api.routes_infra: WA[b58d145e] -> sendMessage | target=918700004157 | len=154
+2026-06-13 16:49:06,653 [INFO] app.api.routes_infra: WA[b58d145e] <- status=200 | body={"success":true}
+2026-06-13 16:49:06,654 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=893 contact=8700004157
+2026-06-13 17:14:07,224 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=894 created_by=SALEEM JAVED dept=Customer Care category=Software
+2026-06-13 17:14:07,226 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=894 | msg_len=262
+2026-06-13 17:14:07,227 [INFO] app.api.routes_infra: WA[18910fc0] -> sendMessage | target=120363141953100908@g.us | len=262
+2026-06-13 17:14:07,325 [INFO] app.api.routes_infra: WA[18910fc0] <- status=200 | body={"success":true}
+2026-06-13 17:14:07,325 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-13 17:15:14,483 [INFO] app.api.routes_infra: WA[76255a52] -> sendMessage | target=919654441851 | len=125
+2026-06-13 17:15:14,803 [INFO] app.api.routes_infra: WA[76255a52] <- status=200 | body={"success":true}
+2026-06-13 17:15:14,804 [INFO] app.api.routes_infra: PickNotify sent to 9654441851 | ticket_id=894
+2026-06-13 19:14:24,376 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-13 19:14:24,376 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-13 19:14:24,376 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-13 20:43:33,222 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-13 20:43:33,224 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-13 20:43:33,225 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-14 08:13:20,305 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=895 created_by=Prerna Sharma dept=Customer Care category=Other
+2026-06-14 08:13:20,305 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=895 | msg_len=238
+2026-06-14 08:13:20,306 [INFO] app.api.routes_infra: WA[687c203f] -> sendMessage | target=120363141953100908@g.us | len=238
+2026-06-14 08:13:20,348 [INFO] app.api.routes_infra: WA[687c203f] <- status=200 | body={"success":true}
+2026-06-14 08:13:20,349 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-14 11:53:38,311 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=896 created_by=Md Shaquib Alam dept=Technical category=Software
+2026-06-14 11:53:38,312 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=896 | msg_len=458
+2026-06-14 11:53:38,313 [INFO] app.api.routes_infra: WA[7d0a1ed1] -> sendMessage | target=120363141953100908@g.us | len=458
+2026-06-14 11:53:38,380 [INFO] app.api.routes_infra: WA[7d0a1ed1] <- status=200 | body={"success":true}
+2026-06-14 11:53:38,380 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 08:31:34,893 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=897 created_by=Prerna Sharma dept=Customer Care category=Software
+2026-06-15 08:31:34,894 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=897 | msg_len=348
+2026-06-15 08:31:34,895 [INFO] app.api.routes_infra: WA[a43c2c59] -> sendMessage | target=120363141953100908@g.us | len=348
+2026-06-15 08:31:34,999 [INFO] app.api.routes_infra: WA[a43c2c59] <- status=200 | body={"success":true}
+2026-06-15 08:31:34,999 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 08:40:25,225 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=898 created_by=Prerna Sharma dept=Admin category=Software
+2026-06-15 08:40:25,226 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=898 | msg_len=242
+2026-06-15 08:40:25,227 [INFO] app.api.routes_infra: WA[56dfd141] -> sendMessage | target=120363141953100908@g.us | len=242
+2026-06-15 08:40:25,329 [INFO] app.api.routes_infra: WA[56dfd141] <- status=200 | body={"success":true}
+2026-06-15 08:40:25,329 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 09:50:18,386 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=899 created_by=Prerna Sharma dept=Customer Care category=Software
+2026-06-15 09:50:18,387 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=899 | msg_len=287
+2026-06-15 09:50:18,387 [INFO] app.api.routes_infra: WA[9244a22a] -> sendMessage | target=120363141953100908@g.us | len=287
+2026-06-15 09:50:19,315 [INFO] app.api.routes_infra: WA[9244a22a] <- status=200 | body={"success":true}
+2026-06-15 09:50:19,315 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 10:01:04,826 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=900 created_by=Mansi Shukla dept=Technical category=Hardware
+2026-06-15 10:01:04,827 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=900 | msg_len=245
+2026-06-15 10:01:04,827 [INFO] app.api.routes_infra: WA[185d4737] -> sendMessage | target=120363141953100908@g.us | len=245
+2026-06-15 10:01:04,869 [INFO] app.api.routes_infra: WA[185d4737] <- status=200 | body={"success":true}
+2026-06-15 10:01:04,870 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 10:10:09,437 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=901 created_by=Sonia dept=Center Phlebo category=Hardware
+2026-06-15 10:10:09,438 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=901 | msg_len=231
+2026-06-15 10:10:09,438 [INFO] app.api.routes_infra: WA[4b4040a4] -> sendMessage | target=120363141953100908@g.us | len=231
+2026-06-15 10:10:09,489 [INFO] app.api.routes_infra: WA[4b4040a4] <- status=200 | body={"success":true}
+2026-06-15 10:10:09,489 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 10:11:47,404 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=902 created_by=Prerna Sharma dept=Technical category=Hardware
+2026-06-15 10:11:47,405 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=902 | msg_len=271
+2026-06-15 10:11:47,405 [INFO] app.api.routes_infra: WA[b48b88f9] -> sendMessage | target=120363141953100908@g.us | len=271
+2026-06-15 10:11:47,444 [INFO] app.api.routes_infra: WA[b48b88f9] <- status=200 | body={"success":true}
+2026-06-15 10:11:47,444 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 11:46:18,908 [INFO] app.api.routes_infra: WA[a753d2f3] -> sendMessage | target=919910773271 | len=122
+2026-06-15 11:46:19,225 [INFO] app.api.routes_infra: WA[a753d2f3] <- status=200 | body={"success":true}
+2026-06-15 11:46:19,225 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=902
+2026-06-15 11:46:23,120 [INFO] app.api.routes_infra: WA[68204f94] -> sendMessage | target=919910773271 | len=160
+2026-06-15 11:46:23,416 [INFO] app.api.routes_infra: WA[68204f94] <- status=200 | body={"success":true}
+2026-06-15 11:46:23,417 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=902 contact=9910773271
+2026-06-15 11:48:55,408 [INFO] app.api.routes_infra: WA[0e6c64e2] -> sendMessage | target=918595713150 | len=122
+2026-06-15 11:48:55,706 [INFO] app.api.routes_infra: WA[0e6c64e2] <- status=200 | body={"success":true}
+2026-06-15 11:48:55,707 [INFO] app.api.routes_infra: PickNotify sent to 8595713150 | ticket_id=900
+2026-06-15 11:49:04,791 [INFO] app.api.routes_infra: WA[36dc0f84] -> sendMessage | target=918595713150 | len=160
+2026-06-15 11:49:05,107 [INFO] app.api.routes_infra: WA[36dc0f84] <- status=200 | body={"success":true}
+2026-06-15 11:49:05,108 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=900 contact=8595713150
+2026-06-15 11:49:34,103 [INFO] app.api.routes_infra: WA[59c17561] -> sendMessage | target=919910773271 | len=122
+2026-06-15 11:49:34,394 [INFO] app.api.routes_infra: WA[59c17561] <- status=200 | body={"success":true}
+2026-06-15 11:49:34,395 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=898
+2026-06-15 11:49:46,817 [INFO] app.api.routes_infra: WA[67553b64] -> sendMessage | target=919910773271 | len=160
+2026-06-15 11:49:47,103 [INFO] app.api.routes_infra: WA[67553b64] <- status=200 | body={"success":true}
+2026-06-15 11:49:47,104 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=898 contact=9910773271
+2026-06-15 12:02:01,540 [INFO] app.api.routes_infra: WA[fe7507d7] -> sendMessage | target=919818247844 | len=122
+2026-06-15 12:02:01,850 [INFO] app.api.routes_infra: WA[fe7507d7] <- status=200 | body={"success":true}
+2026-06-15 12:02:01,851 [INFO] app.api.routes_infra: PickNotify sent to 9818247844 | ticket_id=881
+2026-06-15 12:03:11,236 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=903 created_by=Harshita Basnuwal dept=Technical category=Hardware
+2026-06-15 12:03:11,236 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=903 | msg_len=274
+2026-06-15 12:03:11,236 [INFO] app.api.routes_infra: WA[8b8282e6] -> sendMessage | target=120363141953100908@g.us | len=274
+2026-06-15 12:03:11,273 [INFO] app.api.routes_infra: WA[8b8282e6] <- status=200 | body={"success":true}
+2026-06-15 12:03:11,273 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 12:18:34,132 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=904 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-06-15 12:18:34,133 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=904 | msg_len=298
+2026-06-15 12:18:34,133 [INFO] app.api.routes_infra: WA[051a0b3e] -> sendMessage | target=120363141953100908@g.us | len=298
+2026-06-15 12:18:36,356 [INFO] app.api.routes_infra: WA[051a0b3e] <- status=200 | body={"success":true}
+2026-06-15 12:18:36,357 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 13:35:40,914 [INFO] app.api.routes_infra: WA[ac842631] -> sendMessage | target=919818247844 | len=160
+2026-06-15 13:35:41,218 [INFO] app.api.routes_infra: WA[ac842631] <- status=200 | body={"success":true}
+2026-06-15 13:35:41,219 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=881 contact=9818247844
+2026-06-15 14:16:00,071 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=905 created_by=ANKITA dept=Other category=Software
+2026-06-15 14:16:00,071 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=905 | msg_len=290
+2026-06-15 14:16:00,072 [INFO] app.api.routes_infra: WA[7a20f64e] -> sendMessage | target=120363141953100908@g.us | len=290
+2026-06-15 14:16:00,112 [INFO] app.api.routes_infra: WA[7a20f64e] <- status=200 | body={"success":true}
+2026-06-15 14:16:00,113 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-15 14:17:34,057 [INFO] app.api.routes_infra: WA[18f8e44c] -> sendMessage | target=918700004157 | len=116
+2026-06-15 14:17:34,349 [INFO] app.api.routes_infra: WA[18f8e44c] <- status=200 | body={"success":true}
+2026-06-15 14:17:34,349 [INFO] app.api.routes_infra: PickNotify sent to 8700004157 | ticket_id=905
+2026-06-15 14:17:42,118 [INFO] app.api.routes_infra: WA[71d9bd05] -> sendMessage | target=918700004157 | len=154
+2026-06-15 14:17:42,483 [INFO] app.api.routes_infra: WA[71d9bd05] <- status=200 | body={"success":true}
+2026-06-15 14:17:42,483 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=905 contact=8700004157
+2026-06-15 17:49:47,500 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=906 created_by=SAMI AHMAD KHAN dept=Technical category=Software
+2026-06-15 17:49:47,501 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=906 | msg_len=272
+2026-06-15 17:49:47,501 [INFO] app.api.routes_infra: WA[d00ff239] -> sendMessage | target=120363141953100908@g.us | len=272
+2026-06-15 17:49:47,550 [INFO] app.api.routes_infra: WA[d00ff239] <- status=200 | body={"success":true}
+2026-06-15 17:49:47,550 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 08:34:52,040 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=907 created_by=ANKITA dept=Other category=Software
+2026-06-16 08:34:52,040 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=907 | msg_len=263
+2026-06-16 08:34:52,040 [INFO] app.api.routes_infra: WA[3a85944a] -> sendMessage | target=120363141953100908@g.us | len=263
+2026-06-16 08:34:52,140 [INFO] app.api.routes_infra: WA[3a85944a] <- status=200 | body={"success":true}
+2026-06-16 08:34:52,140 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 08:35:06,380 [INFO] app.api.routes_infra: WA[fa44300c] -> sendMessage | target=918700004157 | len=116
+2026-06-16 08:35:06,687 [INFO] app.api.routes_infra: WA[fa44300c] <- status=200 | body={"success":true}
+2026-06-16 08:35:06,688 [INFO] app.api.routes_infra: PickNotify sent to 8700004157 | ticket_id=907
+2026-06-16 08:35:12,839 [INFO] app.api.routes_infra: WA[e3488e33] -> sendMessage | target=918700004157 | len=154
+2026-06-16 08:35:13,136 [INFO] app.api.routes_infra: WA[e3488e33] <- status=200 | body={"success":true}
+2026-06-16 08:35:13,137 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=907 contact=8700004157
+2026-06-16 09:18:17,519 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=908 created_by=Prerna Sharma dept=Technical category=Hardware
+2026-06-16 09:18:17,520 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=908 | msg_len=299
+2026-06-16 09:18:17,520 [INFO] app.api.routes_infra: WA[a00cc3a0] -> sendMessage | target=120363141953100908@g.us | len=299
+2026-06-16 09:18:17,565 [INFO] app.api.routes_infra: WA[a00cc3a0] <- status=200 | body={"success":true}
+2026-06-16 09:18:17,565 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 11:13:13,915 [INFO] app.api.routes_infra: WA[61d3611d] -> sendMessage | target=917520132030 | len=125
+2026-06-16 11:13:14,267 [INFO] app.api.routes_infra: WA[61d3611d] <- status=200 | body={"success":true}
+2026-06-16 11:13:14,268 [INFO] app.api.routes_infra: PickNotify sent to 7520132030 | ticket_id=906
+2026-06-16 11:13:27,274 [INFO] app.api.routes_infra: WA[70bddc3e] -> sendMessage | target=917290010403 | len=125
+2026-06-16 11:13:27,629 [INFO] app.api.routes_infra: WA[70bddc3e] <- status=200 | body={"success":true}
+2026-06-16 11:13:27,630 [INFO] app.api.routes_infra: PickNotify sent to 7290010403 | ticket_id=901
+2026-06-16 11:13:32,477 [INFO] app.api.routes_infra: WA[42c89f63] -> sendMessage | target=917290010403 | len=163
+2026-06-16 11:13:32,776 [INFO] app.api.routes_infra: WA[42c89f63] <- status=200 | body={"success":true}
+2026-06-16 11:13:32,776 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=901 contact=7290010403
+2026-06-16 11:13:41,314 [INFO] app.api.routes_infra: WA[50452887] -> sendMessage | target=919910773271 | len=125
+2026-06-16 11:13:42,603 [INFO] app.api.routes_infra: WA[50452887] <- status=200 | body={"success":true}
+2026-06-16 11:13:42,604 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=899
+2026-06-16 11:13:46,368 [INFO] app.api.routes_infra: WA[3e451c19] -> sendMessage | target=919910773271 | len=163
+2026-06-16 11:13:46,670 [INFO] app.api.routes_infra: WA[3e451c19] <- status=200 | body={"success":true}
+2026-06-16 11:13:46,670 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=899 contact=9910773271
+2026-06-16 11:13:58,038 [INFO] app.api.routes_infra: WA[57e02528] -> sendMessage | target=919910773271 | len=125
+2026-06-16 11:13:58,345 [INFO] app.api.routes_infra: WA[57e02528] <- status=200 | body={"success":true}
+2026-06-16 11:13:58,346 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=897
+2026-06-16 11:14:01,820 [INFO] app.api.routes_infra: WA[1b4b0467] -> sendMessage | target=919910773271 | len=163
+2026-06-16 11:14:02,180 [INFO] app.api.routes_infra: WA[1b4b0467] <- status=200 | body={"success":true}
+2026-06-16 11:14:02,181 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=897 contact=9910773271
+2026-06-16 11:14:12,469 [INFO] app.api.routes_infra: WA[256db84c] -> sendMessage | target=918448558464 | len=125
+2026-06-16 11:14:12,818 [INFO] app.api.routes_infra: WA[256db84c] <- status=200 | body={"success":true}
+2026-06-16 11:14:12,818 [INFO] app.api.routes_infra: PickNotify sent to 8448558464 | ticket_id=896
+2026-06-16 11:14:20,025 [INFO] app.api.routes_infra: WA[5c2d2627] -> sendMessage | target=919910773271 | len=125
+2026-06-16 11:14:20,317 [INFO] app.api.routes_infra: WA[5c2d2627] <- status=200 | body={"success":true}
+2026-06-16 11:14:20,318 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=895
+2026-06-16 11:14:23,626 [INFO] app.api.routes_infra: WA[d100998a] -> sendMessage | target=919910773271 | len=163
+2026-06-16 11:14:23,935 [INFO] app.api.routes_infra: WA[d100998a] <- status=200 | body={"success":true}
+2026-06-16 11:14:23,935 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=895 contact=9910773271
+2026-06-16 12:36:38,422 [INFO] app.api.routes_infra: WA[a446b106] -> sendMessage | target=918448558464 | len=163
+2026-06-16 12:36:38,766 [INFO] app.api.routes_infra: WA[a446b106] <- status=200 | body={"success":true}
+2026-06-16 12:36:38,766 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=896 contact=8448558464
+2026-06-16 13:04:40,147 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=909 created_by=Suresh Kundra dept=Customer Care category=Hardware
+2026-06-16 13:04:40,148 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=909 | msg_len=272
+2026-06-16 13:04:40,148 [INFO] app.api.routes_infra: WA[8253f05b] -> sendMessage | target=120363141953100908@g.us | len=272
+2026-06-16 13:04:40,193 [INFO] app.api.routes_infra: WA[8253f05b] <- status=200 | body={"success":true}
+2026-06-16 13:04:40,193 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 13:09:03,265 [INFO] app.api.routes_infra: WA[b23bd5ab] -> sendMessage | target=919667798385 | len=122
+2026-06-16 13:09:03,566 [INFO] app.api.routes_infra: WA[b23bd5ab] <- status=200 | body={"success":true}
+2026-06-16 13:09:03,566 [INFO] app.api.routes_infra: PickNotify sent to 9667798385 | ticket_id=909
+2026-06-16 13:09:06,014 [INFO] app.api.routes_infra: WA[b11cded8] -> sendMessage | target=919667798385 | len=160
+2026-06-16 13:09:06,347 [INFO] app.api.routes_infra: WA[b11cded8] <- status=200 | body={"success":true}
+2026-06-16 13:09:06,347 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=909 contact=9667798385
+2026-06-16 13:15:28,369 [INFO] app.api.routes_infra: WA[7a9ba657] -> sendMessage | target=919910773271 | len=122
+2026-06-16 13:15:29,258 [INFO] app.api.routes_infra: WA[7a9ba657] <- status=200 | body={"success":true}
+2026-06-16 13:15:29,259 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=908
+2026-06-16 13:15:33,510 [INFO] app.api.routes_infra: WA[4cf53645] -> sendMessage | target=919910773271 | len=160
+2026-06-16 13:15:33,844 [INFO] app.api.routes_infra: WA[4cf53645] <- status=200 | body={"success":true}
+2026-06-16 13:15:33,845 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=908 contact=9910773271
+2026-06-16 13:16:36,790 [INFO] app.api.routes_infra: WA[2dea1c88] -> sendMessage | target=919818393041 | len=122
+2026-06-16 13:16:37,103 [INFO] app.api.routes_infra: WA[2dea1c88] <- status=200 | body={"success":true}
+2026-06-16 13:16:37,104 [INFO] app.api.routes_infra: PickNotify sent to 9818393041 | ticket_id=873
+2026-06-16 13:17:27,673 [INFO] app.api.routes_infra: WA[a29a9e80] -> sendMessage | target=919818393041 | len=160
+2026-06-16 13:17:28,066 [INFO] app.api.routes_infra: WA[a29a9e80] <- status=200 | body={"success":true}
+2026-06-16 13:17:28,067 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=873 contact=9818393041
+2026-06-16 13:37:46,441 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=910 created_by=Shabnam khan dept=Technical category=Hardware
+2026-06-16 13:37:46,441 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=910 | msg_len=246
+2026-06-16 13:37:46,442 [INFO] app.api.routes_infra: WA[f6c757bf] -> sendMessage | target=120363141953100908@g.us | len=246
+2026-06-16 13:37:46,666 [INFO] app.api.routes_infra: WA[f6c757bf] <- status=200 | body={"success":true}
+2026-06-16 13:37:46,666 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 14:18:23,863 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=911 created_by=Jaspal singh rawat dept=Customer Care category=Hardware
+2026-06-16 14:18:23,863 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=911 | msg_len=276
+2026-06-16 14:18:23,864 [INFO] app.api.routes_infra: WA[a955d80c] -> sendMessage | target=120363141953100908@g.us | len=276
+2026-06-16 14:18:23,965 [INFO] app.api.routes_infra: WA[a955d80c] <- status=200 | body={"success":true}
+2026-06-16 14:18:23,966 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 15:34:01,528 [INFO] app.api.routes_infra: WA[65043643] -> sendMessage | target=919654441851 | len=163
+2026-06-16 15:34:01,858 [INFO] app.api.routes_infra: WA[65043643] <- status=200 | body={"success":true}
+2026-06-16 15:34:01,859 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=894 contact=9654441851
+2026-06-16 15:34:16,990 [INFO] app.api.routes_infra: WA[775eb832] -> sendMessage | target=919818393041 | len=163
+2026-06-16 15:34:17,298 [INFO] app.api.routes_infra: WA[775eb832] <- status=200 | body={"success":true}
+2026-06-16 15:34:17,299 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=872 contact=9818393041
+2026-06-16 15:37:40,272 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=912 created_by=Ritu Mahalwal dept=Technical category=Software
+2026-06-16 15:37:40,272 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=912 | msg_len=349
+2026-06-16 15:37:40,272 [INFO] app.api.routes_infra: WA[9f0d624c] -> sendMessage | target=120363141953100908@g.us | len=349
+2026-06-16 15:37:40,317 [INFO] app.api.routes_infra: WA[9f0d624c] <- status=200 | body={"success":true}
+2026-06-16 15:37:40,318 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 15:51:28,825 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=913 created_by=Akshay Kumar dept=Technical category=Hardware
+2026-06-16 15:51:28,827 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=913 | msg_len=249
+2026-06-16 15:51:28,827 [INFO] app.api.routes_infra: WA[249e9234] -> sendMessage | target=120363141953100908@g.us | len=249
+2026-06-16 15:51:28,873 [INFO] app.api.routes_infra: WA[249e9234] <- status=200 | body={"success":true}
+2026-06-16 15:51:28,873 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 16:03:20,491 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=914 created_by=Suresh Kundra dept=Customer Care category=Software
+2026-06-16 16:03:20,492 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=914 | msg_len=252
+2026-06-16 16:03:20,492 [INFO] app.api.routes_infra: WA[ad537e44] -> sendMessage | target=120363141953100908@g.us | len=252
+2026-06-16 16:03:20,527 [INFO] app.api.routes_infra: WA[ad537e44] <- status=200 | body={"success":true}
+2026-06-16 16:03:20,527 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 16:43:02,950 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=915 created_by=ANKITA dept=Other category=Software
+2026-06-16 16:43:02,951 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=915 | msg_len=262
+2026-06-16 16:43:02,951 [INFO] app.api.routes_infra: WA[762dd994] -> sendMessage | target=120363141953100908@g.us | len=262
+2026-06-16 16:43:02,989 [INFO] app.api.routes_infra: WA[762dd994] <- status=200 | body={"success":true}
+2026-06-16 16:43:02,990 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-16 16:43:13,057 [INFO] app.api.routes_infra: WA[29163569] -> sendMessage | target=918700004157 | len=116
+2026-06-16 16:43:13,352 [INFO] app.api.routes_infra: WA[29163569] <- status=200 | body={"success":true}
+2026-06-16 16:43:13,352 [INFO] app.api.routes_infra: PickNotify sent to 8700004157 | ticket_id=915
+2026-06-16 16:43:16,756 [INFO] app.api.routes_infra: WA[0a50f266] -> sendMessage | target=918700004157 | len=154
+2026-06-16 16:43:17,054 [INFO] app.api.routes_infra: WA[0a50f266] <- status=200 | body={"success":true}
+2026-06-16 16:43:17,055 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=915 contact=8700004157
+2026-06-16 17:18:34,933 [INFO] app.api.routes_infra: WA[55a489d2] -> sendMessage | target=918882193438 | len=122
+2026-06-16 17:18:35,263 [INFO] app.api.routes_infra: WA[55a489d2] <- status=200 | body={"success":true}
+2026-06-16 17:18:35,263 [INFO] app.api.routes_infra: PickNotify sent to 8882193438 | ticket_id=913
+2026-06-16 17:19:11,255 [INFO] app.api.routes_infra: WA[ecc4533a] -> sendMessage | target=918882193438 | len=160
+2026-06-16 17:19:11,560 [INFO] app.api.routes_infra: WA[ecc4533a] <- status=200 | body={"success":true}
+2026-06-16 17:19:11,561 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=913 contact=8882193438
+2026-06-16 18:22:56,651 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=916 created_by=Shabnam khan dept=Technical category=Software
+2026-06-16 18:22:56,651 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=916 | msg_len=225
+2026-06-16 18:22:56,652 [INFO] app.api.routes_infra: WA[1bc0fee1] -> sendMessage | target=120363141953100908@g.us | len=225
+2026-06-16 18:22:56,706 [INFO] app.api.routes_infra: WA[1bc0fee1] <- status=200 | body={"success":true}
+2026-06-16 18:22:56,706 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-17 11:16:42,038 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=917 created_by=Rani dept=Technical category=Software
+2026-06-17 11:16:42,039 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=917 | msg_len=233
+2026-06-17 11:16:42,039 [INFO] app.api.routes_infra: WA[293c3cc7] -> sendMessage | target=120363141953100908@g.us | len=233
+2026-06-17 11:16:42,089 [INFO] app.api.routes_infra: WA[293c3cc7] <- status=200 | body={"success":true}
+2026-06-17 11:16:42,089 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-17 12:45:17,799 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=918 created_by=Sonia dept=Center Phlebo category=Software
+2026-06-17 12:45:17,799 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=918 | msg_len=227
+2026-06-17 12:45:17,799 [INFO] app.api.routes_infra: WA[9376c138] -> sendMessage | target=120363141953100908@g.us | len=227
+2026-06-17 12:45:17,835 [INFO] app.api.routes_infra: WA[9376c138] <- status=200 | body={"success":true}
+2026-06-17 12:45:17,835 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-17 13:01:19,740 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=919 created_by=Shahana Parveen dept=Marketing category=Hardware
+2026-06-17 13:01:19,740 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=919 | msg_len=237
+2026-06-17 13:01:19,741 [INFO] app.api.routes_infra: WA[1afafa9c] -> sendMessage | target=120363141953100908@g.us | len=237
+2026-06-17 13:01:19,786 [INFO] app.api.routes_infra: WA[1afafa9c] <- status=200 | body={"success":true}
+2026-06-17 13:01:19,786 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-17 14:34:05,519 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=920 created_by=ANKITA dept=Other category=Software
+2026-06-17 14:34:05,519 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=920 | msg_len=290
+2026-06-17 14:34:05,520 [INFO] app.api.routes_infra: WA[fb63fd98] -> sendMessage | target=120363141953100908@g.us | len=290
+2026-06-17 14:34:05,574 [INFO] app.api.routes_infra: WA[fb63fd98] <- status=200 | body={"success":true}
+2026-06-17 14:34:05,574 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-17 16:29:17,660 [INFO] app.api.routes_infra: WA[2d2d4015] -> sendMessage | target=918448546358 | len=122
+2026-06-17 16:29:18,091 [INFO] app.api.routes_infra: WA[2d2d4015] <- status=200 | body={"success":true}
+2026-06-17 16:29:18,092 [INFO] app.api.routes_infra: PickNotify sent to 8448546358 | ticket_id=919
+2026-06-17 16:29:20,985 [INFO] app.api.routes_infra: WA[b332750c] -> sendMessage | target=918448546358 | len=160
+2026-06-17 16:29:21,351 [INFO] app.api.routes_infra: WA[b332750c] <- status=200 | body={"success":true}
+2026-06-17 16:29:21,351 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=919 contact=8448546358
+2026-06-17 17:23:26,312 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=921 created_by=Shahana Parveen dept=Marketing category=Hardware
+2026-06-17 17:23:26,312 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=921 | msg_len=308
+2026-06-17 17:23:26,312 [INFO] app.api.routes_infra: WA[9bae74da] -> sendMessage | target=120363141953100908@g.us | len=308
+2026-06-17 17:23:26,353 [INFO] app.api.routes_infra: WA[9bae74da] <- status=200 | body={"success":true}
+2026-06-17 17:23:26,353 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-17 17:40:47,563 [INFO] app.api.routes_infra: WA[6111291b] -> sendMessage | target=918700004157 | len=116
+2026-06-17 17:40:47,866 [INFO] app.api.routes_infra: WA[6111291b] <- status=200 | body={"success":true}
+2026-06-17 17:40:47,867 [INFO] app.api.routes_infra: PickNotify sent to 8700004157 | ticket_id=920
+2026-06-17 17:40:53,255 [INFO] app.api.routes_infra: WA[75b13102] -> sendMessage | target=918700004157 | len=154
+2026-06-17 17:40:53,559 [INFO] app.api.routes_infra: WA[75b13102] <- status=200 | body={"success":true}
+2026-06-17 17:40:53,560 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=920 contact=8700004157
+2026-06-17 18:22:34,340 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=922 created_by=SANKET KUMAR dept=Technical category=Hardware
+2026-06-17 18:22:34,341 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=922 | msg_len=257
+2026-06-17 18:22:34,342 [INFO] app.api.routes_infra: WA[b1851abf] -> sendMessage | target=120363141953100908@g.us | len=257
+2026-06-17 18:22:34,400 [INFO] app.api.routes_infra: WA[b1851abf] <- status=200 | body={"success":true}
+2026-06-17 18:22:34,401 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-17 18:28:14,493 [INFO] app.api.routes_infra: WA[e139e1ce] -> sendMessage | target=917290010403 | len=125
+2026-06-17 18:28:14,857 [INFO] app.api.routes_infra: WA[e139e1ce] <- status=200 | body={"success":true}
+2026-06-17 18:28:14,858 [INFO] app.api.routes_infra: PickNotify sent to 7290010403 | ticket_id=918
+2026-06-17 18:28:18,675 [INFO] app.api.routes_infra: WA[00f4c0c5] -> sendMessage | target=917290010403 | len=163
+2026-06-17 18:28:19,024 [INFO] app.api.routes_infra: WA[00f4c0c5] <- status=200 | body={"success":true}
+2026-06-17 18:28:19,025 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=918 contact=7290010403
+2026-06-17 18:28:32,198 [INFO] app.api.routes_infra: WA[d96d0364] -> sendMessage | target=919818393041 | len=125
+2026-06-17 18:28:32,516 [INFO] app.api.routes_infra: WA[d96d0364] <- status=200 | body={"success":true}
+2026-06-17 18:28:32,516 [INFO] app.api.routes_infra: PickNotify sent to 9818393041 | ticket_id=916
+2026-06-17 18:28:37,121 [INFO] app.api.routes_infra: WA[f66380db] -> sendMessage | target=919818393041 | len=163
+2026-06-17 18:28:37,428 [INFO] app.api.routes_infra: WA[f66380db] <- status=200 | body={"success":true}
+2026-06-17 18:28:37,429 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=916 contact=9818393041
+2026-06-17 20:47:47,766 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-17 20:47:47,766 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-17 20:47:47,766 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-18 09:26:13,992 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=923 created_by=Maria Dass dept=Customer Care category=Software
+2026-06-18 09:26:13,992 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=923 | msg_len=279
+2026-06-18 09:26:13,992 [INFO] app.api.routes_infra: WA[d3a7c3cd] -> sendMessage | target=120363141953100908@g.us | len=279
+2026-06-18 09:26:14,060 [INFO] app.api.routes_infra: WA[d3a7c3cd] <- status=200 | body={"success":true}
+2026-06-18 09:26:14,060 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-18 10:28:18,028 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=924 created_by=Prerna Sharma dept=Technical category=Hardware
+2026-06-18 10:28:18,029 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=924 | msg_len=278
+2026-06-18 10:28:18,030 [INFO] app.api.routes_infra: WA[2790bcb0] -> sendMessage | target=120363141953100908@g.us | len=278
+2026-06-18 10:28:18,068 [INFO] app.api.routes_infra: WA[2790bcb0] <- status=200 | body={"success":true}
+2026-06-18 10:28:18,068 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-18 10:45:19,797 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=925 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-06-18 10:45:19,798 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=925 | msg_len=255
+2026-06-18 10:45:19,799 [INFO] app.api.routes_infra: WA[4adc9f80] -> sendMessage | target=120363141953100908@g.us | len=255
+2026-06-18 10:45:19,830 [INFO] app.api.routes_infra: WA[4adc9f80] <- status=200 | body={"success":true}
+2026-06-18 10:45:19,830 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-18 12:26:41,197 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-18 12:26:41,197 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-18 12:26:41,197 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-18 13:11:33,253 [INFO] app.api.routes_infra: WA[a1292a35] -> sendMessage | target=917870484426 | len=122
+2026-06-18 13:11:33,618 [INFO] app.api.routes_infra: WA[a1292a35] <- status=200 | body={"success":true}
+2026-06-18 13:11:33,618 [INFO] app.api.routes_infra: PickNotify sent to 7870484426 | ticket_id=922
+2026-06-18 13:11:50,590 [INFO] app.api.routes_infra: WA[03d865af] -> sendMessage | target=918448546358 | len=122
+2026-06-18 13:11:50,927 [INFO] app.api.routes_infra: WA[03d865af] <- status=200 | body={"success":true}
+2026-06-18 13:11:50,927 [INFO] app.api.routes_infra: PickNotify sent to 8448546358 | ticket_id=921
+2026-06-18 13:12:09,618 [INFO] app.api.routes_infra: WA[d55065ed] -> sendMessage | target=919873439864 | len=122
+2026-06-18 13:12:09,966 [INFO] app.api.routes_infra: WA[d55065ed] <- status=200 | body={"success":true}
+2026-06-18 13:12:09,966 [INFO] app.api.routes_infra: PickNotify sent to 9873439864 | ticket_id=917
+2026-06-18 13:12:44,688 [INFO] app.api.routes_infra: WA[12e21a88] -> sendMessage | target=918505916252 | len=122
+2026-06-18 13:12:45,166 [INFO] app.api.routes_infra: WA[12e21a88] <- status=200 | body={"success":true}
+2026-06-18 13:12:45,167 [INFO] app.api.routes_infra: PickNotify sent to 8505916252 | ticket_id=903
+2026-06-18 13:13:30,078 [INFO] app.api.routes_infra: WA[f66dc9b2] -> sendMessage | target=917870484426 | len=160
+2026-06-18 13:13:30,409 [INFO] app.api.routes_infra: WA[f66dc9b2] <- status=200 | body={"success":true}
+2026-06-18 13:13:30,409 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=922 contact=7870484426
+2026-06-18 13:13:36,331 [INFO] app.api.routes_infra: WA[7e8f08a5] -> sendMessage | target=918448546358 | len=160
+2026-06-18 13:13:36,660 [INFO] app.api.routes_infra: WA[7e8f08a5] <- status=200 | body={"success":true}
+2026-06-18 13:13:36,660 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=921 contact=8448546358
+2026-06-18 13:13:41,630 [INFO] app.api.routes_infra: WA[3c0c0c34] -> sendMessage | target=919873439864 | len=160
+2026-06-18 13:13:41,920 [INFO] app.api.routes_infra: WA[3c0c0c34] <- status=200 | body={"success":true}
+2026-06-18 13:13:41,920 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=917 contact=9873439864
+2026-06-18 13:13:47,219 [INFO] app.api.routes_infra: WA[7e32d358] -> sendMessage | target=918505916252 | len=160
+2026-06-18 13:13:47,531 [INFO] app.api.routes_infra: WA[7e32d358] <- status=200 | body={"success":true}
+2026-06-18 13:13:47,531 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=903 contact=8505916252
+2026-06-18 13:22:58,056 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=926 created_by=SUMIT SINGH dept=Other category=Office Infra
+2026-06-18 13:22:58,057 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=926 | msg_len=356
+2026-06-18 13:22:58,057 [INFO] app.api.routes_infra: WA[7e2d3290] -> sendMessage | target=120363141953100908@g.us | len=356
+2026-06-18 13:22:58,114 [INFO] app.api.routes_infra: WA[7e2d3290] <- status=200 | body={"success":true}
+2026-06-18 13:22:58,114 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-18 14:12:32,388 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=927 created_by=Sejal Rai dept=Customer Care category=Software
+2026-06-18 14:12:32,388 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=927 | msg_len=269
+2026-06-18 14:12:32,389 [INFO] app.api.routes_infra: WA[1acc5123] -> sendMessage | target=120363141953100908@g.us | len=269
+2026-06-18 14:12:32,441 [INFO] app.api.routes_infra: WA[1acc5123] <- status=200 | body={"success":true}
+2026-06-18 14:12:32,441 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-18 15:48:04,788 [INFO] app.api.routes_infra: WA[e96001de] -> sendMessage | target=919871366002 | len=125
+2026-06-18 15:48:05,141 [INFO] app.api.routes_infra: WA[e96001de] <- status=200 | body={"success":true}
+2026-06-18 15:48:05,142 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=925
+2026-06-18 18:08:00,916 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=928 created_by=Aashu kashyap dept=Other category=Hardware
+2026-06-18 18:08:00,917 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=928 | msg_len=249
+2026-06-18 18:08:00,917 [INFO] app.api.routes_infra: WA[c2a9d0f8] -> sendMessage | target=120363141953100908@g.us | len=249
+2026-06-18 18:08:01,146 [INFO] app.api.routes_infra: WA[c2a9d0f8] <- status=200 | body={"success":true}
+2026-06-18 18:08:01,147 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-18 19:40:31,933 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=929 created_by=SALEEM JAVED dept=Customer Care category=Software
+2026-06-18 19:40:31,933 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=929 | msg_len=257
+2026-06-18 19:40:31,934 [INFO] app.api.routes_infra: WA[3d31faeb] -> sendMessage | target=120363141953100908@g.us | len=257
+2026-06-18 19:40:31,977 [INFO] app.api.routes_infra: WA[3d31faeb] <- status=200 | body={"success":true}
+2026-06-18 19:40:31,977 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-19 10:48:13,727 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=930 created_by=Harshita Basnuwal dept=Technical category=Hardware
+2026-06-19 10:48:13,728 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=930 | msg_len=274
+2026-06-19 10:48:13,728 [INFO] app.api.routes_infra: WA[30955b28] -> sendMessage | target=120363141953100908@g.us | len=274
+2026-06-19 10:48:13,831 [INFO] app.api.routes_infra: WA[30955b28] <- status=200 | body={"success":true}
+2026-06-19 10:48:13,831 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-19 11:12:49,486 [INFO] app.api.routes_infra: WA[75fdf8df] -> sendMessage | target=916203999124 | len=122
+2026-06-19 11:12:49,821 [INFO] app.api.routes_infra: WA[75fdf8df] <- status=200 | body={"success":true}
+2026-06-19 11:12:49,822 [INFO] app.api.routes_infra: PickNotify sent to 6203999124 | ticket_id=928
+2026-06-19 11:12:56,234 [INFO] app.api.routes_infra: WA[e5f44921] -> sendMessage | target=916203999124 | len=160
+2026-06-19 11:12:56,542 [INFO] app.api.routes_infra: WA[e5f44921] <- status=200 | body={"success":true}
+2026-06-19 11:12:56,542 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=928 contact=6203999124
+2026-06-19 13:07:32,438 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=931 created_by=Suresh Kundra dept=Customer Care category=Hardware
+2026-06-19 13:07:32,438 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=931 | msg_len=419
+2026-06-19 13:07:32,439 [INFO] app.api.routes_infra: WA[ae3eb9bd] -> sendMessage | target=120363141953100908@g.us | len=419
+2026-06-19 13:07:32,480 [INFO] app.api.routes_infra: WA[ae3eb9bd] <- status=200 | body={"success":true}
+2026-06-19 13:07:32,480 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-19 13:33:00,693 [INFO] app.api.routes_infra: WA[92eaa121] -> sendMessage | target=919871366002 | len=163
+2026-06-19 13:33:01,032 [INFO] app.api.routes_infra: WA[92eaa121] <- status=200 | body={"success":true}
+2026-06-19 13:33:01,032 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=925 contact=9871366002
+2026-06-19 13:33:20,018 [INFO] app.api.routes_infra: WA[80242fe4] -> sendMessage | target=919654441851 | len=125
+2026-06-19 13:33:20,370 [INFO] app.api.routes_infra: WA[80242fe4] <- status=200 | body={"success":true}
+2026-06-19 13:33:20,370 [INFO] app.api.routes_infra: PickNotify sent to 9654441851 | ticket_id=929
+2026-06-19 14:15:10,158 [INFO] app.api.routes_infra: WA[73ec182a] -> sendMessage | target=916203999124 | len=122
+2026-06-19 14:15:10,469 [INFO] app.api.routes_infra: WA[73ec182a] <- status=200 | body={"success":true}
+2026-06-19 14:15:10,470 [INFO] app.api.routes_infra: PickNotify sent to 6203999124 | ticket_id=875
+2026-06-19 14:15:16,648 [INFO] app.api.routes_infra: WA[3866391e] -> sendMessage | target=916203999124 | len=160
+2026-06-19 14:15:16,973 [INFO] app.api.routes_infra: WA[3866391e] <- status=200 | body={"success":true}
+2026-06-19 14:15:16,973 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=875 contact=6203999124
+2026-06-19 14:43:00,733 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=932 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-06-19 14:43:00,734 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=932 | msg_len=291
+2026-06-19 14:43:00,735 [INFO] app.api.routes_infra: WA[04dab539] -> sendMessage | target=120363141953100908@g.us | len=291
+2026-06-19 14:43:00,773 [INFO] app.api.routes_infra: WA[04dab539] <- status=200 | body={"success":true}
+2026-06-19 14:43:00,773 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-19 15:24:18,527 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=933 created_by=SAHIL BISHT dept=Technical category=Hardware
+2026-06-19 15:24:18,528 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=933 | msg_len=342
+2026-06-19 15:24:18,528 [INFO] app.api.routes_infra: WA[292e9427] -> sendMessage | target=120363141953100908@g.us | len=342
+2026-06-19 15:24:18,717 [INFO] app.api.routes_infra: WA[292e9427] <- status=200 | body={"success":true}
+2026-06-19 15:24:18,717 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-19 15:24:38,685 [INFO] app.api.routes_infra: WA[1bffd713] -> sendMessage | target=918057054076 | len=121
+2026-06-19 15:24:41,695 [INFO] app.api.routes_infra: WA[1bffd713] <- status=200 | body={"success":true}
+2026-06-19 15:24:41,695 [INFO] app.api.routes_infra: PickNotify sent to 8057054076 | ticket_id=933
+2026-06-19 15:24:56,270 [INFO] app.api.routes_infra: WA[81ad0e1d] -> sendMessage | target=918057054076 | len=159
+2026-06-19 15:24:56,625 [INFO] app.api.routes_infra: WA[81ad0e1d] <- status=200 | body={"success":true}
+2026-06-19 15:24:56,626 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=933 contact=8057054076
+2026-06-19 15:30:12,845 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-19 15:30:12,960 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=9); skipping start
+2026-06-19 15:30:12,988 [INFO] app.api.routes_infra: InfraReminder -> processing 13 pending tickets
+2026-06-19 15:30:12,988 [INFO] app.api.routes_infra: WA[8e8c1612] -> sendMessage | target=120363141953100908@g.us | len=291
+2026-06-19 15:30:13,043 [INFO] app.api.routes_infra: WA[8e8c1612] <- status=200 | body={"success":true}
+2026-06-19 15:30:13,058 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=888 status=200
+2026-06-19 15:30:13,065 [INFO] app.api.routes_infra: WA[ab916a05] -> sendMessage | target=120363141953100908@g.us | len=278
+2026-06-19 15:30:13,175 [INFO] app.api.routes_infra: WA[ab916a05] <- status=200 | body={"success":true}
+2026-06-19 15:30:13,175 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=890 status=200
+2026-06-19 15:30:13,176 [INFO] app.api.routes_infra: WA[9ac98cd4] -> sendMessage | target=120363141953100908@g.us | len=326
+2026-06-19 15:30:13,234 [INFO] app.api.routes_infra: WA[9ac98cd4] <- status=200 | body={"success":true}
+2026-06-19 15:30:13,235 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=891 status=200
+2026-06-19 15:30:13,235 [INFO] app.api.routes_infra: WA[178852a7] -> sendMessage | target=120363141953100908@g.us | len=310
+2026-06-19 15:30:13,287 [INFO] app.api.routes_infra: WA[178852a7] <- status=200 | body={"success":true}
+2026-06-19 15:30:13,287 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=892 status=200
+2026-06-19 15:30:13,287 [INFO] app.api.routes_infra: WA[9f7adcdc] -> sendMessage | target=120363141953100908@g.us | len=313
+2026-06-19 15:30:14,746 [INFO] app.api.routes_infra: WA[9f7adcdc] <- status=200 | body={"success":true}
+2026-06-19 15:30:14,746 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=904 status=200
+2026-06-19 15:30:14,746 [INFO] app.api.routes_infra: WA[4173f837] -> sendMessage | target=120363141953100908@g.us | len=261
+2026-06-19 15:30:14,863 [INFO] app.api.routes_infra: WA[4173f837] <- status=200 | body={"success":true}
+2026-06-19 15:30:14,863 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=910 status=200
+2026-06-19 15:30:14,864 [INFO] app.api.routes_infra: WA[c1afbf97] -> sendMessage | target=120363141953100908@g.us | len=278
+2026-06-19 15:30:14,907 [INFO] app.api.routes_infra: WA[c1afbf97] <- status=200 | body={"success":true}
+2026-06-19 15:30:14,908 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=911 status=200
+2026-06-19 15:30:14,908 [INFO] app.api.routes_infra: WA[75b76b99] -> sendMessage | target=120363141953100908@g.us | len=351
+2026-06-19 15:30:14,973 [INFO] app.api.routes_infra: WA[75b76b99] <- status=200 | body={"success":true}
+2026-06-19 15:30:14,973 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=912 status=200
+2026-06-19 15:30:14,973 [INFO] app.api.routes_infra: WA[b2694a13] -> sendMessage | target=120363141953100908@g.us | len=267
+2026-06-19 15:30:15,051 [INFO] app.api.routes_infra: WA[b2694a13] <- status=200 | body={"success":true}
+2026-06-19 15:30:15,051 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=914 status=200
+2026-06-19 15:30:15,052 [INFO] app.api.routes_infra: WA[d68f4441] -> sendMessage | target=120363141953100908@g.us | len=282
+2026-06-19 15:30:15,235 [INFO] app.api.routes_infra: WA[d68f4441] <- status=200 | body={"success":true}
+2026-06-19 15:30:15,236 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=923 status=200
+2026-06-19 15:30:15,236 [INFO] app.api.routes_infra: WA[2c8f9845] -> sendMessage | target=120363141953100908@g.us | len=280
+2026-06-19 15:30:15,382 [INFO] app.api.routes_infra: WA[2c8f9845] <- status=200 | body={"success":true}
+2026-06-19 15:30:15,383 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=924 status=200
+2026-06-19 15:30:15,383 [INFO] app.api.routes_infra: WA[dbc81e02] -> sendMessage | target=120363141953100908@g.us | len=371
+2026-06-19 15:30:15,501 [INFO] app.api.routes_infra: WA[dbc81e02] <- status=200 | body={"success":true}
+2026-06-19 15:30:15,501 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=926 status=200
+2026-06-19 15:30:15,502 [INFO] app.api.routes_infra: WA[f9b5468c] -> sendMessage | target=120363141953100908@g.us | len=272
+2026-06-19 15:30:15,677 [INFO] app.api.routes_infra: WA[f9b5468c] <- status=200 | body={"success":true}
+2026-06-19 15:30:15,677 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=927 status=200
+2026-06-19 15:40:03,294 [INFO] app.api.routes_infra: WA[ce34a4aa] -> sendMessage | target=919818393041 | len=122
+2026-06-19 15:40:03,619 [INFO] app.api.routes_infra: WA[ce34a4aa] <- status=200 | body={"success":true}
+2026-06-19 15:40:03,620 [INFO] app.api.routes_infra: PickNotify sent to 9818393041 | ticket_id=910
+2026-06-19 15:40:06,530 [INFO] app.api.routes_infra: WA[cf37be4f] -> sendMessage | target=919818393041 | len=160
+2026-06-19 15:40:06,817 [INFO] app.api.routes_infra: WA[cf37be4f] <- status=200 | body={"success":true}
+2026-06-19 15:40:06,817 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=910 contact=9818393041
+2026-06-19 15:41:08,571 [INFO] app.api.routes_infra: WA[2a26f430] -> sendMessage | target=919818393041 | len=122
+2026-06-19 15:41:08,902 [INFO] app.api.routes_infra: WA[2a26f430] <- status=200 | body={"success":true}
+2026-06-19 15:41:08,903 [INFO] app.api.routes_infra: PickNotify sent to 9818393041 | ticket_id=814
+2026-06-19 15:41:14,632 [INFO] app.api.routes_infra: WA[39c30828] -> sendMessage | target=919818393041 | len=160
+2026-06-19 15:41:14,929 [INFO] app.api.routes_infra: WA[39c30828] <- status=200 | body={"success":true}
+2026-06-19 15:41:14,929 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=814 contact=9818393041
+2026-06-20 11:30:15,890 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-20 11:30:15,891 [INFO] app.api.routes_infra: WA[bf01bb78] -> sendMessage | target=120363141953100908@g.us | len=276
+2026-06-20 11:30:15,939 [INFO] app.api.routes_infra: WA[bf01bb78] <- status=200 | body={"success":true}
+2026-06-20 11:30:15,939 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=930 status=200
+2026-06-20 12:34:09,489 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=934 created_by=Deepak ojha dept=Technical category=Hardware
+2026-06-20 12:34:09,490 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=934 | msg_len=231
+2026-06-20 12:34:09,491 [INFO] app.api.routes_infra: WA[bf818564] -> sendMessage | target=120363141953100908@g.us | len=231
+2026-06-20 12:34:09,526 [INFO] app.api.routes_infra: WA[bf818564] <- status=200 | body={"success":true}
+2026-06-20 12:34:09,527 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-20 12:47:08,836 [INFO] app.api.routes_infra: WA[60a21bd9] -> sendMessage | target=919310671290 | len=122
+2026-06-20 12:47:09,167 [INFO] app.api.routes_infra: WA[60a21bd9] <- status=200 | body={"success":true}
+2026-06-20 12:47:09,168 [INFO] app.api.routes_infra: PickNotify sent to 9310671290 | ticket_id=934
+2026-06-20 12:47:24,677 [INFO] app.api.routes_infra: WA[4a09b9d3] -> sendMessage | target=919310671290 | len=160
+2026-06-20 12:47:25,006 [INFO] app.api.routes_infra: WA[4a09b9d3] <- status=200 | body={"success":true}
+2026-06-20 12:47:25,006 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=934 contact=9310671290
+2026-06-20 13:15:50,524 [INFO] app.api.routes_infra: WA[e9ebea1f] -> sendMessage | target=919871366002 | len=121
+2026-06-20 13:15:50,842 [INFO] app.api.routes_infra: WA[e9ebea1f] <- status=200 | body={"success":true}
+2026-06-20 13:15:50,842 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=904
+2026-06-20 13:16:57,937 [INFO] app.api.routes_infra: WA[27374352] -> sendMessage | target=919871366002 | len=159
+2026-06-20 13:16:58,219 [INFO] app.api.routes_infra: WA[27374352] <- status=200 | body={"success":true}
+2026-06-20 13:16:58,219 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=904 contact=9871366002
+2026-06-20 13:18:05,856 [INFO] app.api.routes_infra: WA[1ea73070] -> sendMessage | target=919871366002 | len=121
+2026-06-20 13:18:06,167 [INFO] app.api.routes_infra: WA[1ea73070] <- status=200 | body={"success":true}
+2026-06-20 13:18:06,167 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=880
+2026-06-20 13:18:25,269 [INFO] app.api.routes_infra: WA[e20deaab] -> sendMessage | target=919871366002 | len=159
+2026-06-20 13:18:25,579 [INFO] app.api.routes_infra: WA[e20deaab] <- status=200 | body={"success":true}
+2026-06-20 13:18:25,579 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=880 contact=9871366002
+2026-06-20 13:19:02,336 [INFO] app.api.routes_infra: WA[c1b8ed1e] -> sendMessage | target=919598226263 | len=121
+2026-06-20 13:19:02,621 [INFO] app.api.routes_infra: WA[c1b8ed1e] <- status=200 | body={"success":true}
+2026-06-20 13:19:02,622 [INFO] app.api.routes_infra: PickNotify sent to 9598226263 | ticket_id=879
+2026-06-20 13:19:05,852 [INFO] app.api.routes_infra: WA[a9e548d0] -> sendMessage | target=919598226263 | len=159
+2026-06-20 13:19:06,154 [INFO] app.api.routes_infra: WA[a9e548d0] <- status=200 | body={"success":true}
+2026-06-20 13:19:06,154 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=879 contact=9598226263
+2026-06-20 13:20:46,300 [INFO] app.api.routes_infra: WA[fb1a575c] -> sendMessage | target=919667798385 | len=121
+2026-06-20 13:20:46,677 [INFO] app.api.routes_infra: WA[fb1a575c] <- status=200 | body={"success":true}
+2026-06-20 13:20:46,677 [INFO] app.api.routes_infra: PickNotify sent to 9667798385 | ticket_id=914
+2026-06-20 13:20:49,149 [INFO] app.api.routes_infra: WA[14e87a7b] -> sendMessage | target=919667798385 | len=159
+2026-06-20 13:20:49,435 [INFO] app.api.routes_infra: WA[14e87a7b] <- status=200 | body={"success":true}
+2026-06-20 13:20:49,435 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=914 contact=9667798385
+2026-06-20 13:20:49,474 [INFO] app.api.routes_infra: WA[b0c4cbcb] -> sendMessage | target=919667798385 | len=159
+2026-06-20 13:20:49,762 [INFO] app.api.routes_infra: WA[b0c4cbcb] <- status=200 | body={"success":true}
+2026-06-20 13:20:49,763 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=914 contact=9667798385
+2026-06-20 13:21:35,856 [INFO] app.api.routes_infra: WA[a90fabd1] -> sendMessage | target=919899847571 | len=121
+2026-06-20 13:21:36,149 [INFO] app.api.routes_infra: WA[a90fabd1] <- status=200 | body={"success":true}
+2026-06-20 13:21:36,149 [INFO] app.api.routes_infra: PickNotify sent to 9899847571 | ticket_id=834
+2026-06-20 13:22:00,269 [INFO] app.api.routes_infra: WA[d993d52f] -> sendMessage | target=918368207989 | len=121
+2026-06-20 13:22:00,576 [INFO] app.api.routes_infra: WA[d993d52f] <- status=200 | body={"success":true}
+2026-06-20 13:22:00,577 [INFO] app.api.routes_infra: PickNotify sent to 8368207989 | ticket_id=816
+2026-06-20 13:22:03,336 [INFO] app.api.routes_infra: WA[872e7ac2] -> sendMessage | target=919899847571 | len=159
+2026-06-20 13:22:03,620 [INFO] app.api.routes_infra: WA[872e7ac2] <- status=200 | body={"success":true}
+2026-06-20 13:22:03,621 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=834 contact=9899847571
+2026-06-20 13:22:08,085 [INFO] app.api.routes_infra: WA[c9921b02] -> sendMessage | target=918368207989 | len=159
+2026-06-20 13:22:08,390 [INFO] app.api.routes_infra: WA[c9921b02] <- status=200 | body={"success":true}
+2026-06-20 13:22:08,390 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=816 contact=8368207989
+2026-06-20 13:24:06,763 [INFO] app.api.routes_infra: WA[cc04a0dc] -> sendMessage | target=918368207989 | len=121
+2026-06-20 13:24:07,048 [INFO] app.api.routes_infra: WA[cc04a0dc] <- status=200 | body={"success":true}
+2026-06-20 13:24:07,048 [INFO] app.api.routes_infra: PickNotify sent to 8368207989 | ticket_id=772
+2026-06-20 13:24:10,607 [INFO] app.api.routes_infra: WA[2f12ba60] -> sendMessage | target=918368207989 | len=159
+2026-06-20 13:24:10,914 [INFO] app.api.routes_infra: WA[2f12ba60] <- status=200 | body={"success":true}
+2026-06-20 13:24:10,914 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=772 contact=8368207989
+2026-06-20 13:30:15,962 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-20 13:30:15,963 [INFO] app.api.routes_infra: WA[9374dab6] -> sendMessage | target=120363141953100908@g.us | len=422
+2026-06-20 13:30:15,999 [INFO] app.api.routes_infra: WA[9374dab6] <- status=200 | body={"success":true}
+2026-06-20 13:30:15,999 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=931 status=200
+2026-06-20 13:43:30,291 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=935 created_by=Monika Rajput dept=Admin category=Office Infra
+2026-06-20 13:43:30,292 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=935 | msg_len=240
+2026-06-20 13:43:30,292 [INFO] app.api.routes_infra: WA[0a40e95e] -> sendMessage | target=120363141953100908@g.us | len=240
+2026-06-20 13:43:30,335 [INFO] app.api.routes_infra: WA[0a40e95e] <- status=200 | body={"success":true}
+2026-06-20 13:43:30,335 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-20 13:46:44,868 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=936 created_by=Dr Vipul Bhasin dept=Customer Care category=Hardware
+2026-06-20 13:46:44,868 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=936 | msg_len=307
+2026-06-20 13:46:44,868 [INFO] app.api.routes_infra: WA[5c3e830b] -> sendMessage | target=120363141953100908@g.us | len=307
+2026-06-20 13:46:44,921 [INFO] app.api.routes_infra: WA[5c3e830b] <- status=200 | body={"success":true}
+2026-06-20 13:46:44,921 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-20 13:49:55,379 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=937 created_by=Ritu Mahalwal dept=Technical category=Software
+2026-06-20 13:49:55,380 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=937 | msg_len=290
+2026-06-20 13:49:55,380 [INFO] app.api.routes_infra: WA[edbadd46] -> sendMessage | target=120363141953100908@g.us | len=290
+2026-06-20 13:49:55,421 [INFO] app.api.routes_infra: WA[edbadd46] <- status=200 | body={"success":true}
+2026-06-20 13:49:55,421 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-20 14:05:28,975 [INFO] app.api.routes_infra: WA[2b00c1d0] -> sendMessage | target=919667798385 | len=122
+2026-06-20 14:05:29,375 [INFO] app.api.routes_infra: WA[2b00c1d0] <- status=200 | body={"success":true}
+2026-06-20 14:05:29,376 [INFO] app.api.routes_infra: PickNotify sent to 9667798385 | ticket_id=931
+2026-06-20 14:05:37,236 [INFO] app.api.routes_infra: WA[35369674] -> sendMessage | target=919667798385 | len=160
+2026-06-20 14:05:37,522 [INFO] app.api.routes_infra: WA[35369674] <- status=200 | body={"success":true}
+2026-06-20 14:05:37,522 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=931 contact=9667798385
+2026-06-20 14:06:02,390 [INFO] app.api.routes_infra: WA[a6abedbe] -> sendMessage | target=918505916252 | len=122
+2026-06-20 14:06:02,766 [INFO] app.api.routes_infra: WA[a6abedbe] <- status=200 | body={"success":true}
+2026-06-20 14:06:02,767 [INFO] app.api.routes_infra: PickNotify sent to 8505916252 | ticket_id=930
+2026-06-20 14:07:08,818 [INFO] app.api.routes_infra: WA[62812556] -> sendMessage | target=919821957370 | len=122
+2026-06-20 14:07:09,149 [INFO] app.api.routes_infra: WA[62812556] <- status=200 | body={"success":true}
+2026-06-20 14:07:09,150 [INFO] app.api.routes_infra: PickNotify sent to 9821957370 | ticket_id=926
+2026-06-20 14:09:53,678 [INFO] app.api.routes_infra: WA[fa6fbaf5] -> sendMessage | target=917838686369 | len=122
+2026-06-20 14:09:54,029 [INFO] app.api.routes_infra: WA[fa6fbaf5] <- status=200 | body={"success":true}
+2026-06-20 14:09:54,029 [INFO] app.api.routes_infra: PickNotify sent to 7838686369 | ticket_id=911
+2026-06-20 14:10:09,304 [INFO] app.api.routes_infra: WA[4ca8429d] -> sendMessage | target=917838686369 | len=160
+2026-06-20 14:10:09,644 [INFO] app.api.routes_infra: WA[4ca8429d] <- status=200 | body={"success":true}
+2026-06-20 14:10:09,645 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=911 contact=7838686369
+2026-06-20 14:13:18,056 [INFO] app.api.routes_infra: WA[62049869] -> sendMessage | target=919958547534 | len=122
+2026-06-20 14:13:18,394 [INFO] app.api.routes_infra: WA[62049869] <- status=200 | body={"success":true}
+2026-06-20 14:13:18,394 [INFO] app.api.routes_infra: PickNotify sent to 9958547534 | ticket_id=887
+2026-06-20 14:13:33,695 [INFO] app.api.routes_infra: WA[00a8510c] -> sendMessage | target=919958547534 | len=160
+2026-06-20 14:13:34,004 [INFO] app.api.routes_infra: WA[00a8510c] <- status=200 | body={"success":true}
+2026-06-20 14:13:34,005 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=887 contact=9958547534
+2026-06-20 14:16:49,037 [INFO] app.api.routes_infra: WA[7d441d7b] -> sendMessage | target=919871366002 | len=122
+2026-06-20 14:16:49,357 [INFO] app.api.routes_infra: WA[7d441d7b] <- status=200 | body={"success":true}
+2026-06-20 14:16:49,357 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=847
+2026-06-20 14:17:02,362 [INFO] app.api.routes_infra: WA[7e1c15ce] -> sendMessage | target=919871366002 | len=160
+2026-06-20 14:17:02,694 [INFO] app.api.routes_infra: WA[7e1c15ce] <- status=200 | body={"success":true}
+2026-06-20 14:17:02,695 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=847 contact=9871366002
+2026-06-20 15:30:16,023 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-20 15:30:16,024 [INFO] app.api.routes_infra: WA[eecd2539] -> sendMessage | target=120363141953100908@g.us | len=293
+2026-06-20 15:30:16,060 [INFO] app.api.routes_infra: WA[eecd2539] <- status=200 | body={"success":true}
+2026-06-20 15:30:16,060 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=932 status=200
+2026-06-20 15:34:14,823 [INFO] app.api.routes_infra: WA[6d1053c6] -> sendMessage | target=919667798385 | len=121
+2026-06-20 15:34:15,140 [INFO] app.api.routes_infra: WA[6d1053c6] <- status=200 | body={"success":true}
+2026-06-20 15:34:15,140 [INFO] app.api.routes_infra: PickNotify sent to 9667798385 | ticket_id=843
+2026-06-20 15:34:19,363 [INFO] app.api.routes_infra: WA[c3055030] -> sendMessage | target=919667798385 | len=159
+2026-06-20 15:34:19,678 [INFO] app.api.routes_infra: WA[c3055030] <- status=200 | body={"success":true}
+2026-06-20 15:34:19,679 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=843 contact=9667798385
+2026-06-20 15:35:39,279 [INFO] app.api.routes_infra: WA[584af2b2] -> sendMessage | target=919717852423 | len=121
+2026-06-20 15:35:39,644 [INFO] app.api.routes_infra: WA[584af2b2] <- status=200 | body={"success":true}
+2026-06-20 15:35:39,644 [INFO] app.api.routes_infra: PickNotify sent to 9717852423 | ticket_id=686
+2026-06-20 15:35:43,506 [INFO] app.api.routes_infra: WA[1436e0c2] -> sendMessage | target=919717852423 | len=159
+2026-06-20 15:35:43,881 [INFO] app.api.routes_infra: WA[1436e0c2] <- status=200 | body={"success":true}
+2026-06-20 15:35:43,881 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=686 contact=9717852423
+2026-06-20 15:36:01,524 [INFO] app.api.routes_infra: WA[a8df11ec] -> sendMessage | target=919870554746 | len=121
+2026-06-20 15:36:01,823 [INFO] app.api.routes_infra: WA[a8df11ec] <- status=200 | body={"success":true}
+2026-06-20 15:36:01,823 [INFO] app.api.routes_infra: PickNotify sent to 9870554746 | ticket_id=824
+2026-06-20 15:36:04,667 [INFO] app.api.routes_infra: WA[a1a25ea3] -> sendMessage | target=919870554746 | len=159
+2026-06-20 15:36:04,997 [INFO] app.api.routes_infra: WA[a1a25ea3] <- status=200 | body={"success":true}
+2026-06-20 15:36:04,997 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=824 contact=9870554746
+2026-06-20 15:36:25,304 [INFO] app.api.routes_infra: WA[05c81695] -> sendMessage | target=919650692437 | len=121
+2026-06-20 15:36:25,643 [INFO] app.api.routes_infra: WA[05c81695] <- status=200 | body={"success":true}
+2026-06-20 15:36:25,643 [INFO] app.api.routes_infra: PickNotify sent to 9650692437 | ticket_id=821
+2026-06-20 15:36:28,744 [INFO] app.api.routes_infra: WA[3330f3c3] -> sendMessage | target=919650692437 | len=159
+2026-06-20 15:36:29,060 [INFO] app.api.routes_infra: WA[3330f3c3] <- status=200 | body={"success":true}
+2026-06-20 15:36:29,060 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=821 contact=9650692437
+2026-06-20 15:39:23,331 [INFO] app.api.routes_infra: WA[f03d1342] -> sendMessage | target=919818393041 | len=121
+2026-06-20 15:39:23,634 [INFO] app.api.routes_infra: WA[f03d1342] <- status=200 | body={"success":true}
+2026-06-20 15:39:23,634 [INFO] app.api.routes_infra: PickNotify sent to 9818393041 | ticket_id=797
+2026-06-20 15:39:26,663 [INFO] app.api.routes_infra: WA[a7cc81f7] -> sendMessage | target=919818393041 | len=159
+2026-06-20 15:39:26,999 [INFO] app.api.routes_infra: WA[a7cc81f7] <- status=200 | body={"success":true}
+2026-06-20 15:39:26,999 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=797 contact=9818393041
+2026-06-20 16:34:31,031 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=938 created_by=Aman Shukla dept=Field category=Hardware
+2026-06-20 16:34:31,031 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=938 | msg_len=324
+2026-06-20 16:34:31,032 [INFO] app.api.routes_infra: WA[1b5102a9] -> sendMessage | target=120363141953100908@g.us | len=324
+2026-06-20 16:34:31,156 [INFO] app.api.routes_infra: WA[1b5102a9] <- status=200 | body={"success":true}
+2026-06-20 16:34:31,157 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-20 16:37:34,454 [INFO] app.api.routes_infra: WA[e28e0ab0] -> sendMessage | target=919717852423 | len=121
+2026-06-20 16:37:34,814 [INFO] app.api.routes_infra: WA[e28e0ab0] <- status=200 | body={"success":true}
+2026-06-20 16:37:34,814 [INFO] app.api.routes_infra: PickNotify sent to 9717852423 | ticket_id=803
+2026-06-20 16:47:32,683 [INFO] app.api.routes_infra: WA[5491a0c0] -> sendMessage | target=919871366002 | len=121
+2026-06-20 16:47:33,030 [INFO] app.api.routes_infra: WA[5491a0c0] <- status=200 | body={"success":true}
+2026-06-20 16:47:33,030 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=691
+2026-06-20 16:47:37,284 [INFO] app.api.routes_infra: WA[b3bf4c50] -> sendMessage | target=919717852423 | len=159
+2026-06-20 16:47:37,659 [INFO] app.api.routes_infra: WA[b3bf4c50] <- status=200 | body={"success":true}
+2026-06-20 16:47:37,659 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=803 contact=9717852423
+2026-06-20 16:47:40,847 [INFO] app.api.routes_infra: WA[2592c4f0] -> sendMessage | target=919871366002 | len=159
+2026-06-20 16:47:41,190 [INFO] app.api.routes_infra: WA[2592c4f0] <- status=200 | body={"success":true}
+2026-06-20 16:47:41,190 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=691 contact=9871366002
+2026-06-20 16:48:33,104 [INFO] app.api.routes_infra: WA[3af7973b] -> sendMessage | target=919871366002 | len=121
+2026-06-20 16:48:33,444 [INFO] app.api.routes_infra: WA[3af7973b] <- status=200 | body={"success":true}
+2026-06-20 16:48:33,445 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=932
+2026-06-20 16:48:36,292 [INFO] app.api.routes_infra: WA[b7f4b000] -> sendMessage | target=919871366002 | len=159
+2026-06-20 16:48:36,638 [INFO] app.api.routes_infra: WA[b7f4b000] <- status=200 | body={"success":true}
+2026-06-20 16:48:36,639 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=932 contact=9871366002
+2026-06-20 16:51:15,484 [INFO] app.api.routes_infra: WA[e98474fd] -> sendMessage | target=919821957370 | len=121
+2026-06-20 16:51:15,851 [INFO] app.api.routes_infra: WA[e98474fd] <- status=200 | body={"success":true}
+2026-06-20 16:51:15,851 [INFO] app.api.routes_infra: PickNotify sent to 9821957370 | ticket_id=890
+2026-06-20 16:53:47,757 [INFO] app.api.routes_infra: WA[3c5838d0] -> sendMessage | target=919654876714 | len=121
+2026-06-20 16:53:48,073 [INFO] app.api.routes_infra: WA[3c5838d0] <- status=200 | body={"success":true}
+2026-06-20 16:53:48,074 [INFO] app.api.routes_infra: PickNotify sent to 9654876714 | ticket_id=923
+2026-06-20 16:53:57,608 [INFO] app.api.routes_infra: WA[93bff7fb] -> sendMessage | target=919871366002 | len=121
+2026-06-20 16:53:58,054 [INFO] app.api.routes_infra: WA[93bff7fb] <- status=200 | body={"success":true}
+2026-06-20 16:53:58,054 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=912
+2026-06-20 16:54:03,711 [INFO] app.api.routes_infra: WA[ebf11666] -> sendMessage | target=919871366002 | len=121
+2026-06-20 16:54:04,053 [INFO] app.api.routes_infra: WA[ebf11666] <- status=200 | body={"success":true}
+2026-06-20 16:54:04,054 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=891
+2026-06-20 16:54:09,523 [INFO] app.api.routes_infra: WA[21fc2793] -> sendMessage | target=919598226263 | len=121
+2026-06-20 16:54:09,859 [INFO] app.api.routes_infra: WA[21fc2793] <- status=200 | body={"success":true}
+2026-06-20 16:54:09,860 [INFO] app.api.routes_infra: PickNotify sent to 9598226263 | ticket_id=878
+2026-06-20 16:54:14,786 [INFO] app.api.routes_infra: WA[332fd1ab] -> sendMessage | target=917838686369 | len=121
+2026-06-20 16:54:15,167 [INFO] app.api.routes_infra: WA[332fd1ab] <- status=200 | body={"success":true}
+2026-06-20 16:54:15,167 [INFO] app.api.routes_infra: PickNotify sent to 7838686369 | ticket_id=836
+2026-06-20 16:54:20,929 [INFO] app.api.routes_infra: WA[7196374a] -> sendMessage | target=919871366002 | len=121
+2026-06-20 16:54:21,225 [INFO] app.api.routes_infra: WA[7196374a] <- status=200 | body={"success":true}
+2026-06-20 16:54:21,226 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=833
+2026-06-20 16:54:26,366 [INFO] app.api.routes_infra: WA[2bef9eab] -> sendMessage | target=919667798385 | len=121
+2026-06-20 16:54:26,690 [INFO] app.api.routes_infra: WA[2bef9eab] <- status=200 | body={"success":true}
+2026-06-20 16:54:26,690 [INFO] app.api.routes_infra: PickNotify sent to 9667798385 | ticket_id=693
+2026-06-20 16:54:32,122 [INFO] app.api.routes_infra: WA[19487501] -> sendMessage | target=917838686369 | len=121
+2026-06-20 16:54:32,463 [INFO] app.api.routes_infra: WA[19487501] <- status=200 | body={"success":true}
+2026-06-20 16:54:32,463 [INFO] app.api.routes_infra: PickNotify sent to 7838686369 | ticket_id=835
+2026-06-20 16:54:42,189 [INFO] app.api.routes_infra: WA[1500997f] -> sendMessage | target=919654876714 | len=159
+2026-06-20 16:54:42,509 [INFO] app.api.routes_infra: WA[1500997f] <- status=200 | body={"success":true}
+2026-06-20 16:54:42,510 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=923 contact=9654876714
+2026-06-20 16:54:45,608 [INFO] app.api.routes_infra: WA[fb3b9ef5] -> sendMessage | target=919871366002 | len=159
+2026-06-20 16:54:45,943 [INFO] app.api.routes_infra: WA[fb3b9ef5] <- status=200 | body={"success":true}
+2026-06-20 16:54:45,944 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=912 contact=9871366002
+2026-06-20 16:54:49,574 [INFO] app.api.routes_infra: WA[6cda2254] -> sendMessage | target=919871366002 | len=159
+2026-06-20 16:54:49,868 [INFO] app.api.routes_infra: WA[6cda2254] <- status=200 | body={"success":true}
+2026-06-20 16:54:49,869 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=891 contact=9871366002
+2026-06-20 16:54:53,006 [INFO] app.api.routes_infra: WA[38cef995] -> sendMessage | target=919598226263 | len=159
+2026-06-20 16:54:53,308 [INFO] app.api.routes_infra: WA[38cef995] <- status=200 | body={"success":true}
+2026-06-20 16:54:53,308 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=878 contact=9598226263
+2026-06-20 16:54:55,771 [INFO] app.api.routes_infra: WA[b5c97487] -> sendMessage | target=917838686369 | len=159
+2026-06-20 16:54:56,132 [INFO] app.api.routes_infra: WA[b5c97487] <- status=200 | body={"success":true}
+2026-06-20 16:54:56,133 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=836 contact=7838686369
+2026-06-20 16:54:58,067 [INFO] app.api.routes_infra: WA[631d3652] -> sendMessage | target=917838686369 | len=159
+2026-06-20 16:54:58,427 [INFO] app.api.routes_infra: WA[631d3652] <- status=200 | body={"success":true}
+2026-06-20 16:54:58,428 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=835 contact=7838686369
+2026-06-20 16:55:00,387 [INFO] app.api.routes_infra: WA[7d127c4c] -> sendMessage | target=919871366002 | len=159
+2026-06-20 16:55:00,739 [INFO] app.api.routes_infra: WA[7d127c4c] <- status=200 | body={"success":true}
+2026-06-20 16:55:00,739 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=833 contact=9871366002
+2026-06-20 16:55:02,615 [INFO] app.api.routes_infra: WA[3e32a152] -> sendMessage | target=919871366002 | len=159
+2026-06-20 16:55:02,958 [INFO] app.api.routes_infra: WA[3e32a152] <- status=200 | body={"success":true}
+2026-06-20 16:55:02,958 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=756 contact=9871366002
+2026-06-20 16:55:05,234 [INFO] app.api.routes_infra: WA[28b18fd6] -> sendMessage | target=919667798385 | len=159
+2026-06-20 16:55:05,564 [INFO] app.api.routes_infra: WA[28b18fd6] <- status=200 | body={"success":true}
+2026-06-20 16:55:05,564 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=693 contact=9667798385
+2026-06-20 19:07:09,919 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=939 created_by=Shabnam khan dept=Technical category=Software
+2026-06-20 19:07:09,920 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=939 | msg_len=231
+2026-06-20 19:07:09,921 [INFO] app.api.routes_infra: WA[e024f3cf] -> sendMessage | target=120363141953100908@g.us | len=231
+2026-06-20 19:07:10,059 [INFO] app.api.routes_infra: WA[e024f3cf] <- status=200 | body={"success":true}
+2026-06-20 19:07:10,060 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-20 19:14:09,292 [INFO] app.api.routes_infra: WA[696614af] -> sendMessage | target=918505916252 | len=160
+2026-06-20 19:14:09,725 [INFO] app.api.routes_infra: WA[696614af] <- status=200 | body={"success":true}
+2026-06-20 19:14:09,725 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=930 contact=8505916252
+2026-06-21 14:30:16,327 [INFO] app.api.routes_infra: InfraReminder -> processing 3 pending tickets
+2026-06-21 14:30:16,328 [INFO] app.api.routes_infra: WA[cd25edd2] -> sendMessage | target=120363141953100908@g.us | len=255
+2026-06-21 14:30:16,373 [INFO] app.api.routes_infra: WA[cd25edd2] <- status=200 | body={"success":true}
+2026-06-21 14:30:16,373 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=935 status=200
+2026-06-21 14:30:16,373 [INFO] app.api.routes_infra: WA[86c9ed01] -> sendMessage | target=120363141953100908@g.us | len=322
+2026-06-21 14:30:16,495 [INFO] app.api.routes_infra: WA[86c9ed01] <- status=200 | body={"success":true}
+2026-06-21 14:30:16,495 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=936 status=200
+2026-06-21 14:30:16,495 [INFO] app.api.routes_infra: WA[ca5655c9] -> sendMessage | target=120363141953100908@g.us | len=305
+2026-06-21 14:30:16,585 [INFO] app.api.routes_infra: WA[ca5655c9] <- status=200 | body={"success":true}
+2026-06-21 14:30:16,585 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=937 status=200
+2026-06-21 17:30:16,634 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-21 17:30:16,635 [INFO] app.api.routes_infra: WA[333512ae] -> sendMessage | target=120363141953100908@g.us | len=326
+2026-06-21 17:30:16,672 [INFO] app.api.routes_infra: WA[333512ae] <- status=200 | body={"success":true}
+2026-06-21 17:30:16,673 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=938 status=200
+2026-06-21 19:30:16,707 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-21 19:30:16,709 [INFO] app.api.routes_infra: WA[a09d447d] -> sendMessage | target=120363141953100908@g.us | len=246
+2026-06-21 19:30:16,758 [INFO] app.api.routes_infra: WA[a09d447d] <- status=200 | body={"success":true}
+2026-06-21 19:30:16,758 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=939 status=200
+2026-06-22 08:05:49,987 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=940 created_by=Prerna Sharma dept=Customer Care category=Hardware
+2026-06-22 08:05:49,988 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=940 | msg_len=295
+2026-06-22 08:05:49,990 [INFO] app.api.routes_infra: WA[9eba6709] -> sendMessage | target=120363141953100908@g.us | len=295
+2026-06-22 08:05:53,615 [INFO] app.api.routes_infra: WA[9eba6709] <- status=200 | body={"success":true}
+2026-06-22 08:05:53,615 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-22 11:37:04,514 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=941 created_by=Gulrez Sultan dept=Customer Care category=Software
+2026-06-22 11:37:04,515 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=941 | msg_len=259
+2026-06-22 11:37:04,515 [INFO] app.api.routes_infra: WA[3b344930] -> sendMessage | target=120363141953100908@g.us | len=259
+2026-06-22 11:37:04,556 [INFO] app.api.routes_infra: WA[3b344930] <- status=200 | body={"success":true}
+2026-06-22 11:37:04,556 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-22 12:04:19,954 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=942 created_by=Ritu Mahalwal dept=Customer Care category=Software
+2026-06-22 12:04:19,955 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=942 | msg_len=253
+2026-06-22 12:04:19,955 [INFO] app.api.routes_infra: WA[2456beb2] -> sendMessage | target=120363141953100908@g.us | len=253
+2026-06-22 12:04:19,995 [INFO] app.api.routes_infra: WA[2456beb2] <- status=200 | body={"success":true}
+2026-06-22 12:04:19,995 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-22 12:07:15,438 [INFO] app.api.routes_infra: WA[5e821ebd] -> sendMessage | target=919871366002 | len=121
+2026-06-22 12:07:15,909 [INFO] app.api.routes_infra: WA[5e821ebd] <- status=200 | body={"success":true}
+2026-06-22 12:07:15,909 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=937
+2026-06-22 12:07:18,278 [INFO] app.api.routes_infra: WA[9e85606f] -> sendMessage | target=919821957370 | len=121
+2026-06-22 12:07:18,632 [INFO] app.api.routes_infra: WA[9e85606f] <- status=200 | body={"success":true}
+2026-06-22 12:07:18,633 [INFO] app.api.routes_infra: PickNotify sent to 9821957370 | ticket_id=890
+2026-06-22 12:07:54,816 [INFO] app.api.routes_infra: WA[15718d5f] -> sendMessage | target=919871366002 | len=121
+2026-06-22 12:07:55,102 [INFO] app.api.routes_infra: WA[15718d5f] <- status=200 | body={"success":true}
+2026-06-22 12:07:55,103 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=846
+2026-06-22 12:13:30,734 [INFO] app.api.routes_infra: WA[7e829ff9] -> sendMessage | target=919818247844 | len=125
+2026-06-22 12:13:31,120 [INFO] app.api.routes_infra: WA[7e829ff9] <- status=200 | body={"success":true}
+2026-06-22 12:13:31,120 [INFO] app.api.routes_infra: PickNotify sent to 9818247844 | ticket_id=941
+2026-06-22 12:14:46,533 [INFO] app.api.routes_infra: WA[e89fdcdb] -> sendMessage | target=919818393041 | len=125
+2026-06-22 12:14:46,832 [INFO] app.api.routes_infra: WA[e89fdcdb] <- status=200 | body={"success":true}
+2026-06-22 12:14:46,833 [INFO] app.api.routes_infra: PickNotify sent to 9818393041 | ticket_id=939
+2026-06-22 12:14:51,496 [INFO] app.api.routes_infra: WA[af863be6] -> sendMessage | target=919818393041 | len=163
+2026-06-22 12:14:51,806 [INFO] app.api.routes_infra: WA[af863be6] <- status=200 | body={"success":true}
+2026-06-22 12:14:51,806 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=939 contact=9818393041
+2026-06-22 12:18:22,313 [INFO] app.api.routes_infra: WA[aee8f413] -> sendMessage | target=919871366002 | len=121
+2026-06-22 12:18:22,624 [INFO] app.api.routes_infra: WA[aee8f413] <- status=200 | body={"success":true}
+2026-06-22 12:18:22,624 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=942
+2026-06-22 12:19:18,871 [INFO] app.api.routes_infra: WA[a4e572ed] -> sendMessage | target=918368207989 | len=121
+2026-06-22 12:19:19,269 [INFO] app.api.routes_infra: WA[a4e572ed] <- status=200 | body={"success":true}
+2026-06-22 12:19:19,269 [INFO] app.api.routes_infra: PickNotify sent to 8368207989 | ticket_id=927
+2026-06-22 12:19:36,201 [INFO] app.api.routes_infra: WA[9091c779] -> sendMessage | target=919871366002 | len=121
+2026-06-22 12:19:36,507 [INFO] app.api.routes_infra: WA[9091c779] <- status=200 | body={"success":true}
+2026-06-22 12:19:36,507 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=892
+2026-06-22 12:19:56,470 [INFO] app.api.routes_infra: WA[6f1fb71c] -> sendMessage | target=919871366002 | len=159
+2026-06-22 12:19:56,869 [INFO] app.api.routes_infra: WA[6f1fb71c] <- status=200 | body={"success":true}
+2026-06-22 12:19:56,869 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=892 contact=9871366002
+2026-06-22 12:20:18,750 [INFO] app.api.routes_infra: WA[c57a3309] -> sendMessage | target=919871366002 | len=159
+2026-06-22 12:20:19,072 [INFO] app.api.routes_infra: WA[c57a3309] <- status=200 | body={"success":true}
+2026-06-22 12:20:19,073 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=846 contact=9871366002
+2026-06-22 12:20:33,641 [INFO] app.api.routes_infra: WA[08f70917] -> sendMessage | target=919871366002 | len=121
+2026-06-22 12:20:33,960 [INFO] app.api.routes_infra: WA[08f70917] <- status=200 | body={"success":true}
+2026-06-22 12:20:33,960 [INFO] app.api.routes_infra: PickNotify sent to 9871366002 | ticket_id=842
+2026-06-22 12:22:09,074 [INFO] app.api.routes_infra: WA[1512a224] -> sendMessage | target=919654441851 | len=163
+2026-06-22 12:22:09,366 [INFO] app.api.routes_infra: WA[1512a224] <- status=200 | body={"success":true}
+2026-06-22 12:22:09,366 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=929 contact=9654441851
+2026-06-22 12:29:02,753 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=943 created_by=Harshita Basnuwal dept=Technical category=Software
+2026-06-22 12:29:02,753 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=943 | msg_len=254
+2026-06-22 12:29:02,753 [INFO] app.api.routes_infra: WA[7224e0c8] -> sendMessage | target=120363141953100908@g.us | len=254
+2026-06-22 12:29:02,792 [INFO] app.api.routes_infra: WA[7224e0c8] <- status=200 | body={"success":true}
+2026-06-22 12:29:02,793 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-22 13:27:47,956 [INFO] app.api.routes_infra: WA[473f3916] -> sendMessage | target=919871366002 | len=159
+2026-06-22 13:27:48,278 [INFO] app.api.routes_infra: WA[473f3916] <- status=200 | body={"success":true}
+2026-06-22 13:27:48,278 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=842 contact=9871366002
+2026-06-22 13:28:44,376 [INFO] app.api.routes_infra: WA[c0cad5d2] -> sendMessage | target=918505916252 | len=122
+2026-06-22 13:28:44,756 [INFO] app.api.routes_infra: WA[c0cad5d2] <- status=200 | body={"success":true}
+2026-06-22 13:28:44,756 [INFO] app.api.routes_infra: PickNotify sent to 8505916252 | ticket_id=943
+2026-06-22 13:28:48,038 [INFO] app.api.routes_infra: WA[621842e7] -> sendMessage | target=918505916252 | len=160
+2026-06-22 13:28:48,409 [INFO] app.api.routes_infra: WA[621842e7] <- status=200 | body={"success":true}
+2026-06-22 13:28:48,409 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=943 contact=8505916252
+2026-06-22 13:35:42,820 [INFO] app.api.routes_infra: WA[d68c49ad] -> sendMessage | target=919871366002 | len=159
+2026-06-22 13:35:43,153 [INFO] app.api.routes_infra: WA[d68c49ad] <- status=200 | body={"success":true}
+2026-06-22 13:35:43,154 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=942 contact=9871366002
+2026-06-22 14:22:03,570 [INFO] app.api.routes_infra: WA[37bedaaf] -> sendMessage | target=916203999124 | len=122
+2026-06-22 14:22:03,941 [INFO] app.api.routes_infra: WA[37bedaaf] <- status=200 | body={"success":true}
+2026-06-22 14:22:03,942 [INFO] app.api.routes_infra: PickNotify sent to 6203999124 | ticket_id=800
+2026-06-22 14:22:18,887 [INFO] app.api.routes_infra: WA[6414526c] -> sendMessage | target=919810030372 | len=125
+2026-06-22 14:22:19,256 [INFO] app.api.routes_infra: WA[6414526c] <- status=200 | body={"success":true}
+2026-06-22 14:22:19,256 [INFO] app.api.routes_infra: PickNotify sent to 9810030372 | ticket_id=886
+2026-06-22 14:29:59,562 [INFO] app.api.routes_infra: WA[3ce1d6f8] -> sendMessage | target=917520132030 | len=163
+2026-06-22 14:29:59,902 [INFO] app.api.routes_infra: WA[3ce1d6f8] <- status=200 | body={"success":true}
+2026-06-22 14:29:59,902 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=906 contact=7520132030
+2026-06-22 14:32:48,717 [INFO] app.api.routes_infra: WA[069bf6e8] -> sendMessage | target=918742945845 | len=122
+2026-06-22 14:32:49,030 [INFO] app.api.routes_infra: WA[069bf6e8] <- status=200 | body={"success":true}
+2026-06-22 14:32:49,031 [INFO] app.api.routes_infra: PickNotify sent to 8742945845 | ticket_id=935
+2026-06-22 14:33:17,868 [INFO] app.api.routes_infra: WA[0168ed15] -> sendMessage | target=918742945845 | len=160
+2026-06-22 14:33:18,178 [INFO] app.api.routes_infra: WA[0168ed15] <- status=200 | body={"success":true}
+2026-06-22 14:33:18,178 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=935 contact=8742945845
+2026-06-22 14:35:32,142 [INFO] app.api.routes_infra: WA[585ac855] -> sendMessage | target=918178408980 | len=122
+2026-06-22 14:35:32,507 [INFO] app.api.routes_infra: WA[585ac855] <- status=200 | body={"success":true}
+2026-06-22 14:35:32,507 [INFO] app.api.routes_infra: PickNotify sent to 8178408980 | ticket_id=938
+2026-06-22 14:35:40,133 [INFO] app.api.routes_infra: WA[44452dda] -> sendMessage | target=918178408980 | len=160
+2026-06-22 14:35:40,473 [INFO] app.api.routes_infra: WA[44452dda] <- status=200 | body={"success":true}
+2026-06-22 14:35:40,473 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=938 contact=8178408980
+2026-06-22 14:42:07,976 [INFO] app.api.routes_infra: WA[5706a539] -> sendMessage | target=919910773271 | len=122
+2026-06-22 14:42:08,362 [INFO] app.api.routes_infra: WA[5706a539] <- status=200 | body={"success":true}
+2026-06-22 14:42:08,362 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=519
+2026-06-22 14:42:17,677 [INFO] app.api.routes_infra: WA[01525650] -> sendMessage | target=919910773271 | len=160
+2026-06-22 14:42:17,983 [INFO] app.api.routes_infra: WA[01525650] <- status=200 | body={"success":true}
+2026-06-22 14:42:17,984 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=519 contact=9910773271
+2026-06-22 14:43:53,241 [INFO] app.api.routes_infra: WA[d067e433] -> sendMessage | target=919910773271 | len=122
+2026-06-22 14:43:53,551 [INFO] app.api.routes_infra: WA[d067e433] <- status=200 | body={"success":true}
+2026-06-22 14:43:53,551 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=940
+2026-06-22 14:44:41,532 [INFO] app.api.routes_infra: WA[daadcdc8] -> sendMessage | target=919910773271 | len=160
+2026-06-22 14:44:41,933 [INFO] app.api.routes_infra: WA[daadcdc8] <- status=200 | body={"success":true}
+2026-06-22 14:44:41,933 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=940 contact=9910773271
+2026-06-22 14:47:59,932 [INFO] app.api.routes_infra: WA[1149e30f] -> sendMessage | target=919910773271 | len=122
+2026-06-22 14:48:00,249 [INFO] app.api.routes_infra: WA[1149e30f] <- status=200 | body={"success":true}
+2026-06-22 14:48:00,249 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=924
+2026-06-22 14:48:24,577 [INFO] app.api.routes_infra: WA[062ef69f] -> sendMessage | target=919910773271 | len=160
+2026-06-22 14:48:24,877 [INFO] app.api.routes_infra: WA[062ef69f] <- status=200 | body={"success":true}
+2026-06-22 14:48:24,878 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=924 contact=9910773271
+2026-06-23 07:48:51,457 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=944 created_by=Prerna Sharma dept=Technical category=Hardware
+2026-06-23 07:48:51,458 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=944 | msg_len=271
+2026-06-23 07:48:51,458 [INFO] app.api.routes_infra: WA[fa6b7744] -> sendMessage | target=120363141953100908@g.us | len=271
+2026-06-23 07:48:51,594 [INFO] app.api.routes_infra: WA[fa6b7744] <- status=200 | body={"success":true}
+2026-06-23 07:48:51,595 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-23 11:00:53,781 [INFO] app.api.routes_infra: WA[410b6907] -> sendMessage | target=919910773271 | len=122
+2026-06-23 11:00:54,114 [INFO] app.api.routes_infra: WA[410b6907] <- status=200 | body={"success":true}
+2026-06-23 11:00:54,115 [INFO] app.api.routes_infra: PickNotify sent to 9910773271 | ticket_id=944
+2026-06-23 11:00:56,912 [INFO] app.api.routes_infra: WA[eceff353] -> sendMessage | target=919910773271 | len=160
+2026-06-23 11:00:57,300 [INFO] app.api.routes_infra: WA[eceff353] <- status=200 | body={"success":true}
+2026-06-23 11:00:57,301 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=944 contact=9910773271
+2026-06-23 11:20:15,813 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=945 created_by=SUMIT SINGH dept=Home Collection category=Software
+2026-06-23 11:20:15,814 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=945 | msg_len=274
+2026-06-23 11:20:15,814 [INFO] app.api.routes_infra: WA[16136677] -> sendMessage | target=120363141953100908@g.us | len=274
+2026-06-23 11:20:15,858 [INFO] app.api.routes_infra: WA[16136677] <- status=200 | body={"success":true}
+2026-06-23 11:20:15,858 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-23 11:49:24,869 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-06-23 11:49:24,886 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=10); skipping start
+2026-06-23 14:49:04,138 [INFO] app.api.routes_infra: WA[73a60d0d] -> sendMessage | target=919818247844 | len=163
+2026-06-23 14:49:04,545 [INFO] app.api.routes_infra: WA[73a60d0d] <- status=200 | body={"success":true}
+2026-06-23 14:49:04,546 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=941 contact=9818247844
+2026-06-23 16:10:29,739 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=946 created_by=Jaspal singh rawat dept=Customer Care category=Hardware
+2026-06-23 16:10:29,740 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=946 | msg_len=349
+2026-06-23 16:10:29,740 [INFO] app.api.routes_infra: WA[f03c7972] -> sendMessage | target=120363141953100908@g.us | len=349
+2026-06-23 16:10:29,824 [INFO] app.api.routes_infra: WA[f03c7972] <- status=200 | body={"success":true}
+2026-06-23 16:10:29,825 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-23 17:29:38,831 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=947 created_by=Roopa Rani dept=Center Phlebo category=Hardware
+2026-06-23 17:29:38,832 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=947 | msg_len=487
+2026-06-23 17:29:38,832 [INFO] app.api.routes_infra: WA[06b4f0d6] -> sendMessage | target=120363141953100908@g.us | len=487
+2026-06-23 17:29:40,089 [INFO] app.api.routes_infra: WA[06b4f0d6] <- status=200 | body={"success":true}
+2026-06-23 17:29:40,089 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-23 20:17:54,654 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=948 created_by=SALEEM JAVED dept=Customer Care category=Hardware
+2026-06-23 20:17:54,654 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=948 | msg_len=267
+2026-06-23 20:17:54,654 [INFO] app.api.routes_infra: WA[68afcb7e] -> sendMessage | target=120363141953100908@g.us | len=267
+2026-06-23 20:17:54,768 [INFO] app.api.routes_infra: WA[68afcb7e] <- status=200 | body={"success":true}
+2026-06-23 20:17:54,768 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-24 10:38:01,216 [INFO] app.api.routes_infra: WA[7e2504bd] -> sendMessage | target=919654441851 | len=122
+2026-06-24 10:38:01,551 [INFO] app.api.routes_infra: WA[7e2504bd] <- status=200 | body={"success":true}
+2026-06-24 10:38:01,551 [INFO] app.api.routes_infra: PickNotify sent to 9654441851 | ticket_id=948
+2026-06-24 10:38:55,538 [INFO] app.api.routes_infra: WA[a856476c] -> sendMessage | target=919915932746 | len=122
+2026-06-24 10:38:55,873 [INFO] app.api.routes_infra: WA[a856476c] <- status=500 | body={"error":"Protocol error (Runtime.callFunctionOn): Promise was collected"}
+2026-06-24 10:38:55,874 [ERROR] app.api.routes_infra: PickNotify failed | ticket_id=947 status=500 resp={"error":"Protocol error (Runtime.callFunctionOn): Promise was collected"}
+2026-06-24 11:17:16,177 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=949 created_by=Nitu dept=Customer Care category=Software
+2026-06-24 11:17:16,178 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=949 | msg_len=264
+2026-06-24 11:17:16,178 [INFO] app.api.routes_infra: WA[9b9e3ae1] -> sendMessage | target=120363141953100908@g.us | len=264
+2026-06-24 11:17:16,238 [INFO] app.api.routes_infra: WA[9b9e3ae1] <- status=200 | body={"success":true}
+2026-06-24 11:17:16,239 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-24 11:49:25,123 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-24 11:49:25,123 [INFO] app.api.routes_infra: WA[8b088a90] -> sendMessage | target=120363141953100908@g.us | len=289
+2026-06-24 11:49:25,171 [INFO] app.api.routes_infra: WA[8b088a90] <- status=200 | body={"success":true}
+2026-06-24 11:49:25,172 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=945 status=200
+2026-06-24 15:07:02,567 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=950 created_by=SONA dept=Customer Care category=Software
+2026-06-24 15:07:02,568 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=950 | msg_len=254
+2026-06-24 15:07:02,569 [INFO] app.api.routes_infra: WA[3f8bf522] -> sendMessage | target=120363141953100908@g.us | len=254
+2026-06-24 15:07:02,629 [INFO] app.api.routes_infra: WA[3f8bf522] <- status=200 | body={"success":true}
+2026-06-24 15:07:02,629 [INFO] app.api.routes_infra: InfraAlert sent | status=200 | resp={"success":true}
+2026-06-24 16:49:25,198 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-24 16:49:25,198 [INFO] app.api.routes_infra: WA[c580bd1a] -> sendMessage | target=120363141953100908@g.us | len=351
+2026-06-24 16:49:25,249 [INFO] app.api.routes_infra: WA[c580bd1a] <- status=200 | body={"success":true}
+2026-06-24 16:49:25,249 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=946 status=200

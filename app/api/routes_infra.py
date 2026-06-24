@@ -380,7 +380,7 @@ def _start_reminder_loop_once():
     """
     Start the reminder thread only if we hold the singleton lock.
     """
-    lock_path = Path("logs") / "infra_reminder.lock"
+    lock_path = Path("/tmp") / "hiccup_infra_reminder.lock"
     if _acquire_reminder_lock(lock_path):
         thread = threading.Thread(target=_reminder_loop, daemon=True)
         thread.start()

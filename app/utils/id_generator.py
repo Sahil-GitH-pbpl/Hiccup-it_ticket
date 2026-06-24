@@ -17,12 +17,11 @@ def generate_hiccup_id(db: Session) -> str:
     """
     year_suffix = datetime.utcnow().strftime("%y")
     prefix = f"HCP-{year_suffix}-"
-    last = (
+    rows = (
         db.query(Hiccup.hiccup_id)
         .filter(Hiccup.hiccup_id.like(f"{prefix}%"))
-        .order_by(Hiccup.hiccup_id.desc())
-        .first()
+        .all()
     )
-    last_seq = _parse_seq(last[0]) if last else 0
+    last_seq = max((_parse_seq(row[0]) for row in rows), default=0)
     seq = last_seq + 1
     return f"{prefix}{seq:03d}"

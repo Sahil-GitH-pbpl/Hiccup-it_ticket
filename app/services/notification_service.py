@@ -1,7 +1,7 @@
 import logging
 import threading
 from collections import Counter
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import List, Optional
 from urllib.parse import quote_plus
 
@@ -11,7 +11,7 @@ from app.integrations.whatsapp_client import send_bulk
 from app.core.config import get_settings
 from app.db.session import SessionLocal
 from app.services.report_service import recent_stats
-from app.services.hiccup_service import trend_alerts
+from app.services.hiccup_service import mark_overdue_flags, trend_alerts
 from app.models.department import Department
 from app.models.hiccup import Hiccup
 from app.models.staff import Staff
@@ -43,6 +43,236 @@ def _localize_timestamp(value: datetime | None) -> datetime | None:
         return value
     tz = timezone(settings.timezone)
     return tz.localize(value)
+
+
+def _date_bounds_naive(report_date: date | None = None) -> tuple[datetime, datetime, str]:
+    today = report_date or now_local().date()
+    return (
+        datetime.combine(today, time.min),
+        datetime.combine(today, time.max),
+        today.strftime("%Y-%m-%d"),
+    )
+
+
+def _today_bounds_naive() -> tuple[datetime, datetime, str]:
+    return _date_bounds_naive()
+
+
+def _person_label(value: str | None, fallback: str | None = None) -> str:
+    text = (value or fallback or "").strip()
+    return text if text else "Not specified"
+
+
+def _short_text(value: str | None, limit: int = 700) -> str:
+    text = " ".join((value or "").split())
+    if not text:
+        return "N/A"
+    if len(text) <= limit:
+        return text
+    return f"{text[: limit - 3].rstrip()}..."
+
+
+def _format_hiccup_basic(hiccup: Hiccup, index: int) -> list[str]:
+    return [
+        f"{index}. *Hiccup ID:* {hiccup.hiccup_id}",
+        f"   *Raised By:* {_person_label(hiccup.raised_by_name)}",
+        f"   *Raised Against:* {_person_label(hiccup.raised_against_name, hiccup.raised_against)}",
+        f"   *Type:* {hiccup.hiccup_type or 'N/A'}",
+        f"   *Hiccup Text:* {_short_text(hiccup.description)}",
+    ]
+
+
+def _format_hiccup_section(
+    title: str,
+    hiccups: list[Hiccup],
+    *,
+    include_response: bool = False,
+) -> list[str]:
+    lines = [title, f"Count: {len(hiccups)}"]
+    if not hiccups:
+        lines.append("No records.")
+        return lines
+    for index, hiccup in enumerate(hiccups, start=1):
+        lines.append("")
+        lines.extend(_format_hiccup_basic(hiccup, index))
+        if include_response:
+            lines.append(f"   *Response:* {_short_text(hiccup.response_text)}")
+    return lines
+
+
+def build_hiccup_whatsapp_report(db: Session, report_date: date | None = None) -> str:
+    """
+    Build the three-part Hiccup report for the current local date.
+    """
+    mark_overdue_flags(db)
+    db.flush()
+
+    today_start, today_end, today_label = _date_bounds_naive(report_date)
+    blocked_72_start = today_start - timedelta(hours=72)
+    blocked_72_end = today_end - timedelta(hours=72)
+
+    today_open = (
+        db.query(Hiccup)
+        .filter(
+            Hiccup.created_at >= today_start,
+            Hiccup.created_at <= today_end,
+            Hiccup.status == "Open",
+            Hiccup.response_text.is_(None),
+        )
+        .order_by(Hiccup.created_at.asc(), Hiccup.hiccup_id.asc())
+        .all()
+    )
+
+    blocked_today = (
+        db.query(Hiccup)
+        .filter(
+            Hiccup.created_at >= blocked_72_start,
+            Hiccup.created_at <= blocked_72_end,
+            Hiccup.status == "Open",
+            Hiccup.response_blocked.is_(True),
+        )
+        .order_by(Hiccup.created_at.asc(), Hiccup.hiccup_id.asc())
+        .all()
+    )
+
+    responded_today = (
+        db.query(Hiccup)
+        .filter(
+            Hiccup.created_at >= today_start,
+            Hiccup.created_at <= today_end,
+            Hiccup.response_text.isnot(None),
+            Hiccup.response_text != "",
+        )
+        .order_by(Hiccup.created_at.asc(), Hiccup.hiccup_id.asc())
+        .all()
+    )
+
+    lines = [
+        "Daily Hiccup Report",
+        f"Date: {today_label}",
+        "",
+    ]
+    lines.extend(_format_hiccup_section("1) Today's Open Hiccups - Response Pending", today_open))
+    lines.extend(["", "------------------------------", ""])
+    lines.extend(_format_hiccup_section("2) 72 Hours Completed - Response Blocked Today", blocked_today))
+    lines.extend(["", "------------------------------", ""])
+    lines.extend(
+        _format_hiccup_section(
+            "3) Today's Hiccups With Response",
+            responded_today,
+            include_response=True,
+        )
+    )
+    return "\n".join(lines)
+
+
+def build_today_hiccup_whatsapp_report(db: Session) -> str:
+    return build_hiccup_whatsapp_report(db)
+
+
+def build_hiccup_whatsapp_messages(
+    db: Session,
+    report_date: date | None = None,
+) -> list[str]:
+    """
+    Build three separate Hiccup WhatsApp messages for the current local date.
+    """
+    mark_overdue_flags(db)
+    db.flush()
+
+    today_start, today_end, today_label = _date_bounds_naive(report_date)
+    blocked_72_start = today_start - timedelta(hours=72)
+    blocked_72_end = today_end - timedelta(hours=72)
+
+    today_open = (
+        db.query(Hiccup)
+        .filter(
+            Hiccup.created_at >= today_start,
+            Hiccup.created_at <= today_end,
+            Hiccup.status == "Open",
+            Hiccup.response_text.is_(None),
+        )
+        .order_by(Hiccup.created_at.asc(), Hiccup.hiccup_id.asc())
+        .all()
+    )
+    blocked_today = (
+        db.query(Hiccup)
+        .filter(
+            Hiccup.created_at >= blocked_72_start,
+            Hiccup.created_at <= blocked_72_end,
+            Hiccup.status == "Open",
+            Hiccup.response_blocked.is_(True),
+        )
+        .order_by(Hiccup.created_at.asc(), Hiccup.hiccup_id.asc())
+        .all()
+    )
+    responded_today = (
+        db.query(Hiccup)
+        .filter(
+            Hiccup.created_at >= today_start,
+            Hiccup.created_at <= today_end,
+            Hiccup.response_text.isnot(None),
+            Hiccup.response_text != "",
+        )
+        .order_by(Hiccup.created_at.asc(), Hiccup.hiccup_id.asc())
+        .all()
+    )
+
+    messages = []
+    section = ["Daily Hiccup Report", f"Date: {today_label}", ""]
+    section.extend(_format_hiccup_section("1) Today's Open Hiccups - Response Pending", today_open))
+    messages.append("\n".join(section))
+
+    section = ["Daily Hiccup Report", f"Date: {today_label}", ""]
+    section.extend(_format_hiccup_section("2) 72 Hours Completed - Response Blocked Today", blocked_today))
+    messages.append("\n".join(section))
+
+    section = ["Daily Hiccup Report", f"Date: {today_label}", ""]
+    section.extend(
+        _format_hiccup_section(
+            "3) Today's Hiccups With Response",
+            responded_today,
+            include_response=True,
+        )
+    )
+    messages.append("\n".join(section))
+
+    return messages
+
+
+def build_today_hiccup_whatsapp_messages(db: Session) -> list[str]:
+    return build_hiccup_whatsapp_messages(db)
+
+
+def send_today_hiccup_whatsapp_report(
+    db: Session,
+    to_number: str = "919810030372",
+) -> bool:
+    message = build_today_hiccup_whatsapp_report(db)
+    return send_bulk(_dedup_numbers([to_number]), message)
+
+
+def send_today_hiccup_whatsapp_reports_separately(
+    db: Session,
+    to_number: str = "919810030372",
+) -> bool:
+    success = False
+    numbers = _dedup_numbers([to_number])
+    for message in build_today_hiccup_whatsapp_messages(db):
+        success = send_bulk(numbers, message) or success
+    return success
+
+
+def send_hiccup_whatsapp_reports_separately(
+    db: Session,
+    report_date: date,
+    to_number: str = "919810030372",
+) -> bool:
+    success = False
+    numbers = _dedup_numbers([to_number])
+    for message in build_hiccup_whatsapp_messages(db, report_date=report_date):
+        success = send_bulk(numbers, message) or success
+    return success
 
 
 def notify_on_creation(db: Session, hiccup: Hiccup):
@@ -344,6 +574,7 @@ def send_response_reminders(db: Session):
         .filter(
             Hiccup.status == "Open",
             Hiccup.raised_against.isnot(None),
+            Hiccup.response_blocked.is_(False),
             (Hiccup.reminder_sent.is_(False))
             | (Hiccup.overdue_msg_sent.is_(False))
             | (Hiccup.escalate_msg_sent.is_(False)),
@@ -375,6 +606,12 @@ def send_response_reminders(db: Session):
         if not created_at:
             continue
         age = now - created_at
+        if hiccup.response_blocked:
+            logger.info(
+                "Skipping response reminder for blocked hiccup %s",
+                hiccup.hiccup_id,
+            )
+            continue
         reminder_delta = timedelta(minutes=settings.response_reminder_minutes)
         overdue_delta = timedelta(minutes=settings.response_overdue_minutes)
         escalate_delta = timedelta(minutes=settings.response_escalate_minutes)

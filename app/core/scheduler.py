@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -12,12 +13,14 @@ from app.db.session import SessionLocal
 from app.services.hiccup_service import mark_overdue_flags
 from app.services.notification_service import (
     send_daily_summary,
+    send_hiccup_whatsapp_reports_separately,
     send_response_reminders,
 )
+from app.utils.time_utils import now_local
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
-SCHEDULER_LOCK_PATH = Path("logs") / "scheduler.lock"
+SCHEDULER_LOCK_PATH = Path("/tmp") / "hiccup_scheduler.lock"
 
 
 def get_scheduler() -> BackgroundScheduler:
@@ -103,6 +106,23 @@ def start_scheduler():
         finally:
             db.close()
 
+    def previous_day_hiccup_report_job():
+        report_date = now_local().date() - timedelta(days=1)
+        logger.info("Running previous-day Hiccup WhatsApp report for %s", report_date)
+        db: Session = SessionLocal()
+        try:
+            send_hiccup_whatsapp_reports_separately(db, report_date=report_date)
+            db.commit()
+        except Exception as exc:  # noqa: BLE001
+            logger.exception(
+                "Previous-day Hiccup WhatsApp report failed for %s: %s",
+                report_date,
+                exc,
+            )
+            db.rollback()
+        finally:
+            db.close()
+
     scheduler.add_job(
         hourly_job, "interval", minutes=60, id="sla-check", replace_existing=True
     )
@@ -110,6 +130,12 @@ def start_scheduler():
         daily_summary_job,
         trigger=CronTrigger(hour=23, minute=59, timezone=timezone(settings.timezone)),
         id="daily-summary",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        previous_day_hiccup_report_job,
+        trigger=CronTrigger(hour=0, minute=2, timezone=timezone(settings.timezone)),
+        id="previous-day-hiccup-whatsapp-report",
         replace_existing=True,
     )
     scheduler.start()
