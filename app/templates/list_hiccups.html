@@ -15,97 +15,25 @@
         }
       }
     </style>
-    <div class="hiccup-sticky-toolbar">
-        <div class="flex flex-col gap-2">
-            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-tealbrand">My workbench</p>
-            <h2 class="text-2xl font-semibold text-slate-900">My Hiccups</h2>
-        </div>
-        <div class="flex items-center justify-end gap-2">
-            <button type="button" class="hiccup-filter-trigger" data-density-toggle>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"></path>
-                </svg>
-                <span data-density-label>Compact</span>
-            </button>
-            <button type="button" class="hiccup-filter-trigger" data-filter-drawer-open="my-hiccup-filters">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M3 5h18l-7 8v5l-4 2v-7L3 5z"></path>
-                </svg>
-                Filters
-            </button>
-        </div>
-    </div>
-    <div class="hiccup-sticky-tabs mt-4">
+    <div class="hiccup-sticky-tabs">
         <div class="hiccup-view-tabs">
             <button id="tab-raised-by" type="button" class="hiccup-view-tab is-active" aria-selected="true">By me</button>
             <button id="tab-against-me" type="button" class="hiccup-view-tab" aria-selected="false">For me</button>
         </div>
     </div>
-    <div id="my-active-filters" class="hiccup-active-filters mt-3"></div>
-    <div class="hiccup-filter-drawer" data-filter-drawer="my-hiccup-filters" aria-hidden="true">
-        <button type="button" class="hiccup-filter-drawer__backdrop" data-filter-drawer-close></button>
-        <aside class="hiccup-filter-drawer__panel" role="dialog" aria-modal="true" aria-label="My hiccup filters">
-            <div class="hiccup-filter-drawer__header">
-                <h3>Filters</h3>
-                <button type="button" class="hiccup-filter-drawer__close" data-filter-drawer-close>&times;</button>
-            </div>
-            <div class="hiccup-filter-drawer__body">
-                <div class="table-gradient-heading mt-2">
-                    <div class="hiccup-filter-sections">
-                        <div class="hiccup-filter-section">
-                            <p class="hiccup-filter-section__title">Basic</p>
-                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                            Status
-                            <select id="filter-status" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                                <option value="">All</option>
-                                <option>Open</option>
-                                <option>Responded</option>
-                                <option>Under Review</option>
-                                <option>Closed</option>
-                                <option>Escalated to NC</option>
-                            </select>
-                        </label>
-                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                            Type
-                            <select id="filter-type" class="mt-1 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                                <option value="">All</option>
-                                <option>Person Related</option>
-                                <option>System Related</option>
-                            </select>
-                        </label>
-                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                            Search
-                            <input id="global-hiccup-search" type="search" placeholder="Search all hiccups" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                        </label>
-                        </div>
-                        <div class="hiccup-filter-section">
-                            <p class="hiccup-filter-section__title">Date</p>
-                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                            From
-                            <input id="filter-date-from" type="date" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                        </label>
-                        <label class="flex flex-col text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                            To
-                            <input id="filter-date-to" type="date" class="mt-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:border-tealbrand focus:ring-2 focus:ring-tealbrand/40">
-                        </label>
-                        </div>
-                        <div class="hiccup-filter-section">
-                            <p class="hiccup-filter-section__title">Flags</p>
-                        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                            <input id="filter-escalated" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-tealbrand focus:ring-tealbrand">
-                            Escalated
-                        </label>
-                        <label class="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
-                            <input id="filter-overdue" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-tealbrand focus:ring-tealbrand">
-                            Overdue
-                        </label>
-                        </div>
-                        <button id="reset-filters" class="ml-auto rounded-2xl border border-slate-200 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600 shadow-sm transition hover:border-tealbrand hover:text-tealbrand">Reset</button>
-                    </div>
-                </div>
-            </div>
-        </aside>
+    <div class="hiccup-inline-filterbar mt-4">
+        <label><span>Date From</span><input id="filter-date-from" type="date"></label>
+        <label><span>Date To</span><input id="filter-date-to" type="date"></label>
+        <label><span>Status</span><select id="filter-status"><option value="">All</option><option>Open</option><option>Responded</option><option>Closed</option><option>Escalated to NC</option></select></label>
+        <label><span>Type</span><select id="filter-type"><option value="">All</option><option>Person Related</option><option>System Related</option></select></label>
+        <label class="hiccup-inline-check"><input id="filter-escalated" type="checkbox"><span>Escalated</span></label>
+        <label class="hiccup-inline-check"><input id="filter-overdue" type="checkbox"><span>Overdue</span></label>
+        <label class="hiccup-inline-check"><input id="filter-response-blocked" type="checkbox"><span>Response Blocked</span></label>
+        <label class="hiccup-inline-search"><span>Search</span><input id="global-hiccup-search" type="search" placeholder="name / mobile / hiccup id"></label>
+        <button type="button" data-filter-apply="my">Apply</button>
+        <button id="reset-filters" type="button" class="hiccup-inline-clear">Clear</button>
     </div>
+    <div id="my-active-filters" class="hiccup-active-filters mt-3"></div>
     <div id="raised-by-cards" class="space-y-3 mt-4 hidden"></div>
     <div id="raised-by-section" class="table-scroll mt-4 hidden">
         <table id="my-hiccups-table" class="enhanced-table">
@@ -116,8 +44,6 @@
                     <th class="px-4 py-3 text-left">Status</th>
                     <th class="px-4 py-3 text-left">Created Against</th>
                     <th class="px-4 py-3 text-left">Created</th>
-                    <th class="px-4 py-3 text-left">Updated</th>
-                    <th class="px-4 py-3 text-left">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white text-sm text-slate-600"></tbody>
@@ -134,8 +60,6 @@
                     <th class="px-4 py-3 text-left">Status</th>
                     <th class="px-4 py-3 text-left">Created By</th>
                     <th class="px-4 py-3 text-left">Created</th>
-                    <th class="px-4 py-3 text-left">Updated</th>
-                    <th class="px-4 py-3 text-left">Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white text-sm text-slate-600"></tbody>
@@ -144,5 +68,5 @@
     <div id="pagination-against" class="mt-4"></div>
 </section>
 <script src="/static/js/hiccups-helpers.js?v=20260309c"></script>
-<script src="/static/js/hiccups.js?v=20260309c"></script>
+<script src="/static/js/hiccups.js?v=20260625m"></script>
 {% endblock %}

@@ -29,8 +29,8 @@
           name: "{{ user.name }}",
           department_id: {{ user.department_id if user.department_id is not none else "null" }},
           designation: "{{ user.designation or '' }}",
-          is_admin_like: {{ 'true' if (is_admin_like if is_admin_like is defined else user.is_admin_like if user.is_admin_like is defined else False) else 'false' }},
-          is_infra_admin: {{ 'true' if (user.is_infra_admin if user.is_infra_admin is defined else False) else 'false' }},
+          is_admin_like: {{ 'true' if (is_admin_like if is_admin_like is defined else (user.user_id in [124, 125] if user.user_id is defined else false) or (user.is_admin_like if user.is_admin_like is defined else false)) else 'false' }},
+          is_infra_admin: {{ 'true' if ((user.user_id == 95 if user.user_id is defined else false) or (user.is_infra_admin if user.is_infra_admin is defined else False)) else 'false' }},
         }
         {% else %}
         {}
@@ -42,7 +42,14 @@
       {% else %}
         {% set _is_admin_like = 'admin' in _designation or 'it' in _designation or 'infra' in _designation or 'admin' in _role or 'it' in _role or 'infra' in _role %}
       {% endif %}
+      {% if is_admin_like is defined %}
+        {% set _can_view_all_hiccups_nav = is_admin_like %}
+      {% else %}
+        {% set _can_view_all_hiccups_nav = user is defined and user and ((user.user_id in [124, 125] if user.user_id is defined else false) or (user.is_admin_like if user.is_admin_like is defined else false)) %}
+      {% endif %}
+      {% set _can_view_dashboard_nav = _can_view_all_hiccups_nav %}
       window.serverIsAdmin = {{ 'true' if _is_admin_like else 'false' }};
+      window.serverCanViewAllHiccups = {{ 'true' if _can_view_all_hiccups_nav else 'false' }};
     </script>
     {% block head_extra %}{% endblock %}
     <style>
@@ -257,7 +264,7 @@
             {% if not is_admin_like %}
             <a href="/home" class="hover:text-tealbrand transition-colors">My Desk</a>
             {% endif %}
-            {% if _is_admin_like %}
+            {% if _can_view_dashboard_nav %}
             <a href="/dashboard" class="hover:text-tealbrand transition-colors">Dashboard</a>
             {% endif %}
 
@@ -266,7 +273,7 @@
               <div id="nav-hiccup-menu" class="nav-dropdown hidden">
                 <a href="/raise" class="nav-dropdown__item">Create Hiccup</a>
                 <a href="/my-hiccups" class="nav-dropdown__item">My Hiccups</a>
-            {% if user is defined and user and (user.is_admin_like if user.is_admin_like is defined else false) %}
+            {% if _can_view_all_hiccups_nav %}
             <a id="nav-hic-all" href="/management" class="nav-dropdown__item">All Hiccups</a>
             {% endif %}
             <a href="/assigned" class="nav-dropdown__item">Assigned to Me</a>
@@ -279,6 +286,8 @@
                 <a href="/infra/create-form" class="nav-dropdown__item">Create IT Ticket</a>
               <a href="/my-tickets" class="nav-dropdown__item">My IT Tickets</a>
           {% if user is defined and user and (
+              (user.user_id == 95 if user.user_id is defined else false)
+              or
               (user.is_infra_admin if user.is_infra_admin is defined else false)
               or ('admin' in (user.designation or '')|lower)
               or ('it' in (user.designation or '')|lower)
@@ -321,7 +330,7 @@
          {% if not is_admin_like %}
          <a href="/home" class="mobile-nav-link">My Desk</a>
          {% endif %}
-          {% if _is_admin_like %}
+          {% if _can_view_dashboard_nav %}
           <a href="/dashboard" class="mobile-nav-link">Dashboard</a>
           {% endif %}
         </div>
@@ -329,7 +338,7 @@
           <div class="mobile-nav-section-title">Hiccup</div>
           <a href="/raise" class="mobile-nav-link">Create Hiccup</a>
           <a href="/my-hiccups" class="mobile-nav-link">My Hiccups</a>
-          {% if user is defined and user and (user.is_admin_like if user.is_admin_like is defined else false) %}
+          {% if _can_view_all_hiccups_nav %}
           <a id="nav-hic-all-mobile" href="/management" class="mobile-nav-link">All Hiccups</a>
           {% endif %}
           <a href="/assigned" class="mobile-nav-link">Assigned to Me</a>
@@ -339,6 +348,8 @@
           <a href="/infra/create-form" class="mobile-nav-link">Create IT Ticket</a>
           <a href="/my-tickets" class="mobile-nav-link">My IT Tickets</a>
           {% if user is defined and user and (
+              (user.user_id == 95 if user.user_id is defined else false)
+              or
               (user.is_infra_admin if user.is_infra_admin is defined else false)
               or ('admin' in (user.designation or '')|lower)
               or ('it' in (user.designation or '')|lower)
@@ -362,7 +373,7 @@
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/static/js/main.js?v=20260310b" defer></script>
+    <script src="/static/js/main.js?v=20260625a" defer></script>
     <script>
       const authLinks = {
         login: document.getElementById("nav-login"),
@@ -420,18 +431,26 @@
       function isAdminLike() {
         if (window.serverIsAdmin) return true;
         if (!isLoggedIn()) return false;
+        if (getCurrentUser().is_infra_admin === true || Number(getCurrentUser().user_id) === 95) return true;
         const designation = getDesignation().trim();
         const role = (getCurrentUser().role || "").toString().toLowerCase();
         const keywords = ["admin", "it", "infra"];
         return keywords.some((key) => designation.includes(key) || role.includes(key));
       }
 
+      function canViewAllHiccups() {
+        if (window.serverCanViewAllHiccups) return true;
+        if (!isLoggedIn()) return false;
+        return getCurrentUser().is_admin_like === true;
+      }
+
       function toggleAllTickets() {
-        const admin = isAdminLike();
-        navHicAll?.classList.toggle("hidden", !admin);
-        mobileNav.hicAll?.classList.toggle("hidden", !admin);
-        navItAll?.classList.toggle("hidden", !admin);
-        mobileNav.itAll?.classList.toggle("hidden", !admin);
+        const hiccupAdmin = canViewAllHiccups();
+        const infraAdmin = isAdminLike();
+        navHicAll?.classList.toggle("hidden", !hiccupAdmin);
+        mobileNav.hicAll?.classList.toggle("hidden", !hiccupAdmin);
+        navItAll?.classList.toggle("hidden", !infraAdmin);
+        mobileNav.itAll?.classList.toggle("hidden", !infraAdmin);
       }
 
       function toggleMobileAuthLinks() {
@@ -533,6 +552,8 @@
               name: data.name,
               department_id: data.department_id,
               designation: data.designation || "",
+              is_admin_like: data.is_admin_like === true,
+              is_infra_admin: data.is_infra_admin === true,
             };
           }
         } catch (err) {

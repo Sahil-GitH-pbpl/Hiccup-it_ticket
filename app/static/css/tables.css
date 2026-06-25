@@ -4,8 +4,6 @@
     padding: 0 1.25rem 1.25rem;
     border: 1px solid rgba(148, 163, 184, 0.25);
     box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
-    max-height: 68vh;
-    overflow-y: auto;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     position: relative;
@@ -99,6 +97,97 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 .table-scroll::-webkit-scrollbar-thumb {
     background: rgba(15, 23, 42, 0.3);
     border-radius: 999px;
+}
+
+.hiccup-page-size {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.hiccup-page-size select {
+    border-radius: 999px;
+    border: 1px solid rgba(13, 178, 156, 0.28);
+    background: #fff;
+    color: #0f766e;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    outline: none;
+}
+
+.hiccup-bulkbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65rem;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid rgba(13, 178, 156, 0.22);
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(240, 253, 250, 0.94), rgba(255, 255, 255, 0.95));
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+}
+
+.hiccup-bulkbar.hidden {
+    display: none;
+}
+
+.hiccup-bulkbar__select {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-right: auto;
+    color: #0f766e;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.hiccup-bulkbar input[type="checkbox"],
+.hiccup-bulk-checkbox {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #0d9488;
+}
+
+.enhanced-table .hiccup-select-col {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    max-width: 2.75rem;
+    text-align: center;
+}
+
+.enhanced-table td.hiccup-select-col,
+.enhanced-table th.hiccup-select-col {
+    padding-left: 0.6rem !important;
+    padding-right: 0.35rem !important;
+}
+
+.hiccup-bulkbar__count {
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.hiccup-bulkbar__button {
+    border: none;
+    border-radius: 999px;
+    background: #0db29c;
+    color: #fff;
+    padding: 0.42rem 0.95rem;
+    font-size: 0.78rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(13, 178, 156, 0.22);
+}
+
+.hiccup-bulkbar__button:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+    box-shadow: none;
 }
 
 .hiccup-sticky-toolbar {
@@ -263,6 +352,133 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     border: 1px solid rgba(59, 130, 246, 0.08);
 }
 
+.hiccup-inline-filterbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 0.95rem;
+    border-radius: 1.15rem;
+    border: 1px solid rgba(13, 178, 156, 0.24);
+    background:
+        linear-gradient(135deg, rgba(240, 253, 250, 0.96), rgba(255, 255, 255, 0.94)),
+        #ffffff;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+.hiccup-inline-filterbar label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #0f766e;
+    white-space: nowrap;
+}
+
+.hiccup-inline-filterbar label > span {
+    line-height: 1;
+}
+
+.hiccup-inline-filterbar input[type="date"],
+.hiccup-inline-filterbar input[type="search"],
+.hiccup-inline-filterbar select {
+    min-height: 2.15rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(13, 178, 156, 0.22);
+    background: rgba(255, 255, 255, 0.98);
+    padding: 0.35rem 0.65rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.hiccup-inline-filterbar input[type="date"]:focus,
+.hiccup-inline-filterbar input[type="search"]:focus,
+.hiccup-inline-filterbar select:focus {
+    border-color: #0db29c;
+    box-shadow: 0 0 0 3px rgba(13, 178, 156, 0.14);
+}
+
+.hiccup-inline-filterbar input[type="date"] {
+    min-width: 9.5rem;
+}
+
+.hiccup-inline-filterbar select {
+    min-width: 7.4rem;
+}
+
+.hiccup-inline-filterbar .hiccup-inline-search {
+    flex: 1 1 18rem;
+}
+
+.hiccup-inline-filterbar .hiccup-inline-search input {
+    width: 100%;
+}
+
+.hiccup-inline-filterbar .hiccup-inline-check {
+    border-radius: 999px;
+    border: 1px solid rgba(13, 178, 156, 0.16);
+    background: rgba(255, 255, 255, 0.82);
+    padding: 0.42rem 0.65rem;
+    color: #0f766e;
+}
+
+.hiccup-inline-filterbar input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #0d9488;
+}
+
+.hiccup-inline-filterbar button {
+    min-height: 2.2rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: #0db29c;
+    color: #fff;
+    padding: 0.35rem 0.95rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(13, 178, 156, 0.22);
+}
+
+.hiccup-inline-filterbar button:hover {
+    background: #0a7f6f;
+}
+
+.hiccup-inline-filterbar .hiccup-inline-clear {
+    border: 1px solid rgba(13, 178, 156, 0.28);
+    background: #ffffff;
+    color: #0f766e;
+    box-shadow: none;
+}
+
+.hiccup-inline-filterbar .hiccup-inline-clear:hover {
+    background: rgba(240, 253, 250, 0.98);
+}
+
+@media (max-width: 768px) {
+    .hiccup-inline-filterbar {
+        align-items: stretch;
+    }
+
+    .hiccup-inline-filterbar label,
+    .hiccup-inline-filterbar button {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .hiccup-inline-filterbar input[type="date"],
+    .hiccup-inline-filterbar input[type="search"],
+    .hiccup-inline-filterbar select {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
 .detail-btn {
     border-radius: 999px;
     border: 1px solid rgba(13, 178, 156, 0.5);
@@ -281,6 +497,136 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 .detail-btn:hover {
     background: rgba(13, 178, 156, 0.08);
     transform: none;
+}
+
+.hiccup-row-toggle,
+.hiccup-accordion-toggle {
+    gap: 0.4rem;
+    white-space: nowrap;
+}
+
+.hiccup-accordion-toggle__chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 999px;
+    background: rgba(13, 178, 156, 0.12);
+    color: #0f766e;
+    font-size: 0.9rem;
+    line-height: 1;
+    transform: rotate(0deg);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.hiccup-row-toggle.is-open .hiccup-accordion-toggle__chevron,
+.hiccup-accordion-toggle.is-open .hiccup-accordion-toggle__chevron {
+    transform: rotate(180deg);
+    background: rgba(13, 178, 156, 0.2);
+}
+
+.hiccup-summary-row--open {
+    background: linear-gradient(90deg, rgba(240, 253, 250, 0.82), rgba(255, 255, 255, 0.96));
+}
+
+.hiccup-accordion-row {
+    background: #f8fafc;
+}
+
+.enhanced-table tbody tr.hiccup-accordion-row:hover {
+    background: #f8fafc;
+}
+
+.hiccup-accordion-cell {
+    padding: 0 !important;
+    border-top: 0;
+}
+
+.hiccup-accordion-cell .hiccup-detail-canvas--inline {
+    height: auto;
+    min-height: 0;
+    padding: 0.85rem;
+}
+
+.hiccup-accordion-cell .hiccup-detail-modal--inline {
+    height: auto;
+    min-height: 0;
+    grid-template-rows: auto auto auto;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(13, 178, 156, 0.18);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.hiccup-accordion-cell .hiccup-detail-viewport {
+    min-height: 0;
+}
+
+.hiccup-accordion-cell .hiccup-detail-column {
+    max-height: none;
+    overflow: visible;
+}
+
+.hiccup-card-accordion {
+    margin-top: 0.65rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.22);
+    padding-top: 0.65rem;
+}
+
+.hiccup-card-accordion .hiccup-detail-canvas--inline {
+    height: auto;
+    min-height: 0;
+    padding: 0;
+}
+
+.hiccup-card-accordion .hiccup-detail-modal--inline {
+    height: auto;
+    min-height: 0;
+    grid-template-rows: auto auto auto;
+    border-radius: 1rem;
+    box-shadow: none;
+}
+
+.hiccup-card-accordion .hiccup-detail-viewport {
+    grid-template-columns: 1fr;
+}
+
+.hiccup-card-accordion .hiccup-detail-column {
+    max-height: none;
+    overflow: visible;
+}
+
+.hiccup-inline-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.hiccup-inline-actions .mgmt-action-group {
+    display: inline-flex;
+}
+
+.hiccup-inline-actions .mgmt-actions-stack {
+    right: 0;
+}
+
+.hiccup-direct-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.hiccup-direct-actions .mgmt-pill {
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
 }
 
 .mgmt-action-group {
@@ -532,6 +878,7 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    position: relative;
 }
 
 .status-modal__field-group > .status-modal__label {
@@ -566,6 +913,92 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     border-color: #0db29c;
     box-shadow: 0 0 0 3px rgba(13, 178, 156, 0.2);
     background: #fff;
+}
+
+.status-modal__suggestions {
+    display: none;
+    position: static;
+    max-height: 14rem;
+    overflow-y: auto;
+    border: 1px solid rgba(13, 178, 156, 0.34);
+    border-top: 3px solid #0db29c;
+    border-radius: 0.9rem;
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+    padding: 0.35rem;
+    margin-top: 0.2rem;
+}
+
+.status-modal__suggestions.is-open {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.status-modal__field-group--suggestions {
+    padding-bottom: 0.15rem;
+}
+
+.status-modal__suggestion {
+    width: 100%;
+    border: 0;
+    border-radius: 0.72rem;
+    background: transparent;
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.status-modal__suggestion:hover,
+.status-modal__suggestion:focus {
+    outline: none;
+    background: linear-gradient(135deg, rgba(240, 253, 250, 0.95), rgba(239, 246, 255, 0.95));
+}
+
+.status-modal__suggestion-name {
+    display: block;
+    color: #0f172a;
+    font-size: 0.9rem;
+    font-weight: 900;
+}
+
+.status-modal__suggestion-meta,
+.status-modal__suggestion-empty {
+    display: block;
+    margin-top: 0.12rem;
+    color: #64748b;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.status-modal__suggestion-empty {
+    padding: 0.6rem 0.65rem;
+}
+
+.status-modal__note-highlight {
+    border: 1px solid rgba(13, 178, 156, 0.34);
+    border-left: 5px solid #0db29c;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(240, 253, 250, 0.98), rgba(239, 246, 255, 0.92));
+    padding: 0.8rem 0.95rem;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+.status-modal__note-highlight-label {
+    margin: 0;
+    color: #0f766e;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.status-modal__note-highlight-text {
+    margin: 0.35rem 0 0;
+    color: #0f172a;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.45;
+    white-space: pre-line;
 }
 
 .status-modal__checkbox-group {
@@ -756,7 +1189,7 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding: 0.7rem 0.85rem;
+    padding: 0.62rem 0.78rem;
     border-radius: 0.9rem;
     border: 1px solid #dbeafe;
     background: linear-gradient(90deg, #eff6ff, #ecfeff);
@@ -775,18 +1208,6 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     color: #475569;
     letter-spacing: 0.09em;
     text-transform: uppercase;
-}
-
-.hiccup-detail-status {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #0a7f6f;
-    border: 1px solid #99f6e4;
-    background: #f0fdfa;
-    border-radius: 999px;
-    padding: 0.3rem 0.6rem;
 }
 
 .hiccup-detail-kv {
@@ -815,9 +1236,9 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 
 .hiccup-detail-panel {
     border: 1px solid #e2e8f0;
-    border-radius: 0.85rem;
+    border-radius: 0.76rem;
     background: linear-gradient(180deg, #ffffff, #f8fafc);
-    padding: 0.7rem;
+    padding: 0.58rem;
     box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
 }
 
@@ -836,13 +1257,13 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 }
 
 .hiccup-detail-panel__body {
-    margin-top: 0.45rem;
+    margin-top: 0.36rem;
     font-size: 0.84rem;
     line-height: 1.5;
     color: #0f172a;
     white-space: pre-line;
     word-break: break-word;
-    max-height: 13rem;
+    max-height: 11rem;
     overflow: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -854,9 +1275,9 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 
 .hiccup-detail-response {
     border: 1px solid #99f6e4;
-    border-radius: 0.95rem;
+    border-radius: 0.82rem;
     background: linear-gradient(135deg, #f0fdfa, #ecfeff);
-    padding: 0.75rem;
+    padding: 0.6rem;
     box-shadow: 0 12px 24px rgba(13, 178, 156, 0.12);
 }
 
@@ -870,11 +1291,11 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 }
 
 .hiccup-detail-response__text {
-    margin: 0.45rem 0 0;
+    margin: 0.36rem 0 0;
     font-size: 0.9rem;
     font-weight: 700;
     color: #0f172a;
-    max-height: 8rem;
+    max-height: 6.75rem;
     overflow-y: auto;
     padding-right: 0.1rem;
     white-space: pre-line;
@@ -888,7 +1309,7 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 }
 
 .hiccup-detail-response__meta {
-    margin: 0.45rem 0 0;
+    margin: 0.36rem 0 0;
     font-size: 0.76rem;
     color: #475569;
 }
@@ -994,7 +1415,124 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     min-height: 0;
     display: grid;
     grid-template-rows: auto auto 1fr;
+    gap: 0.48rem;
+}
+
+.hiccup-detail-compact-grid {
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(180px, 0.64fr) minmax(420px, 1.62fr) minmax(190px, 0.74fr);
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.hiccup-detail-section {
+    min-width: 0;
+    border: 1px solid rgba(203, 213, 225, 0.86);
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.055);
+    padding: 0.58rem;
+}
+
+.hiccup-detail-section__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.48rem;
+    padding-bottom: 0.42rem;
+    border-bottom: 1px solid rgba(203, 213, 225, 0.65);
+}
+
+.hiccup-detail-section__head span {
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #0f766e;
+}
+
+.hiccup-detail-section__head small {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #64748b;
+    text-align: right;
+}
+
+.hiccup-detail-section--issue {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+}
+
+.hiccup-detail-section--actions {
+    grid-column: 1 / -1;
+}
+
+.hiccup-info-list {
+    display: grid;
+    gap: 0.42rem;
+}
+
+.hiccup-info-item {
+    border: 1px solid rgba(226, 232, 240, 0.96);
+    border-radius: 0.72rem;
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    padding: 0.5rem 0.58rem;
+}
+
+.hiccup-info-item__label {
+    margin: 0;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #64748b;
+}
+
+.hiccup-info-item__value {
+    margin: 0.28rem 0 0;
+    color: #0f172a;
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.hiccup-issue-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.hiccup-detail-panel--flat {
+    padding: 0.46rem 0.58rem;
+    box-shadow: none;
+}
+
+.hiccup-context-attachments {
+    margin-top: 0.45rem;
+}
+
+.hiccup-detail-section--actions {
+    display: grid;
+    grid-template-columns: minmax(150px, auto) minmax(0, 1fr);
+    align-items: center;
     gap: 0.55rem;
+    background: linear-gradient(90deg, rgba(240, 253, 250, 0.92), rgba(239, 246, 255, 0.82));
+    padding: 0.52rem 0.65rem;
+}
+
+.hiccup-detail-section--actions .hiccup-detail-section__head {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: block;
+}
+
+.hiccup-detail-section--actions .hiccup-detail-section__head small {
+    display: block;
+    text-align: left;
+    margin-top: 0.16rem;
 }
 
 .hiccup-detail-topline {
@@ -1097,12 +1635,18 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     padding: 0.34rem 0.85rem;
 }
 
+.hiccup-detail-section--actions .hiccup-detail-actionbar {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
 .hiccup-detail-panel__body--lg {
-    max-height: 8.5rem;
+    max-height: 7.2rem;
 }
 
 .attachment-stack {
-    max-height: 8.5rem;
+    max-height: 5rem;
     overflow: auto;
 }
 
@@ -1123,6 +1667,23 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
         height: auto;
         min-height: 0;
         grid-template-rows: auto auto auto;
+    }
+
+    .hiccup-detail-compact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hiccup-detail-section--actions {
+        grid-column: auto;
+    }
+
+    .hiccup-detail-section--actions {
+        grid-template-columns: 1fr;
+    }
+
+    .hiccup-detail-section--actions .hiccup-detail-section__head {
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(203, 213, 225, 0.65);
     }
 
     .hiccup-detail-viewport {
@@ -1170,7 +1731,8 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
 
     .hiccup-detail-kv-grid,
     .hiccup-detail-story-grid,
-    .hiccup-detail-bottom-grid {
+    .hiccup-detail-bottom-grid,
+    .hiccup-issue-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1179,7 +1741,9 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     }
 
     .hiccup-detail-panel,
-    .hiccup-detail-kv {
+    .hiccup-detail-kv,
+    .hiccup-detail-section,
+    .hiccup-info-item {
         padding: 0.58rem;
     }
 }

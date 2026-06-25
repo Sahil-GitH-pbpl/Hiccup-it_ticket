@@ -33,13 +33,9 @@
 
 {% block scripts %}
 <script>
-const adminKeywords = ['admin','management','manager','supervisor','lead','it','infra'];
 function isAdminLike(user){
     if (!user) return false;
-    if (user.is_admin_like === true) return true;
-    const role = (user.role || '').toLowerCase();
-    const designation = (user.designation || '').toLowerCase();
-    return role === 'admin' || adminKeywords.some(k => role.includes(k) || designation.includes(k));
+    return user.is_admin_like === true;
 }
 
 function isFormOnly(user) {

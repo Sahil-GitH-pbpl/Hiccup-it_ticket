@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     # response_overdue_minutes: int = Field(3, env="RESPONSE_OVERDUE_MINUTES")
     # response_escalate_minutes: int = Field(4, env="RESPONSE_ESCALATE_MINUTES")
     session_secret: str = Field("change-this-session-secret", env="SESSION_SECRET")
+    enable_infra_reminder: bool = Field(True, env="ENABLE_INFRA_REMINDER")
+    local_reload: bool = Field(False, env="LOCAL_RELOAD")
 
     model_config = SettingsConfigDict(
         env_file=".env",

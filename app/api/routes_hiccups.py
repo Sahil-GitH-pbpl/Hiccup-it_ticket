@@ -13,6 +13,8 @@ from app.core.security import (
 )
 from app.db.session import SessionLocal
 from app.schemas.hiccup import (
+    BulkCloseRequest,
+    BulkCloseResponse,
     HiccupCreate,
     HiccupListResponse,
     HiccupResponse,
@@ -72,13 +74,14 @@ def create_hiccup(
 @router.get("", response_model=HiccupListResponse)
 def list_hiccups(
     page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
+    page_size: int = Query(50, ge=1, le=200),
     status: str | None = Query(None),
     hiccup_type: str | None = Query(None),
     date_from: date | None = Query(None),
     date_to: date | None = Query(None),
     escalated: bool = Query(False),
     overdue: bool = Query(False),
+    response_blocked: bool = Query(False),
     search: str | None = Query(None),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
@@ -94,6 +97,7 @@ def list_hiccups(
         date_to=date_to,
         escalated_only=escalated,
         overdue_only=overdue,
+        response_blocked_only=response_blocked,
         search=search,
     )
 
@@ -101,7 +105,7 @@ def list_hiccups(
 @router.get("/assigned", response_model=HiccupListResponse)
 def list_assigned_hiccups(
     page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
+    page_size: int = Query(50, ge=1, le=200),
     status: str | None = Query(None),
     hiccup_type: str | None = Query(None),
     root_cause_category: str | None = Query(None),
@@ -109,6 +113,7 @@ def list_assigned_hiccups(
     date_to: date | None = Query(None),
     escalated: bool = Query(False),
     overdue: bool = Query(False),
+    response_blocked: bool = Query(False),
     search: str | None = Query(None),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
@@ -125,6 +130,7 @@ def list_assigned_hiccups(
         date_to=date_to,
         escalated_only=escalated,
         overdue_only=overdue,
+        response_blocked_only=response_blocked,
         search=search,
     )
 
@@ -132,13 +138,14 @@ def list_assigned_hiccups(
 @router.get("/for-me", response_model=HiccupListResponse)
 def list_hiccups_for_me(
     page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
+    page_size: int = Query(50, ge=1, le=200),
     status: str | None = Query(None),
     hiccup_type: str | None = Query(None),
     date_from: date | None = Query(None),
     date_to: date | None = Query(None),
     escalated: bool = Query(False),
     overdue: bool = Query(False),
+    response_blocked: bool = Query(False),
     search: str | None = Query(None),
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
@@ -154,6 +161,7 @@ def list_hiccups_for_me(
         date_to=date_to,
         escalated_only=escalated,
         overdue_only=overdue,
+        response_blocked_only=response_blocked,
         search=search,
     )
 
@@ -161,7 +169,7 @@ def list_hiccups_for_me(
 @router.get("/all", response_model=HiccupListResponse)
 def list_all_hiccups(
     page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
+    page_size: int = Query(50, ge=1, le=200),
     status: str | None = Query(None),
     hiccup_type: str | None = Query(None),
     root_cause_category: str | None = Query(None),
@@ -169,6 +177,7 @@ def list_all_hiccups(
     date_to: date | None = Query(None),
     escalated: bool = Query(False),
     overdue: bool = Query(False),
+    response_blocked: bool = Query(False),
     search: str | None = Query(None),
     db: Session = Depends(get_db),
     user=Depends(require_management),
@@ -184,6 +193,7 @@ def list_all_hiccups(
         date_to=date_to,
         escalated_only=escalated,
         overdue_only=overdue,
+        response_blocked_only=response_blocked,
         search=search,
     )
 
@@ -252,6 +262,60 @@ def public_respond(
     return hiccup_service.respond(db, user, hiccup_id, payload.response_text, allow_public=True)
 
 
+def _is_hiccup_management_user(user) -> bool:
+    return is_allowlisted_hiccup_admin(getattr(user, "user_id", None)) or str(
+        getattr(user, "role", "")
+    ).lower() in {"admin", "management"} or getattr(user, "is_admin_like", False)
+
+
+def _can_close_hiccup(hiccup, user, is_mgmt: bool) -> bool:
+    if is_mgmt:
+        return True
+    return (
+        hiccup.status == "Escalated to NC"
+        and hiccup.nc_assigned_staff_id
+        and str(hiccup.nc_assigned_staff_id) == str(user.user_id)
+    )
+
+
+@router.patch("/bulk/close", response_model=BulkCloseResponse)
+def bulk_close_hiccups(
+    payload: BulkCloseRequest,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
+    is_mgmt = _is_hiccup_management_user(user)
+    unique_ids = []
+    seen = set()
+    for hiccup_id in payload.hiccup_ids or []:
+        clean_id = str(hiccup_id or "").strip()
+        if clean_id and clean_id not in seen:
+            unique_ids.append(clean_id)
+            seen.add(clean_id)
+    if not unique_ids:
+        raise HTTPException(status_code=400, detail="No hiccups selected")
+
+    closed = 0
+    skipped = []
+    for hiccup_id in unique_ids:
+        hiccup = hiccup_service.get_hiccup(db, hiccup_id)
+        if hiccup.status == "Closed":
+            skipped.append(hiccup_id)
+            continue
+        if not _can_close_hiccup(hiccup, user, is_mgmt):
+            skipped.append(hiccup_id)
+            continue
+        hiccup_service.update_status(
+            db,
+            user,
+            hiccup_id,
+            "Closed",
+            closure_notes=payload.closure_notes or "N/A",
+        )
+        closed += 1
+    return BulkCloseResponse(closed=closed, skipped=skipped)
+
+
 @router.patch("/{hiccup_id}/status", response_model=HiccupResponse)
 def update_status(
     hiccup_id: str,
@@ -260,16 +324,9 @@ def update_status(
     user=Depends(get_current_user),
 ):
     hiccup = hiccup_service.get_hiccup(db, hiccup_id)
-    is_mgmt = is_allowlisted_hiccup_admin(getattr(user, "user_id", None)) or str(
-        getattr(user, "role", "")
-    ).lower() in {"admin", "management"} or getattr(user, "is_admin_like", False)
-    is_assigned_nc = (
-        hiccup.status == "Escalated to NC"
-        and hiccup.nc_assigned_staff_id
-        and str(hiccup.nc_assigned_staff_id) == str(user.user_id)
-    )
+    is_mgmt = _is_hiccup_management_user(user)
     if not is_mgmt:
-        if not (payload.status == "Closed" and is_assigned_nc):
+        if not (payload.status == "Closed" and _can_close_hiccup(hiccup, user, is_mgmt)):
             raise HTTPException(status_code=403, detail="Management designation required")
     return hiccup_service.update_status(
         db,

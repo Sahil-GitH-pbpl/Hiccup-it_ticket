@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class HiccupCreate(BaseModel):
@@ -17,6 +17,8 @@ class HiccupCreate(BaseModel):
 
 
 class HiccupResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     hiccup_id: str
     raised_by: int
     raised_by_name: str
@@ -48,13 +50,10 @@ class HiccupResponse(BaseModel):
     root_cause_category: Optional[str]
     is_response_overdue: bool
     is_closure_overdue: bool
+    response_blocked: bool = False
     nc_assigned_staff_id: Optional[int] = None
     nc_assigned_staff_name: Optional[str] = None
     was_response_overdue: bool = False
-
-    class Config:
-        orm_mode = True
-        from_attributes = True
 
 
 class HiccupListResponse(BaseModel):
@@ -73,6 +72,7 @@ class RespondRequest(BaseModel):
 class NCEscalationFormPayload(BaseModel):
     staff_name: str
     staff_id: Optional[int] = None
+    nc_note: Optional[str] = None
     root_cause_flags: Optional[List[str]] = None
     root_cause_other: Optional[str] = None
     corrective_action: Optional[str] = None
@@ -98,9 +98,20 @@ class StatusUpdateRequest(BaseModel):
     escalation_form: Optional[NCEscalationFormPayload] = None
 
 
+class BulkCloseRequest(BaseModel):
+    hiccup_ids: List[str]
+    closure_notes: Optional[str] = None
+
+
+class BulkCloseResponse(BaseModel):
+    closed: int
+    skipped: List[str] = Field(default_factory=list)
+
+
 class NCEscalationFormResponse(BaseModel):
     staff_name: str
     staff_id: Optional[int] = None
+    nc_note: Optional[str] = None
     root_cause_flags: List[str] = Field(default_factory=list)
     root_cause_other: Optional[str] = None
     corrective_action: Optional[str] = None
@@ -126,11 +137,11 @@ class AutoGenerateRequest(BaseModel):
 
 
 class AuditLogEntry(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     action: str
     performed_by: int
     performed_by_name: Optional[str] = None
     timestamp: datetime
     remarks: Optional[str]
 
-    class Config:
-        orm_mode = True

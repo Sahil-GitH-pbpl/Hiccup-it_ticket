@@ -5,6 +5,7 @@ const dateFromFilter = document.getElementById('filter-date-from');
 const dateToFilter = document.getElementById('filter-date-to');
 const escalatedFilter = document.getElementById('filter-escalated');
 const overdueFilter = document.getElementById('filter-overdue');
+const responseBlockedFilter = document.getElementById('filter-response-blocked');
 const resetFilters = document.getElementById('reset-filters');
 const globalSearchInput = document.getElementById('global-hiccup-search');
 const mgmtStatusFilter = document.getElementById('mgmt-filter-status');
@@ -14,13 +15,22 @@ const mgmtDateFromFilter = document.getElementById('mgmt-date-from');
 const mgmtDateToFilter = document.getElementById('mgmt-date-to');
 const mgmtEscalatedFilter = document.getElementById('mgmt-filter-escalated');
 const mgmtOverdueFilter = document.getElementById('mgmt-filter-overdue');
+const mgmtResponseBlockedFilter = document.getElementById('mgmt-filter-response-blocked');
 const mgmtGlobalSearchInput = document.getElementById('mgmt-global-hiccup-search');
 const mgmtResetFilters = document.getElementById('mgmt-reset-filters');
 
-const summaryColumnCount = 6;
-const actionsColumnCount = 1;
-const listColumnCount = summaryColumnCount + actionsColumnCount;
-const hiccupPageSize = 10;
+const summaryColumnCount = 5;
+const actionsColumnCount = 0;
+const listColumnCount = summaryColumnCount;
+const PAGE_SIZE_STORAGE_KEY = 'hiccupPageSize';
+const PAGE_SIZE_OPTIONS = [50, 100, 200];
+
+function getSavedPageSize() {
+    const saved = Number(window.localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '');
+    return PAGE_SIZE_OPTIONS.includes(saved) ? saved : 50;
+}
+
+let hiccupPageSize = getSavedPageSize();
 let raisedListState = { items: [], page: 1, page_size: hiccupPageSize, total: 0, total_pages: 1 };
 let assignedListState = { items: [], page: 1, page_size: hiccupPageSize, total: 0, total_pages: 1 };
 let managementListState = { items: [], page: 1, page_size: hiccupPageSize, total: 0, total_pages: 1 };
@@ -31,8 +41,9 @@ const paginationState = {
     assigned: 1,
 };
 const showManagementActions = Boolean(window.managementActionsEnabled);
-const managementColumnCount = summaryColumnCount + (showManagementActions ? actionsColumnCount : 0);
 const assignedViewMode = Boolean(window.assignedView);
+const bulkCloseEnabled = Boolean(showManagementActions && document.getElementById('bulk-close-bar'));
+const managementColumnCount = summaryColumnCount + (bulkCloseEnabled ? 1 : 0) + (showManagementActions ? actionsColumnCount : 0);
 const currentUserId = window.currentUserId || (window.currentUser && window.currentUser.user_id) || null;
 const currentUserName = (window.currentUser && window.currentUser.name) || '';
 let departmentCache = null;
@@ -46,6 +57,13 @@ const SEARCH_INPUT_DEBOUNCE = 180;
 let mySearchTimer = null;
 let mgmtSearchTimer = null;
 let latestLoadRequestId = 0;
+const selectedBulkCloseIds = new Set();
+const expandedHiccupByScope = {
+    raised: null,
+    against: null,
+    management: null,
+    assigned: null,
+};
 
 function getSavedDensityMode() {
     const saved = window.localStorage.getItem(DENSITY_STORAGE_KEY);
@@ -156,6 +174,10 @@ function buildMyFilters(page = paginationState.raised || 1) {
     if (dateToFilter?.value) params.set('date_to', dateToFilter.value);
     if (escalatedFilter?.checked) params.set('escalated', 'true');
     if (overdueFilter?.checked) params.set('overdue', 'true');
+    if (responseBlockedFilter?.checked) {
+        params.set('status', 'Open');
+        params.set('response_blocked', 'true');
+    }
     const searchValue = globalSearchInput?.value?.trim();
     if (searchValue) params.set('search', searchValue);
     return params;
@@ -174,6 +196,10 @@ function buildManagementFilters(page = paginationState.management || 1) {
     if (mgmtDateToFilter?.value) params.set('date_to', mgmtDateToFilter.value);
     if (mgmtEscalatedFilter?.checked) params.set('escalated', 'true');
     if (mgmtOverdueFilter?.checked) params.set('overdue', 'true');
+    if (mgmtResponseBlockedFilter?.checked) {
+        params.set('status', 'Open');
+        params.set('response_blocked', 'true');
+    }
     const searchValue = mgmtGlobalSearchInput?.value?.trim();
     if (searchValue) params.set('search', searchValue);
     return params;
@@ -181,14 +207,18 @@ function buildManagementFilters(page = paginationState.management || 1) {
 
 async function fetchHiccupList(endpoint, params) {
     const requestParams = params instanceof URLSearchParams ? new URLSearchParams(params) : new URLSearchParams();
+    const responseBlockedRequested = requestParams.get('response_blocked') === 'true';
     requestParams.set('_ts', String(Date.now()));
     const query = `?${requestParams.toString()}`;
     const payload = await fetchJSON(`${endpoint}${query}`);
-    const items = Array.isArray(payload)
+    let items = Array.isArray(payload)
         ? payload
         : Array.isArray(payload?.items)
         ? payload.items
         : [];
+    if (responseBlockedRequested && items.some((entry) => Object.prototype.hasOwnProperty.call(entry || {}, 'response_blocked'))) {
+        items = items.filter((entry) => entry?.status === 'Open' && Boolean(entry?.response_blocked));
+    }
     const page = payload?.page || 1;
     const pageSize = payload?.page_size || hiccupPageSize;
     const total = Array.isArray(payload) ? items.length : payload?.total || 0;
@@ -284,6 +314,7 @@ function renderMyActiveFilters() {
     if (toValue) chips.push({ key: 'to', label: `To: ${toValue}` });
     if (escalatedFilter?.checked) chips.push({ key: 'escalated', label: 'Escalated' });
     if (overdueFilter?.checked) chips.push({ key: 'overdue', label: 'Overdue' });
+    if (responseBlockedFilter?.checked) chips.push({ key: 'response_blocked', label: 'Response Blocked' });
     if (searchValue) chips.push({ key: 'search', label: `Search: ${searchValue}` });
     renderActiveFilterChips('my-active-filters', chips, 'my');
 }
@@ -303,6 +334,7 @@ function renderMgmtActiveFilters() {
     if (toValue) chips.push({ key: 'to', label: `To: ${toValue}` });
     if (mgmtEscalatedFilter?.checked) chips.push({ key: 'escalated', label: 'Escalated' });
     if (mgmtOverdueFilter?.checked) chips.push({ key: 'overdue', label: 'Overdue' });
+    if (mgmtResponseBlockedFilter?.checked) chips.push({ key: 'response_blocked', label: 'Response Blocked' });
     if (searchValue) chips.push({ key: 'search', label: `Search: ${searchValue}` });
     renderActiveFilterChips('mgmt-active-filters', chips, 'mgmt');
 }
@@ -315,6 +347,7 @@ function clearMyFilterChip(key) {
         if (dateToFilter) dateToFilter.value = '';
         if (escalatedFilter) escalatedFilter.checked = false;
         if (overdueFilter) overdueFilter.checked = false;
+        if (responseBlockedFilter) responseBlockedFilter.checked = false;
         if (globalSearchInput) globalSearchInput.value = '';
     } else if (key === 'status' && statusFilter) statusFilter.value = '';
     else if (key === 'type' && typeFilter) typeFilter.value = '';
@@ -322,6 +355,7 @@ function clearMyFilterChip(key) {
     else if (key === 'to' && dateToFilter) dateToFilter.value = '';
     else if (key === 'escalated' && escalatedFilter) escalatedFilter.checked = false;
     else if (key === 'overdue' && overdueFilter) overdueFilter.checked = false;
+    else if (key === 'response_blocked' && responseBlockedFilter) responseBlockedFilter.checked = false;
     else if (key === 'search' && globalSearchInput) globalSearchInput.value = '';
     paginationState.raised = 1;
     paginationState.against = 1;
@@ -337,6 +371,7 @@ function clearMgmtFilterChip(key) {
         if (mgmtDateToFilter) mgmtDateToFilter.value = '';
         if (mgmtEscalatedFilter) mgmtEscalatedFilter.checked = false;
         if (mgmtOverdueFilter) mgmtOverdueFilter.checked = false;
+        if (mgmtResponseBlockedFilter) mgmtResponseBlockedFilter.checked = false;
         if (mgmtGlobalSearchInput) mgmtGlobalSearchInput.value = '';
     } else if (key === 'status' && mgmtStatusFilter) mgmtStatusFilter.value = '';
     else if (key === 'type' && mgmtTypeFilter) mgmtTypeFilter.value = '';
@@ -345,6 +380,7 @@ function clearMgmtFilterChip(key) {
     else if (key === 'to' && mgmtDateToFilter) mgmtDateToFilter.value = '';
     else if (key === 'escalated' && mgmtEscalatedFilter) mgmtEscalatedFilter.checked = false;
     else if (key === 'overdue' && mgmtOverdueFilter) mgmtOverdueFilter.checked = false;
+    else if (key === 'response_blocked' && mgmtResponseBlockedFilter) mgmtResponseBlockedFilter.checked = false;
     else if (key === 'search' && mgmtGlobalSearchInput) mgmtGlobalSearchInput.value = '';
     if (assignedViewMode) {
         paginationState.assigned = 1;
@@ -497,6 +533,12 @@ function renderPagination(containerId, stateKey, meta, label = 'hiccups') {
                 Showing ${meta.start}-${meta.end} of ${meta.total} ${label}
             </p>
             <div class="hiccup-pagination-actions">
+                <label class="hiccup-page-size">
+                    <span>Rows</span>
+                    <select data-page-size-target="${stateKey}">
+                        ${PAGE_SIZE_OPTIONS.map((size) => `<option value="${size}" ${size === hiccupPageSize ? 'selected' : ''}>${size}</option>`).join('')}
+                    </select>
+                </label>
                 ${prevControl}
                 <span class="hiccup-pagination-page">Page ${meta.page} of ${totalPages}</span>
                 ${nextControl}
@@ -505,9 +547,60 @@ function renderPagination(containerId, stateKey, meta, label = 'hiccups') {
     `;
 }
 
+function isBulkClosable(hiccup) {
+    return Boolean(hiccup && hiccup.status !== 'Closed');
+}
+
+function pruneBulkCloseSelection(rows = []) {
+    const closableIds = new Set(
+        rows.filter(isBulkClosable).map((entry) => String(entry.hiccup_id))
+    );
+    Array.from(selectedBulkCloseIds).forEach((id) => {
+        if (!closableIds.has(id)) {
+            selectedBulkCloseIds.delete(id);
+        }
+    });
+}
+
+function renderBulkCloseBar(rows = []) {
+    if (!bulkCloseEnabled) {
+        return;
+    }
+    const bar = document.getElementById('bulk-close-bar');
+    const countEl = document.getElementById('bulk-close-count');
+    const button = document.getElementById('bulk-close-action');
+    const selectAll = document.getElementById('bulk-close-select-all');
+    const selectedCount = selectedBulkCloseIds.size;
+    const closableRows = rows.filter(isBulkClosable);
+
+    if (countEl) {
+        countEl.textContent = selectedCount
+            ? `${selectedCount} selected`
+            : `${closableRows.length} closable`;
+    }
+    if (button) {
+        button.disabled = selectedCount === 0;
+    }
+    if (selectAll) {
+        selectAll.disabled = closableRows.length === 0;
+        selectAll.checked =
+            closableRows.length > 0 &&
+            closableRows.every((h) => selectedBulkCloseIds.has(String(h.hiccup_id)));
+        selectAll.indeterminate =
+            selectedCount > 0 &&
+            closableRows.some((h) => selectedBulkCloseIds.has(String(h.hiccup_id))) &&
+            !selectAll.checked;
+    }
+    bar?.classList.toggle('hidden', closableRows.length === 0);
+}
+
 function managementActionButtons(hiccup) {
-    const { hiccup_id: id, status, escalated_by } = hiccup;
+    const { hiccup_id: id, status, escalated_by, nc_assigned_staff_id } = hiccup;
     const hasEscalation = Boolean(escalated_by);
+    const assignedToCurrentUser =
+        nc_assigned_staff_id &&
+        currentUserId &&
+        String(nc_assigned_staff_id) === String(currentUserId);
     // If closed without any NC escalation history, no management actions are needed.
     if (status === 'Closed' && !hasEscalation) {
         return '';
@@ -540,7 +633,7 @@ function managementActionButtons(hiccup) {
             const statusAttr = action.status ? `data-status="${action.status}"` : '';
             const behaviorAttr = action.behavior ? `data-behavior="${action.behavior}"` : '';
             const readonlyAttr =
-                action.behavior === 'view-nc' && status === 'Closed'
+                action.behavior === 'view-nc' && (status === 'Closed' || !assignedToCurrentUser)
                     ? 'data-nc-readonly="true"'
                     : '';
             return `<button type="button" class="mgmt-pill ${action.classes}" data-hiccup="${id}" ${statusAttr} ${behaviorAttr} ${readonlyAttr}>${action.label}</button>`;
@@ -548,16 +641,35 @@ function managementActionButtons(hiccup) {
         .join('');
 }
 
-function actionCellHtml(h, includeMgmtActions = false, options = {}) {
-    const { allowNcView = false, ncReadonly = false, allowRespond = false, showNcButton = false } = options;
+function actionControlsHtml(h, includeMgmtActions = false, options = {}) {
+    const {
+        allowNcView = false,
+        ncReadonly = false,
+        allowRespond = false,
+        showNcButton = false,
+        detailMode = 'modal',
+        isExpanded = false,
+        accordionScope = '',
+        includeDetail = true,
+        directActions = false,
+    } = options;
     const allowNcViewForCell = resolveOptionValue(allowNcView, h);
     const ncReadonlyValue = resolveOptionValue(ncReadonly, h);
-    const detailButton = `<button type="button" data-hiccup-detail="${h.hiccup_id}" class="detail-btn" aria-label="tails for ${escapeHtml(h.hiccup_id)}">View details</button>`;
+    const detailButton = !includeDetail
+        ? ''
+        : detailMode === 'accordion'
+            ? `<button type="button" data-hiccup-detail="${h.hiccup_id}" data-accordion-scope="${accordionScope}" class="detail-btn hiccup-accordion-toggle ${isExpanded ? 'is-open' : ''}" aria-expanded="${isExpanded ? 'true' : 'false'}" aria-controls="hiccup-detail-row-${accordionScope}-${escapeHtml(h.hiccup_id)}" aria-label="${isExpanded ? 'Hide' : 'Show'} details for ${escapeHtml(h.hiccup_id)}">
+                <span class="hiccup-accordion-toggle__chevron">▾</span>
+                <span>${isExpanded ? 'Hide details' : 'Details'}</span>
+            </button>`
+            : `<button type="button" data-hiccup-detail="${h.hiccup_id}" class="detail-btn" aria-label="Details for ${escapeHtml(h.hiccup_id)}">View details</button>`;
     let mgmtActions = '';
     if (includeMgmtActions) {
         const mgmtButtons = managementActionButtons(h);
         if (mgmtButtons) {
-            mgmtActions = `<div class="mgmt-action-group" data-hiccup-actions="${h.hiccup_id}">
+            mgmtActions = directActions
+                ? `<div class="hiccup-direct-actions">${mgmtButtons}</div>`
+                : `<div class="mgmt-action-group" data-hiccup-actions="${h.hiccup_id}">
                 <button type="button" class="mgmt-toggle" aria-haspopup="true" aria-expanded="false">Actions</button>
                 <div class="mgmt-actions-stack">
                     ${mgmtButtons}
@@ -573,13 +685,18 @@ function actionCellHtml(h, includeMgmtActions = false, options = {}) {
         allowRespond && h.status !== 'Closed'
             ? `<button type="button" class="detail-btn" data-behavior="respond" data-hiccup="${h.hiccup_id}">Respond</button>`
             : '';
-    return `<td class="px-4 py-3 align-top">
-        <div class="flex flex-col gap-3">
+    return `
+        <div class="hiccup-inline-actions">
             ${detailButton}
             ${mgmtActions}
             ${ncViewButton}
             ${respondButton}
-        </div>
+        </div>`;
+}
+
+function actionCellHtml(h, includeMgmtActions = false, options = {}) {
+    return `<td class="px-4 py-3 align-top">
+        ${actionControlsHtml(h, includeMgmtActions, options)}
     </td>`;
 }
 
@@ -631,69 +748,42 @@ function buildDetailNavigation(h, collection = []) {
     return { markup, prevHiccup, nextHiccup };
 }
 
-function detailMarkup(h, ncForm, collection = []) {
-    const navigation = buildDetailNavigation(h, collection);
-    const summaryCards = [
-        { title: 'Created By', value: formatPersonDisplay(h.raised_by_name) },
-        { title: 'Created Against', value: formatPersonDisplay(h.raised_against_name) },
-        { title: 'Type', value: normalizeText(h.hiccup_type) },
-        { title: 'Status', value: normalizeText(h.status) },
+function detailMarkup(h, ncForm, collection = [], options = {}) {
+    const { includeNavigation = true, includeActions = true, inline = false, extraActionsHtml = '' } = options;
+    const navigation = includeNavigation ? buildDetailNavigation(h, collection) : { markup: '' };
+    const peopleCards = [
+        { title: 'Raised By', value: formatPersonDisplay(h.raised_by_name) },
+        { title: 'Raised Against', value: formatPersonDisplay(h.raised_against_name) },
     ];
-    const detailCards = [
-        { title: 'Response By', value: formatPersonDisplay(h.response_by_name, h.response_by) },
-        { title: 'Raised Dept', value: normalizeText(h.raised_by_department) },
+    const contextCards = [
         { title: 'Against Dept', value: normalizeText(h.raised_against_department_name || h.raised_against_department) },
         { title: 'Root Cause', value: normalizeText(h.root_cause_category) },
     ];
     if (ncForm?.staff_name) {
-        detailCards.push({
+        contextCards.push({
             title: 'NC Escalated Staff',
             value: formatPersonDisplay(ncForm.staff_name),
         });
     }
     if (h.nc_assigned_staff_name) {
-        detailCards.push({
+        contextCards.push({
             title: 'Assigned Staff',
             value: formatPersonDisplay(h.nc_assigned_staff_name),
         });
     }
     const attachmentSource =
         Array.isArray(h.attachments) && h.attachments.length ? h.attachments : h.attachment_path;
-    const renderCards = (cards) =>
+    const renderInfoItems = (cards) =>
         cards
             .map(
                 ({ title, value }) => `
-                    <div class="hiccup-detail-kv">
-                        <p class="hiccup-detail-kv__label">${title}</p>
-                        <p class="hiccup-detail-kv__value">${value ?? '-'}</p>
+                    <div class="hiccup-info-item">
+                        <p class="hiccup-info-item__label">${title}</p>
+                        <p class="hiccup-info-item__value">${value ?? '-'}</p>
                     </div>
                 `
             )
             .join('');
-    const narrative = `
-        <div class="hiccup-detail-story-grid">
-            <div class="hiccup-detail-panel">
-                <p class="hiccup-detail-panel__title">Description</p>
-                <div class="hiccup-detail-panel__body hiccup-detail-panel__body--lg">
-                    ${escapeHtml(h.description || '-')}
-                </div>
-            </div>
-            <div class="hiccup-detail-panel">
-                <p class="hiccup-detail-panel__title">Immediate Effect</p>
-                <div class="hiccup-detail-panel__body hiccup-detail-panel__body--lg">
-                    ${escapeHtml(h.immediate_effect || '-')}
-                </div>
-            </div>
-            ${
-                h.status === 'Closed' && h.closure_notes
-                    ? `<div class="hiccup-detail-panel hiccup-detail-panel--success hiccup-detail-panel--wide">
-                        <p class="hiccup-detail-panel__title">Closure Notes</p>
-                        <p class="hiccup-detail-panel__body">${truncatedText(h.closure_notes, 260)}</p>
-                       </div>`
-                    : ''
-            }
-        </div>
-    `;
     const responseHtml = h.response_text
         ? `
             <div class="hiccup-detail-response">
@@ -709,14 +799,7 @@ function detailMarkup(h, ncForm, collection = []) {
             <span class="hiccup-detail-pill">Confidential: ${h.confidential_flag ? 'Yes' : 'No'}</span>
         </div>
     `;
-    const chronology = `
-        <div class="hiccup-detail-chronology">
-            <span class="hiccup-detail-chip"><strong>Created</strong> ${formatDate(h.created_at)}</span>
-            <span class="hiccup-detail-chip"><strong>Updated</strong> ${formatDate(h.updated_at)}</span>
-            <span class="hiccup-detail-chip"><strong>Type</strong> ${normalizeText(h.hiccup_type)}</span>
-        </div>
-    `;
-    const modalActionButtons = showManagementActions ? managementActionButtons(h) : '';
+    const modalActionButtons = includeActions && showManagementActions ? managementActionButtons(h) : '';
     const modalActions = modalActionButtons
         ? `
             <div class="hiccup-detail-actionbar">
@@ -725,44 +808,78 @@ function detailMarkup(h, ncForm, collection = []) {
         `
         : '';
     return `
-        <div class="hiccup-detail-canvas">
-            <div class="hiccup-detail-modal hiccup-detail-modal--compact">
+        <div class="hiccup-detail-canvas ${inline ? 'hiccup-detail-canvas--inline' : ''}">
+            <div class="hiccup-detail-modal hiccup-detail-modal--compact ${inline ? 'hiccup-detail-modal--inline' : ''}">
                 <div class="hiccup-detail-head">
                     <div>
                         <div class="hiccup-detail-id">#${escapeHtml(h.hiccup_id)}</div>
-                        <p class="hiccup-detail-sub">Hiccup Incident Snapshot</p>
+                        <p class="hiccup-detail-sub">Quick incident summary</p>
                     </div>
-                    <div class="hiccup-detail-status">${normalizeText(h.status)}</div>
-                </div>
-                <div class="hiccup-detail-topline">
-                    ${chronology}
                     ${badges}
                 </div>
                 ${navigation.markup}
-                <div class="hiccup-detail-viewport">
-                    <div class="hiccup-detail-column hiccup-detail-column--meta">
-                        <div class="hiccup-detail-kv-grid">
-                            ${renderCards(summaryCards)}
-                            ${renderCards(detailCards)}
+                <div class="hiccup-detail-compact-grid">
+                    <aside class="hiccup-detail-section hiccup-detail-section--people">
+                        <div class="hiccup-detail-section__head">
+                            <span>People</span>
+                            <small>Who is involved</small>
                         </div>
-                    </div>
-                    <div class="hiccup-detail-column hiccup-detail-column--story">
-                        ${narrative}
+                        <div class="hiccup-info-list">
+                            ${renderInfoItems(peopleCards)}
+                        </div>
+                    </aside>
+                    <main class="hiccup-detail-section hiccup-detail-section--issue">
+                        <div class="hiccup-detail-section__head">
+                            <span>Issue</span>
+                            <small>What happened</small>
+                        </div>
+                        <div class="hiccup-issue-grid">
+                            <div class="hiccup-detail-panel">
+                                <p class="hiccup-detail-panel__title">Description</p>
+                                <div class="hiccup-detail-panel__body hiccup-detail-panel__body--lg">${escapeHtml(h.description || '-')}</div>
+                            </div>
+                            <div class="hiccup-detail-panel">
+                                <p class="hiccup-detail-panel__title">Immediate Effect</p>
+                                <div class="hiccup-detail-panel__body hiccup-detail-panel__body--lg">${escapeHtml(h.immediate_effect || '-')}</div>
+                            </div>
+                            ${
+                                h.status === 'Closed' && h.closure_notes
+                                    ? `<div class="hiccup-detail-panel hiccup-detail-panel--success hiccup-detail-panel--wide">
+                                        <p class="hiccup-detail-panel__title">Closure Notes</p>
+                                        <p class="hiccup-detail-panel__body">${truncatedText(h.closure_notes, 260)}</p>
+                                       </div>`
+                                    : ''
+                            }
+                        </div>
                         ${responseHtml}
-                        <div class="hiccup-detail-bottom-grid">
-                            <div class="hiccup-detail-panel">
-                                <p class="hiccup-detail-panel__title">Attachments</p>
-                                <div class="hiccup-detail-panel__body attachment-stack">
-                                    ${formatAttachment(attachmentSource)}
-                                </div>
-                            </div>
-                            <div class="hiccup-detail-panel">
-                                <p class="hiccup-detail-panel__title">Follow-up</p>
-                                <p class="hiccup-detail-panel__body">${normalizeText(h.followup_status)} ${normalizeText(h.followup_comment)}</p>
+                    </main>
+                    <aside class="hiccup-detail-section hiccup-detail-section--context">
+                        <div class="hiccup-detail-section__head">
+                            <span>Context</span>
+                            <small>Useful details</small>
+                        </div>
+                        <div class="hiccup-info-list">
+                            ${renderInfoItems(contextCards)}
+                        </div>
+                        <div class="hiccup-detail-panel hiccup-detail-panel--flat hiccup-context-attachments">
+                            <p class="hiccup-detail-panel__title">Attachments</p>
+                            <div class="hiccup-detail-panel__body attachment-stack">
+                                ${formatAttachment(attachmentSource)}
                             </div>
                         </div>
-                        ${modalActions}
-                    </div>
+                    </aside>
+                    ${
+                        modalActions || extraActionsHtml
+                            ? `<section class="hiccup-detail-section hiccup-detail-section--actions">
+                                <div class="hiccup-detail-section__head">
+                                    <span>Actions</span>
+                                    <small>Next steps</small>
+                                </div>
+                                ${modalActions}
+                                ${extraActionsHtml ? `<div class="hiccup-detail-actionbar">${extraActionsHtml}</div>` : ''}
+                               </section>`
+                            : ''
+                    }
                 </div>
             </div>
         </div>
@@ -831,26 +948,94 @@ async function presentHiccupDetails(h, collection = getActiveDetailCollection())
 }
 
 function summaryRowHtml(h, includeActions = true, includeMgmtActions = false, options = {}) {
-    const { displayRaisedAgainst = true, allowNcView = false, ncReadonly = false, allowRespond = false, showNcButton = false } = options;
-    const actionCell = includeActions
-        ? actionCellHtml(h, includeMgmtActions, { allowNcView, ncReadonly, allowRespond, showNcButton })
+    const {
+        displayRaisedAgainst = true,
+        allowNcView = false,
+        ncReadonly = false,
+        allowRespond = false,
+        showNcButton = false,
+        inlineDetails = false,
+        accordionScope = 'management',
+        includeBulkSelect = false,
+    } = options;
+    const isExpanded = inlineDetails && getExpandedHiccupId(accordionScope) === h.hiccup_id;
+    const inlineActionControls = includeActions
+        ? actionControlsHtml(h, includeMgmtActions, {
+              allowNcView,
+              ncReadonly,
+              allowRespond,
+              showNcButton,
+              detailMode: inlineDetails ? 'accordion' : 'modal',
+              isExpanded,
+              accordionScope,
+              includeDetail: false,
+              directActions: true,
+          })
         : '';
     const targetPerson = displayRaisedAgainst
         ? formatPersonDisplay(h.raised_against_name, h.raised_against)
         : formatPersonDisplay(h.raised_by_name, h.raised_by);
-    return `<tr class="border-b border-slate-100 hover:bg-white">
+    const detailCellColspan = inlineDetails && includeBulkSelect ? managementColumnCount : listColumnCount;
+    const bulkSelectCell =
+        includeBulkSelect && bulkCloseEnabled
+            ? `<td class="hiccup-select-col px-2 py-3 align-top">
+                <input
+                    type="checkbox"
+                    class="hiccup-bulk-checkbox"
+                    data-bulk-close-id="${escapeHtml(h.hiccup_id)}"
+                    ${selectedBulkCloseIds.has(String(h.hiccup_id)) ? 'checked' : ''}
+                    ${isBulkClosable(h) ? '' : 'disabled'}
+                    aria-label="Select ${escapeHtml(h.hiccup_id)} for bulk close"
+                >
+            </td>`
+            : '';
+    const detailRow = isExpanded
+        ? `<tr id="hiccup-detail-row-${accordionScope}-${escapeHtml(h.hiccup_id)}" class="hiccup-accordion-row">
+            <td colspan="${detailCellColspan}" class="hiccup-accordion-cell">
+                ${detailMarkup(h, null, [], {
+                    includeNavigation: false,
+                    includeActions: false,
+                    inline: true,
+                    extraActionsHtml: inlineActionControls,
+                })}
+            </td>
+        </tr>`
+        : '';
+    const idButtonClass = inlineDetails
+        ? `font-semibold text-tealbrand detail-btn hiccup-row-toggle ${isExpanded ? 'is-open' : ''}`
+        : 'font-semibold text-tealbrand detail-btn';
+    const idButtonAttrs = inlineDetails
+        ? `data-accordion-scope="${accordionScope}" aria-expanded="${isExpanded ? 'true' : 'false'}" aria-controls="hiccup-detail-row-${accordionScope}-${escapeHtml(h.hiccup_id)}"`
+        : '';
+    return `<tr class="border-b border-slate-100 hover:bg-white ${isExpanded ? 'hiccup-summary-row--open' : ''}">
+        ${bulkSelectCell}
         <td class="px-4 py-3 align-top">
-            <button type="button" data-hiccup-detail="${h.hiccup_id}" class="font-semibold text-tealbrand detail-btn">
-                ${escapeHtml(h.hiccup_id)}
+            <button type="button" data-hiccup-detail="${h.hiccup_id}" class="${idButtonClass}" ${idButtonAttrs}>
+                ${inlineDetails ? `<span class="hiccup-accordion-toggle__chevron">▾</span>` : ''}
+                <span>${escapeHtml(h.hiccup_id)}</span>
             </button>
         </td>
         <td class="px-4 py-3 align-top">${normalizeText(h.hiccup_type)}</td>
         <td class="px-4 py-3 align-top">${statusWithBadges(h)}</td>
         <td class="px-4 py-3 align-top">${targetPerson}</td>
         <td class="px-4 py-3 align-top">${formatDate(h.created_at)}</td>
-        <td class="px-4 py-3 align-top">${formatDate(h.updated_at)}</td>
-        ${actionCell}
-    </tr>`;
+    </tr>${detailRow}`;
+}
+
+function getExpandedHiccupId(scope) {
+    return expandedHiccupByScope[scope] || null;
+}
+
+function toggleHiccupAccordion(scope, hiccupId) {
+    if (!scope || !Object.prototype.hasOwnProperty.call(expandedHiccupByScope, scope)) {
+        return;
+    }
+    expandedHiccupByScope[scope] = expandedHiccupByScope[scope] === hiccupId ? null : hiccupId;
+    document.querySelectorAll('.mgmt-action-group.open').forEach((group) => {
+        group.classList.remove('open');
+        group.querySelector('.mgmt-toggle')?.setAttribute('aria-expanded', 'false');
+    });
+    renderAllTables();
 }
 
 function matchesCurrentUser(value, fallbackName) {
@@ -883,7 +1068,10 @@ function hiccupCardHtml(h, options = {}) {
         ncReadonly = false,
         allowRespond = false,
         showNcButton = false,
+        inlineDetails = false,
+        accordionScope = 'raised',
     } = options;
+    const isExpanded = inlineDetails && getExpandedHiccupId(accordionScope) === h.hiccup_id;
     const targetPerson = displayRaisedAgainst
         ? formatPersonDisplay(h.raised_against_name, h.raised_against)
         : formatPersonDisplay(h.raised_by_name, h.raised_by);
@@ -906,7 +1094,12 @@ function hiccupCardHtml(h, options = {}) {
         allowRespondForCard && h.status !== 'Closed'
             ? `<button type="button" class="detail-btn" data-behavior="respond" data-hiccup="${h.hiccup_id}">Respond</button>`
             : '';
-    const detailButton = `<button type="button" data-hiccup-detail="${h.hiccup_id}" class="detail-btn">View details</button>`;
+    const detailButton = inlineDetails
+        ? `<button type="button" data-hiccup-detail="${h.hiccup_id}" data-accordion-scope="${accordionScope}" class="detail-btn hiccup-accordion-toggle ${isExpanded ? 'is-open' : ''}" aria-expanded="${isExpanded ? 'true' : 'false'}" aria-controls="hiccup-card-detail-${accordionScope}-${escapeHtml(h.hiccup_id)}">
+            <span class="hiccup-accordion-toggle__chevron">⌄</span>
+            <span>${isExpanded ? 'Hide details' : 'Details'}</span>
+        </button>`
+        : `<button type="button" data-hiccup-detail="${h.hiccup_id}" class="detail-btn">View details</button>`;
     const mgmtButtons = includeMgmtActions ? managementActionButtons(h) : '';
     const mgmtSection = mgmtButtons
         ? `<div class="mgmt-action-group mt-2" data-hiccup-actions="${h.hiccup_id}">
@@ -938,6 +1131,17 @@ function hiccupCardHtml(h, options = {}) {
                 ${respondButton}
                 ${ncViewButton}
             </div>
+            ${
+                isExpanded
+                    ? `<div id="hiccup-card-detail-${accordionScope}-${escapeHtml(h.hiccup_id)}" class="hiccup-card-accordion">
+                        ${detailMarkup(h, null, [], {
+                            includeNavigation: false,
+                            includeActions: false,
+                            inline: true,
+                        })}
+                    </div>`
+                    : ''
+            }
             ${mgmtSection}
         </article>
     `;
@@ -958,7 +1162,7 @@ function renderMyHiccupsTable() {
     const tbody = document.querySelector('#my-hiccups-table tbody');
     if (!tbody && !document.getElementById('raised-by-cards')) return;
     const filtered = Array.isArray(raisedListState.items) ? raisedListState.items : [];
-    const visibleRows = filtered.slice(0, hiccupPageSize);
+    const visibleRows = filtered;
     const allowNcForCreator = (h) =>
         h.status === 'Escalated to NC' || h.escalated_by || h.nc_assigned_staff_id;
     renderMyActiveFilters();
@@ -967,6 +1171,8 @@ function renderMyHiccupsTable() {
         allowNcView: allowNcForCreator,
         ncReadonly: true,
         showNcButton: true,
+        inlineDetails: true,
+        accordionScope: 'raised',
     });
     renderPagination('pagination-raised', 'raised', raisedListState);
     if (tbody) {
@@ -979,6 +1185,8 @@ function renderMyHiccupsTable() {
                         allowNcView: allowNcForCreator(h),
                         ncReadonly: true,
                         showNcButton: true,
+                        inlineDetails: true,
+                        accordionScope: 'raised',
                     })
                 )
                 .join('');
@@ -991,7 +1199,7 @@ function renderAssignedTable() {
     const assignedCardsId = 'against-me-cards';
     if (!assignedBody && !document.getElementById(assignedCardsId)) return;
     const filteredAssigned = Array.isArray(assignedListState.items) ? assignedListState.items : [];
-    const visibleRows = filteredAssigned.slice(0, hiccupPageSize);
+    const visibleRows = filteredAssigned;
     if (assignedListState.total === 0) {
         if (assignedBody) {
             assignedBody.innerHTML = `<tr><td colspan="${listColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No assignments yet.</td></tr>`;
@@ -1025,6 +1233,8 @@ function renderAssignedTable() {
             isAssignedNc(h) && (h.status === 'Escalated to NC' || h.status === 'Closed' || h.escalated_by),
         ncReadonly: ncReadonlyForAssigned, // editable when open, read-only when closed
         showNcButton: true,
+        inlineDetails: true,
+        accordionScope: 'against',
     });
     renderPagination('pagination-against', 'against', assignedListState, 'assignments');
     if (assignedBody) {
@@ -1037,6 +1247,8 @@ function renderAssignedTable() {
                     ncReadonly: ncReadonlyForAssigned,
                     allowRespond: canRespond,
                     showNcButton: true,
+                    inlineDetails: true,
+                    accordionScope: 'against',
                 });
             })
             .join('');
@@ -1076,8 +1288,10 @@ function renderManagementTable() {
     const mgmtCardsId = assignedViewMode ? 'assigned-nc-cards' : 'management-cards';
     if (!mgmtBody && !document.getElementById(mgmtCardsId)) return;
     const finalFiltered = Array.isArray(managementListState.items) ? managementListState.items : [];
-    const visibleRows = finalFiltered.slice(0, hiccupPageSize);
+    const visibleRows = finalFiltered;
     renderMgmtActiveFilters();
+    pruneBulkCloseSelection(visibleRows);
+    renderBulkCloseBar(visibleRows);
     const paginationKey = assignedViewMode ? 'assigned' : 'management';
     const paginationContainerId = assignedViewMode ? 'pagination-assigned' : 'pagination-management';
     const isAssignedNc = (entry) =>
@@ -1089,7 +1303,6 @@ function renderManagementTable() {
         h.status === 'Escalated to NC' || h.escalated_by || h.status === 'Closed';
     const ncReadonlyFor = (h) => {
         if (h.status === 'Closed') return true;
-        if (showManagementActions) return false; // management (Dr Vipul/Dr Vishu) can edit/close
         return !isAssignedNc(h);
     };
     renderHiccupCards(mgmtCardsId, visibleRows, {
@@ -1098,6 +1311,8 @@ function renderManagementTable() {
         allowNcView: allowNcViewFn,
         ncReadonly: ncReadonlyFor,
         showNcButton: true,
+        inlineDetails: true,
+        accordionScope: assignedViewMode ? 'assigned' : 'management',
     });
     renderPagination(paginationContainerId, paginationKey, managementListState);
     if (managementListState.total === 0 || finalFiltered.length === 0) {
@@ -1109,6 +1324,9 @@ function renderManagementTable() {
             summaryRowHtml(h, showManagementActions, showManagementActions, {
                 allowNcView: allowNcViewFn(h),
                 ncReadonly: ncReadonlyFor(h),
+                inlineDetails: true,
+                accordionScope: assignedViewMode ? 'assigned' : 'management',
+                includeBulkSelect: true,
             })
         )
         .join('');
@@ -1123,40 +1341,6 @@ function renderAllTables() {
     renderManagementTable();
 }
 
-if (statusFilter) {
-    statusFilter.addEventListener('change', () => {
-        paginationState.raised = 1;
-        paginationState.against = 1;
-        loadMyHiccups();
-    });
-}
-if (typeFilter) {
-    typeFilter.addEventListener('change', () => {
-        paginationState.raised = 1;
-        paginationState.against = 1;
-        loadMyHiccups();
-    });
-}
-dateFromFilter?.addEventListener('change', () => {
-    paginationState.raised = 1;
-    paginationState.against = 1;
-    loadMyHiccups();
-});
-dateToFilter?.addEventListener('change', () => {
-    paginationState.raised = 1;
-    paginationState.against = 1;
-    loadMyHiccups();
-});
-escalatedFilter?.addEventListener('change', () => {
-    paginationState.raised = 1;
-    paginationState.against = 1;
-    loadMyHiccups();
-});
-overdueFilter?.addEventListener('change', () => {
-    paginationState.raised = 1;
-    paginationState.against = 1;
-    loadMyHiccups();
-});
 resetFilters?.addEventListener('click', () => {
     if (statusFilter) statusFilter.value = '';
     if (typeFilter) typeFilter.value = '';
@@ -1164,6 +1348,7 @@ resetFilters?.addEventListener('click', () => {
     if (dateToFilter) dateToFilter.value = '';
     if (escalatedFilter) escalatedFilter.checked = false;
     if (overdueFilter) overdueFilter.checked = false;
+    if (responseBlockedFilter) responseBlockedFilter.checked = false;
     if (globalSearchInput) globalSearchInput.value = '';
     paginationState.raised = 1;
     paginationState.against = 1;
@@ -1171,68 +1356,6 @@ resetFilters?.addEventListener('click', () => {
     closeFilterDrawer();
 });
 
-const mgmtSelectFilters = [mgmtStatusFilter, mgmtTypeFilter, mgmtRootFilter];
-mgmtSelectFilters.forEach((filterEl) => {
-    if (filterEl) {
-        filterEl.addEventListener('change', () => {
-            if (assignedViewMode) {
-                paginationState.assigned = 1;
-            } else {
-                paginationState.management = 1;
-            }
-            loadMyHiccups();
-        });
-    }
-});
-mgmtDateFromFilter?.addEventListener('change', () => {
-    if (assignedViewMode) {
-        paginationState.assigned = 1;
-    } else {
-        paginationState.management = 1;
-    }
-    loadMyHiccups();
-});
-mgmtDateToFilter?.addEventListener('change', () => {
-    if (assignedViewMode) {
-        paginationState.assigned = 1;
-    } else {
-        paginationState.management = 1;
-    }
-    loadMyHiccups();
-});
-mgmtEscalatedFilter?.addEventListener('change', () => {
-    if (assignedViewMode) {
-        paginationState.assigned = 1;
-    } else {
-        paginationState.management = 1;
-    }
-    loadMyHiccups();
-});
-mgmtOverdueFilter?.addEventListener('change', () => {
-    if (assignedViewMode) {
-        paginationState.assigned = 1;
-    } else {
-        paginationState.management = 1;
-    }
-    loadMyHiccups();
-});
-globalSearchInput?.addEventListener('input', () => {
-    debounceRender('my', () => {
-        paginationState.raised = 1;
-        paginationState.against = 1;
-        loadMyHiccups();
-    });
-});
-mgmtGlobalSearchInput?.addEventListener('input', () =>
-    debounceRender('mgmt', () => {
-        if (assignedViewMode) {
-            paginationState.assigned = 1;
-        } else {
-            paginationState.management = 1;
-        }
-        loadMyHiccups();
-    })
-);
 mgmtResetFilters?.addEventListener('click', () => {
     if (mgmtStatusFilter) mgmtStatusFilter.value = '';
     if (mgmtTypeFilter) mgmtTypeFilter.value = '';
@@ -1241,6 +1364,7 @@ mgmtResetFilters?.addEventListener('click', () => {
     if (mgmtDateToFilter) mgmtDateToFilter.value = '';
     if (mgmtEscalatedFilter) mgmtEscalatedFilter.checked = false;
     if (mgmtOverdueFilter) mgmtOverdueFilter.checked = false;
+    if (mgmtResponseBlockedFilter) mgmtResponseBlockedFilter.checked = false;
     if (mgmtGlobalSearchInput) mgmtGlobalSearchInput.value = '';
     if (assignedViewMode) {
         paginationState.assigned = 1;
@@ -1451,7 +1575,7 @@ function renderStatusField(field) {
             `
             : '';
         return `
-            <div class="status-modal__field-group">
+            <div class="status-modal__field-group ${field.suggestions?.listEnabled ? 'status-modal__field-group--suggestions' : ''}">
                 <p class="status-modal__label">${labelText}</p>
                 <div class="status-modal__checkbox-group" id="${field.id}">
                     ${options}
@@ -1465,14 +1589,22 @@ function renderStatusField(field) {
         : '';
     const suggestionList =
         field.suggestions && field.suggestions.listEnabled
-            ? `<datalist id="${field.id}-list"></datalist>`
+            ? `<div class="status-modal__suggestions" id="${field.id}-list" role="listbox"></div>`
             : '';
-    const suggestionAttr = field.suggestions && field.suggestions.listEnabled ? `list="${field.id}-list"` : '';
     const readonlyAttr = field.readonly ? 'readonly' : '';
     const disabledAttr = field.disabled ? 'disabled' : '';
     if (type === 'hidden') {
         const hiddenValue = escapeHtml(String(field.value ?? ''));
         return `<input id="${field.id}" type="hidden" value="${hiddenValue}" />`;
+    }
+    if (type === 'note_display') {
+        const noteValue = escapeHtml(String(field.value || 'No NC note added.'));
+        return `
+            <div class="status-modal__note-highlight">
+                <p class="status-modal__note-highlight-label">${labelText || 'NC note'}</p>
+                <p class="status-modal__note-highlight-text">${noteValue}</p>
+            </div>
+        `;
     }
     if (type === 'text' || type === 'date') {
         const rawValue = field.value ?? '';
@@ -1485,7 +1617,6 @@ function renderStatusField(field) {
                     type="${type}"
                     class="status-modal__input"
                     placeholder="${placeholder}"
-                    ${suggestionAttr}
                     ${valueAttr}
                     ${readonlyAttr}
                     ${disabledAttr}
@@ -1561,6 +1692,8 @@ async function fetchStaffSuggestions(query) {
             .map((item) => ({
                 id: item.id,
                 name: String(item.name),
+                department_name: '',
+                designation: item.designation || '',
             }));
     } catch (err) {
         console.error('Failed to load staff suggestions', err);
@@ -1578,7 +1711,7 @@ function attachSuggestionHandlers(modal, fields) {
         if (!input) {
             return;
         }
-        const datalist = modal.querySelector(`#${field.id}-list`);
+        const suggestionBox = modal.querySelector(`#${field.id}-list`);
         const hiddenInput = field.hiddenTargetId
             ? modal.querySelector(`#${field.hiddenTargetId}`)
             : null;
@@ -1594,35 +1727,83 @@ function attachSuggestionHandlers(modal, fields) {
             );
             hiddenInput.value = match ? String(match.id) : '';
         };
+        const hideSuggestions = () => {
+            if (suggestionBox) {
+                suggestionBox.classList.remove('is-open');
+                suggestionBox.innerHTML = '';
+            }
+        };
+        const renderSuggestions = (list) => {
+            if (!suggestionBox) {
+                return;
+            }
+            if (!list.length) {
+                suggestionBox.innerHTML = '<div class="status-modal__suggestion-empty">No active staff found</div>';
+                suggestionBox.classList.add('is-open');
+                return;
+            }
+            suggestionBox.innerHTML = list
+                .map(
+                    (item) => `
+                        <button type="button" class="status-modal__suggestion" data-staff-id="${escapeHtml(String(item.id))}" data-staff-name="${escapeHtml(item.name)}">
+                            <span class="status-modal__suggestion-name">${escapeHtml(item.name)}</span>
+                            <span class="status-modal__suggestion-meta">${escapeHtml(
+                                item.designation || 'Staff'
+                            )}</span>
+                        </button>
+                    `
+                )
+                .join('');
+            suggestionBox.classList.add('is-open');
+        };
         const handler = () => {
             const value = input.value.trim();
             if (value.length < (field.suggestions.minLength ?? 2)) {
-                if (datalist) {
-                    datalist.innerHTML = '';
+                if (suggestionBox && document.activeElement === input && value.length > 0) {
+                    suggestionBox.innerHTML = '<div class="status-modal__suggestion-empty">Type at least 2 letters to search staff</div>';
+                    suggestionBox.classList.add('is-open');
+                } else {
+                    hideSuggestions();
                 }
                 suggestionsCache = [];
                 applyHiddenValue();
                 return;
             }
             clearTimeout(timer);
+            if (suggestionBox) {
+                suggestionBox.innerHTML = '<div class="status-modal__suggestion-empty">Searching staff...</div>';
+                suggestionBox.classList.add('is-open');
+            }
             timer = setTimeout(async () => {
                 const list = await fetchStaffSuggestions(value);
-                if (datalist) {
-                    datalist.innerHTML = list
-                        .map(
-                            (item) => `<option value="${escapeHtml(
-                                item.name
-                            )}" data-id="${escapeHtml(String(item.id))}"></option>`
-                        )
-                        .join('');
-                }
                 suggestionsCache = list;
+                renderSuggestions(list);
                 applyHiddenValue();
             }, field.suggestions.debounce ?? SUGGESTION_DEBOUNCE);
         };
+        const clickHandler = (event) => {
+            const option = event.target.closest('.status-modal__suggestion');
+            if (!option) {
+                return;
+            }
+            input.value = option.dataset.staffName || '';
+            if (hiddenInput) {
+                hiddenInput.value = option.dataset.staffId || '';
+            }
+            hideSuggestions();
+        };
+        const blurHandler = () => {
+            window.setTimeout(() => {
+                applyHiddenValue();
+                hideSuggestions();
+            }, 150);
+        };
         applyHiddenValue();
         input.addEventListener('input', handler);
-        handlers.push({ input, handler, timer, datalist });
+        input.addEventListener('focus', handler);
+        input.addEventListener('blur', blurHandler);
+        suggestionBox?.addEventListener('click', clickHandler);
+        handlers.push({ input, handler, timer, suggestionBox, clickHandler, blurHandler });
     });
     return handlers;
 }
@@ -1659,13 +1840,17 @@ function showStatusModal({ title, confirmText, fields }) {
             otherHandlers.forEach(({ checkbox, handler }) => {
                 checkbox.removeEventListener('change', handler);
             });
-            suggestionHandlers.forEach(({ input, handler, timer, datalist }) => {
+            suggestionHandlers.forEach(({ input, handler, timer, suggestionBox, clickHandler, blurHandler }) => {
                 input.removeEventListener('input', handler);
+                input.removeEventListener('focus', handler);
+                input.removeEventListener('blur', blurHandler);
                 if (timer) {
                     clearTimeout(timer);
                 }
-                if (datalist && datalist.parentNode) {
-                    datalist.innerHTML = '';
+                if (suggestionBox) {
+                    suggestionBox.removeEventListener('click', clickHandler);
+                    suggestionBox.innerHTML = '';
+                    suggestionBox.classList.remove('is-open');
                 }
             });
         };
@@ -1679,6 +1864,9 @@ function showStatusModal({ title, confirmText, fields }) {
             const values = {};
             for (const field of fields) {
                 const type = field.type || 'textarea';
+                if (type === 'note_display') {
+                    continue;
+                }
                 if (type === 'checkbox_group') {
                     const group = modal.querySelector(`#${field.id}`);
                     const checkedBoxes = group
@@ -1825,6 +2013,15 @@ function buildNCEscalationFields(initial = {}, options = {}) {
             value: initial.staff_id ?? '',
         });
     }
+    if (options.includeNcNote) {
+        fields.push({
+            id: 'escalation-nc-note-display',
+            key: 'nc_note',
+            label: 'NC note',
+            type: 'note_display',
+            value: initial.nc_note ?? '',
+        });
+    }
     fields.push(
         {
             id: 'escalation-root-cause',
@@ -1902,9 +2099,9 @@ async function gatherStatusPayload(status) {
                 {
                     id: 'closure-notes',
                     key: 'closure_notes',
-                    label: 'Closure notes',
-                    placeholder: 'Describe how the hiccup was closed',
-                    required: true,
+                    label: 'Closure notes (optional)',
+                    placeholder: 'Optional - if left blank, N/A will be saved',
+                    required: false,
                 },
             ],
         });
@@ -1914,43 +2111,35 @@ async function gatherStatusPayload(status) {
             title: 'Escalate to NC – staff name',
             confirmText: 'Next',
             fields: buildStaffNameFields(),
+            title: 'Escalate to NC - assign staff',
         });
         if (!staffResult) {
             return null;
         }
-        const detailResult = await showStatusModal({
-            title: 'Escalation details',
-            confirmText: 'Escalate',
-            fields: buildNCEscalationFields(),
+        const noteResult = await showStatusModal({
+            title: 'NC note',
+            confirmText: 'Next',
+            fields: [
+                {
+                    id: 'escalation-nc-note',
+                    key: 'nc_note',
+                    label: 'NC note (optional)',
+                    placeholder: 'Add a short note for this NC escalation',
+                    required: false,
+                    type: 'textarea',
+                },
+            ],
         });
-        if (!detailResult) {
+        if (!noteResult) {
             return null;
         }
-        const rootCauseSummary = buildRootCauseSummary(
-            detailResult.root_cause_flags,
-            detailResult.root_cause_other
-        );
-        const trimmedCorrectiveAction = detailResult.corrective_action?.trim();
         const payload = {
             escalation_form: {
                 staff_name: staffResult.staff_name,
                 staff_id: staffResult.staff_id,
-                root_cause_flags: detailResult.root_cause_flags,
-                root_cause_other: detailResult.root_cause_other,
-                corrective_action_by: detailResult.corrective_action_by,
-                corrective_action_date: detailResult.corrective_action_date,
-                person_responsible: detailResult.person_responsible,
-                timeline_for_completion: detailResult.timeline_for_completion,
-                preventive_actions: detailResult.preventive_actions,
-                preventive_other: detailResult.preventive_other,
+                nc_note: noteResult.nc_note,
             },
         };
-        if (rootCauseSummary) {
-            payload.root_cause = rootCauseSummary;
-        }
-        if (trimmedCorrectiveAction) {
-            payload.corrective_action = trimmedCorrectiveAction;
-        }
         return payload;
     }
     return {};
@@ -1961,6 +2150,7 @@ function renderNCSummary(formData) {
     const escape = (val) => escapeHtml(val || '-');
     const list = [
         ['Staff name', formData.staff_name],
+        ['NC note', formData.nc_note],
         ['Root causes', Array.isArray(formData.root_cause_flags) ? formData.root_cause_flags.join(', ') : formData.root_cause_flags],
         ['Other root cause', formData.root_cause_other],
         ['Corrective action', formData.corrective_action],
@@ -2017,17 +2207,17 @@ function showNCSummaryModal(formData) {
 const ncModalStyles = `
 #nc-view-modal { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; }
 #nc-view-modal .nc-view-backdrop { position: absolute; inset: 0; background: rgba(15,23,42,0.35); backdrop-filter: blur(2px); }
-#nc-view-modal .nc-view-card { position: relative; max-width: 520px; width: 92vw; max-height: 70vh; overflow-y: auto; background: #fff; border-radius: 18px; box-shadow: 0 18px 38px rgba(15,23,42,0.18); padding: 16px; }
+#nc-view-modal .nc-view-card { position: relative; max-width: 520px; width: 92vw; max-height: 72vh; overflow: hidden; background: #fff; border-radius: 18px; box-shadow: 0 18px 38px rgba(15,23,42,0.18); padding: 16px; display: flex; flex-direction: column; }
 #nc-view-modal .nc-view-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 #nc-view-modal h3 { margin: 0; font-size: 18px; font-weight: 800; color: #0f172a; }
 #nc-view-modal .nc-view-close { border: none; background: #0db29c; color: #fff; border-radius: 10px; padding: 8px 12px; font-weight: 700; cursor: pointer; }
 #nc-view-modal .nc-view-close:hover { background: #0a7f6f; }
-#nc-view-modal .nc-view-body { max-height: 52vh; overflow-y: auto; }
+#nc-view-modal .nc-view-body { max-height: 54vh; overflow-y: auto; padding-right: 4px; scrollbar-width: thin; scrollbar-color: rgba(100,116,139,0.38) transparent; }
 #nc-view-modal .nc-view-footer { display: flex; justify-content: flex-end; margin-top: 12px; }
-#nc-view-modal .nc-view-card::-webkit-scrollbar { width: 6px; }
-#nc-view-modal .nc-view-card::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
-#nc-view-modal .nc-view-card::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-#nc-view-modal .nc-view-card::-webkit-scrollbar-track { background: transparent; }
+#nc-view-modal .nc-view-body::-webkit-scrollbar { width: 3px; }
+#nc-view-modal .nc-view-body::-webkit-scrollbar-thumb { background: rgba(100,116,139,0.38); border-radius: 999px; }
+#nc-view-modal .nc-view-body::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,0.58); }
+#nc-view-modal .nc-view-body::-webkit-scrollbar-track { background: transparent; }
 `;
 if (!document.getElementById('nc-view-modal-style')) {
     const style = document.createElement('style');
@@ -2061,7 +2251,7 @@ async function openNCEscalationForm(hiccupId, options = {}) {
     const detailResult = await showStatusModal({
         title: 'NC escalation details',
         confirmText: 'Save',
-        fields: buildNCEscalationFields(formData, { includeStaffDisplay: true }),
+        fields: buildNCEscalationFields(formData, { includeStaffDisplay: true, includeNcNote: true }),
     });
     if (!detailResult) {
         return;
@@ -2086,9 +2276,9 @@ async function openNCEscalationForm(hiccupId, options = {}) {
                     {
                         id: 'closure-notes',
                         key: 'closure_notes',
-                        label: 'Closure notes',
-                        placeholder: 'Summarize resolution',
-                        required: true,
+                        label: 'Closure notes (optional)',
+                        placeholder: 'Optional - if left blank, N/A will be saved',
+                        required: false,
                         type: 'textarea',
                     },
                 ],
@@ -2200,6 +2390,53 @@ async function quickStatus(id, status) {
     }
 }
 
+async function bulkCloseSelectedHiccups() {
+    const ids = Array.from(selectedBulkCloseIds);
+    if (!ids.length) {
+        return;
+    }
+    const choice = await confirmDialog({
+        title: 'Bulk close selected hiccups?',
+        text: `${ids.length} selected hiccup${ids.length > 1 ? 's' : ''} will be closed. Closure note will be saved as N/A.`,
+        confirmButtonText: 'Yes, close',
+        cancelButtonText: 'Cancel',
+        showCancelButton: true,
+    });
+    if (!choice?.isConfirmed) {
+        return;
+    }
+    showLoading('Closing selected hiccups...');
+    try {
+        const result = await fetchJSON('/api/hiccups/bulk/close', {
+            method: 'PATCH',
+            body: JSON.stringify({
+                hiccup_ids: ids,
+                closure_notes: 'N/A',
+            }),
+        });
+        selectedBulkCloseIds.clear();
+        await loadMyHiccups();
+        const skipped = Number(result?.skipped?.length || 0);
+        await showAlert({
+            icon: 'success',
+            title: 'Bulk close complete',
+            text: skipped
+                ? `${result.closed || 0} closed, ${skipped} skipped.`
+                : `${result.closed || ids.length} hiccup${ids.length > 1 ? 's' : ''} closed.`,
+            timer: 1400,
+            showConfirmButton: false,
+        });
+    } catch (err) {
+        await showAlert({
+            icon: 'error',
+            title: 'Unable to bulk close',
+            text: err?.message || 'Try again later.',
+        });
+    } finally {
+        closeLoading();
+    }
+}
+
 const form = document.getElementById('hiccup-form');
 if (form) {
     form.addEventListener('submit', async (e) => {
@@ -2286,6 +2523,22 @@ if (form) {
 }
 
 document.addEventListener('click', async (event) => {
+    const applyFilterButton = event.target.closest('[data-filter-apply]');
+    if (applyFilterButton) {
+        event.preventDefault();
+        const scope = applyFilterButton.dataset.filterApply;
+        if (scope === 'my') {
+            paginationState.raised = 1;
+            paginationState.against = 1;
+        } else if (assignedViewMode) {
+            paginationState.assigned = 1;
+        } else {
+            paginationState.management = 1;
+        }
+        await loadMyHiccups();
+        return;
+    }
+
     const filterChip = event.target.closest('[data-filter-chip-clear]');
     if (filterChip) {
         event.preventDefault();
@@ -2323,6 +2576,42 @@ document.addEventListener('click', async (event) => {
             paginationState[target] = Math.max(requestedPage, 1);
             await loadMyHiccups();
         }
+        return;
+    }
+
+    const bulkCheckbox = event.target.closest('[data-bulk-close-id]');
+    if (bulkCheckbox) {
+        const hiccupId = bulkCheckbox.dataset.bulkCloseId;
+        if (hiccupId) {
+            if (bulkCheckbox.checked) {
+                selectedBulkCloseIds.add(hiccupId);
+            } else {
+                selectedBulkCloseIds.delete(hiccupId);
+            }
+            renderBulkCloseBar(managementListState.items || []);
+        }
+        return;
+    }
+
+    const bulkSelectAll = event.target.closest('#bulk-close-select-all');
+    if (bulkSelectAll) {
+        const rows = Array.isArray(managementListState.items) ? managementListState.items : [];
+        rows.filter(isBulkClosable).forEach((h) => {
+            const id = String(h.hiccup_id);
+            if (bulkSelectAll.checked) {
+                selectedBulkCloseIds.add(id);
+            } else {
+                selectedBulkCloseIds.delete(id);
+            }
+        });
+        renderAllTables();
+        return;
+    }
+
+    const bulkCloseButton = event.target.closest('#bulk-close-action');
+    if (bulkCloseButton) {
+        event.preventDefault();
+        await bulkCloseSelectedHiccups();
         return;
     }
 
@@ -2367,6 +2656,11 @@ document.addEventListener('click', async (event) => {
     if (detailBtn) {
         event.preventDefault();
         const hiccupId = detailBtn.dataset.hiccupDetail;
+        const accordionScope = detailBtn.dataset.accordionScope;
+        if (accordionScope) {
+            toggleHiccupAccordion(accordionScope, hiccupId);
+            return;
+        }
         const activeCollection = getActiveDetailCollection();
         const hiccup = activeCollection.find((h) => h.hiccup_id === hiccupId) || myHiccupsData.find((h) => h.hiccup_id === hiccupId);
         if (hiccup) {
@@ -2401,6 +2695,24 @@ document.addEventListener('click', async (event) => {
             group.querySelector('.mgmt-toggle')?.setAttribute('aria-expanded', 'false');
         });
     }
+});
+
+document.addEventListener('change', async (event) => {
+    const pageSizeSelect = event.target.closest('[data-page-size-target]');
+    if (!pageSizeSelect) {
+        return;
+    }
+    const requestedSize = Number(pageSizeSelect.value || '');
+    if (!PAGE_SIZE_OPTIONS.includes(requestedSize) || requestedSize === hiccupPageSize) {
+        return;
+    }
+    hiccupPageSize = requestedSize;
+    window.localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(hiccupPageSize));
+    paginationState.raised = 1;
+    paginationState.against = 1;
+    paginationState.management = 1;
+    paginationState.assigned = 1;
+    await loadMyHiccups();
 });
 
 document.addEventListener('keydown', (event) => {

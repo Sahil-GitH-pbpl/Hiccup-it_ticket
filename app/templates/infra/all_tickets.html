@@ -16,17 +16,30 @@
   }
 
   #ticketsContainer {
-    contain: layout paint;
+    contain: none;
+    overflow: visible;
+  }
+
+  .all-tickets-page .tickets-scroll {
+    max-height: none !important;
+    overflow: visible !important;
+    contain: none !important;
   }
 
   .all-tickets-scroll {
-    overflow: auto;
+    overflow-x: auto;
+    overflow-y: visible;
     border: 1px solid rgba(226, 232, 240, 0.95);
     border-radius: 1rem;
     background: #fff;
     box-shadow: 0 6px 14px rgba(15, 23, 42, 0.05);
-    contain: layout paint style;
+    contain: none;
     transform: translateZ(0);
+  }
+
+  .all-tickets-scroll.overflow-x-auto {
+    overflow-x: auto;
+    overflow-y: visible;
   }
 
   .all-tickets-table {
@@ -39,9 +52,7 @@
   }
 
   .all-tickets-table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
+    position: static;
     background: #f8fafc;
     white-space: nowrap;
     padding: 10px 10px;
@@ -85,6 +96,66 @@
   .all-ticket-card:hover {
     box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   }
+
+  .all-tickets-page .glass-card {
+    padding: 1.15rem !important;
+  }
+
+  @media (min-width: 768px) {
+    .all-tickets-page .glass-card {
+      padding: 1.35rem !important;
+    }
+  }
+
+  .all-tickets-topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .all-tickets-title {
+    margin: 0;
+    font-size: 1.7rem;
+    line-height: 1.15;
+  }
+
+  .all-tickets-tabs {
+    display: flex;
+    gap: 0.45rem;
+    font-size: 0.86rem;
+  }
+
+  .all-tickets-tabs .js-view-btn {
+    padding: 0.45rem 0.9rem;
+  }
+
+  #filterForm.all-tickets-filterbar {
+    gap: 0.65rem;
+    padding: 0.8rem 0.9rem;
+    border-radius: 1rem;
+    box-shadow: none;
+  }
+
+  #filterForm.all-tickets-filterbar label {
+    margin-bottom: 0.2rem;
+  }
+
+  .infra-modal-layer {
+    position: fixed !important;
+    inset: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(15, 23, 42, 0.28) !important;
+    backdrop-filter: blur(1px);
+    z-index: 9999 !important;
+  }
+
+  .infra-modal-card {
+    max-height: min(88vh, 560px);
+    overflow: visible;
+  }
 </style>
 {% endblock %}
 
@@ -93,27 +164,12 @@
 <div class="page-wrapper px-3 md:px-4 all-tickets-page all-tickets-page-wrap">
 
     <!-- CARD -->
-    <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+    <div class="glass-card rounded-3xl space-y-4">
 
         <!-- HEADER -->
-        <div class="flex flex-wrap items-center justify-between gap-4">
-            <div class="space-y-2">
-                <div class="pill inline-flex items-center gap-2 text-xs text-slate-600 bg-white">
-                    <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                    Admin / IT view
-                </div>
-                <h2 class="text-3xl font-semibold text-brandText leading-tight">All Infra Tickets</h2>
-                <p class="text-sm text-slate-600">
-                    Filter, pick SLAs, resolve, or mark invalid. Mobile cards below + desktop grid.
-                </p>
-            </div>
-            <div class="hidden sm:flex flex-col items-end text-sm text-slate-500">
-                <span class="font-semibold text-brandBlue">Tip:</span>
-                <span>Auto-submits on every change for faster triage.</span>
-            </div>
-        </div>
-
-        <div class="flex gap-2 text-sm">
+        <div class="all-tickets-topbar">
+            <h2 class="all-tickets-title font-semibold text-brandText">All Infra Tickets</h2>
+            <div class="all-tickets-tabs">
             {% set current_view = filters.view or 'active' %}
             <button type="button"
                     class="js-view-btn px-4 py-2 rounded-full border transition {{ 'bg-tealbrand text-white border-tealbrand' if current_view == 'active' else 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100' }}"
@@ -125,11 +181,12 @@
                     data-view="completed">
                 Completed Tickets
             </button>
+            </div>
         </div>
 
         <!-- FILTERS -->
         <form id="filterForm" method="get"
-              class="flex flex-wrap gap-4 items-end bg-slate-50/80 p-4 rounded-2xl border border-slate-200 shadow-inner">
+              class="all-tickets-filterbar flex flex-wrap items-end bg-slate-50/80 border border-slate-200">
             <input type="hidden" name="page" id="pageInput" value="{{ pagination.page if pagination else 1 }}">
             <input type="hidden" name="view" id="viewInput" value="{{ filters.view or 'active' }}">
 
@@ -188,7 +245,7 @@
             </div>
 
             <!-- ASSIGNED TO ME -->
-            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-semibold mt-2 sm:mt-7 bg-white rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-semibold bg-white rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
                 <input type="checkbox"
                     name="assigned_me"
                     value="true"
@@ -198,7 +255,7 @@
             </label>
 
             <!-- DELAYED -->
-            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-semibold mt-2 sm:mt-7 bg-white rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
+            <label class="inline-flex items-center gap-2 text-sm text-slate-700 font-semibold bg-white rounded-lg px-3 py-2 border border-slate-200 shadow-sm">
                 <input type="checkbox"
                     name="only_delayed"
                     value="true"
@@ -209,15 +266,13 @@
 
         </form>
 
-        <div class="h-px bg-slate-200"></div>
-
 <div id="ticketsContainer">
     {% include "infra/partials/tickets_block.html" %}
 </div>
 
                 <!-- PICK/SLA MODAL - CUSTOM ONLY -->
-<div id="pickModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+<div id="pickModal" class="infra-modal-layer flex p-4 hidden">
+    <div class="infra-modal-card bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div class="p-6">
             <h3 class="text-lg font-semibold text-brandText mb-4">Set Commitment Time (SLA)</h3>
             <form id="pickForm" method="post" class="space-y-4">
@@ -263,8 +318,8 @@
 </div>
 
 <!-- RESOLVE MODAL -->
-<div id="resolveModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+<div id="resolveModal" class="infra-modal-layer flex p-4 hidden">
+    <div class="infra-modal-card bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div class="p-6">
             <h3 class="text-lg font-semibold text-brandText mb-4">Resolve Ticket</h3>
             <p class="text-sm text-slate-600 mb-6">Are you sure you want to mark this ticket as resolved?</p>
@@ -285,8 +340,8 @@
 </div>
 
 <!-- INVALID MODAL -->
-<div id="invalidModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+<div id="invalidModal" class="infra-modal-layer flex p-4 hidden">
+    <div class="infra-modal-card bg-white rounded-2xl shadow-xl w-full max-w-md">
         <div class="p-6">
             <h3 class="text-lg font-semibold text-brandText mb-4">Mark Ticket as Silly</h3>
             <form id="invalidForm" method="post" class="space-y-4">
@@ -315,8 +370,8 @@
 </div>
 
 <!-- SILLY REASON MODAL -->
-<div id="sillyReasonModal" class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+<div id="sillyReasonModal" class="infra-modal-layer flex p-4 hidden">
+    <div class="infra-modal-card bg-white rounded-2xl shadow-2xl w-full max-w-sm">
         <div class="p-5 space-y-4">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-brandText">Silly Reason</h3>
@@ -392,6 +447,46 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentTicketId = null;
     let ticketsRequestController = null;
 
+    function setReturnTo(form) {
+        if (!form) return;
+        let input = form.querySelector('input[name="return_to"]');
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'return_to';
+            form.appendChild(input);
+        }
+        input.value = window.location.pathname + window.location.search;
+    }
+
+    function anyInfraModalOpen() {
+        return [pickModal, resolveModal, invalidModal, sillyReasonModal].some(modal => (
+            modal && !modal.classList.contains('hidden')
+        ));
+    }
+
+    function showInfraModal(modal) {
+        if (!modal) return;
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeInfraModal(modal) {
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+        if (!anyInfraModalOpen()) {
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    function closePickModal() {
+        closeInfraModal(pickModal);
+    }
+
     function openPickModalFor(ticketId) {
         currentTicketId = ticketId;
         if (pickModal) {
@@ -412,29 +507,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (pickForm) {
             pickForm.action = `/infra/pick/${currentTicketId}`;
+            setReturnTo(pickForm);
         }
-        if (pickModal) pickModal.classList.remove('hidden');
+        showInfraModal(pickModal);
     }
 
     function openResolveModalFor(ticketId) {
         currentTicketId = ticketId;
-        if (resolveForm) resolveForm.action = `/infra/resolve/${currentTicketId}`;
-        if (resolveModal) resolveModal.classList.remove('hidden');
+        if (resolveForm) {
+            resolveForm.action = `/infra/resolve/${currentTicketId}`;
+            setReturnTo(resolveForm);
+        }
+        showInfraModal(resolveModal);
     }
 
     function openInvalidModalFor(ticketId) {
         currentTicketId = ticketId;
-        if (invalidForm) invalidForm.action = `/infra/invalid/${currentTicketId}`;
-        if (invalidModal) invalidModal.classList.remove('hidden');
+        if (invalidForm) {
+            invalidForm.action = `/infra/invalid/${currentTicketId}`;
+            setReturnTo(invalidForm);
+        }
+        showInfraModal(invalidModal);
     }
 
     function showSillyReason(reason) {
         if (sillyReasonText) {
             sillyReasonText.textContent = reason || 'Invalid';
         }
-        if (sillyReasonModal) {
-            sillyReasonModal.classList.remove('hidden');
-        }
+        showInfraModal(sillyReasonModal);
     }
 
     async function loadTickets(targetPage) {
@@ -584,6 +684,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             
             const formData = new FormData(this);
+            setReturnTo(this);
            
 
             // Always custom mode
@@ -631,18 +732,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Close Modal Functions
     document.querySelectorAll('.js-close-pick-modal').forEach(btn => {
-        btn.addEventListener('click', () => pickModal.classList.add('hidden'));
+        btn.addEventListener('click', closePickModal);
     });
 
     document.querySelectorAll('.js-close-resolve-modal').forEach(btn => {
-        btn.addEventListener('click', () => resolveModal.classList.add('hidden'));
+        btn.addEventListener('click', () => closeInfraModal(resolveModal));
     });
 
     document.querySelectorAll('.js-close-invalid-modal').forEach(btn => {
-        btn.addEventListener('click', () => invalidModal.classList.add('hidden'));
+        btn.addEventListener('click', () => closeInfraModal(invalidModal));
     });
     document.querySelectorAll('.silly-reason-close').forEach(btn => {
-        btn.addEventListener('click', () => sillyReasonModal.classList.add('hidden'));
+        btn.addEventListener('click', () => closeInfraModal(sillyReasonModal));
     });
 
     // Close modals on background click
@@ -650,7 +751,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (modal) {
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
-                    modal.classList.add('hidden');
+                    closeInfraModal(modal);
                 }
             });
         }
@@ -659,10 +760,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Escape key to close modals
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            if (pickModal) pickModal.classList.add('hidden');
-            if (resolveModal) resolveModal.classList.add('hidden');
-            if (invalidModal) invalidModal.classList.add('hidden');
-            if (sillyReasonModal) sillyReasonModal.classList.add('hidden');
+            closeInfraModal(pickModal);
+            closeInfraModal(resolveModal);
+            closeInfraModal(invalidModal);
+            closeInfraModal(sillyReasonModal);
         }
     });
 

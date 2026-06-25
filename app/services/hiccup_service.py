@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from fastapi import HTTPException, UploadFile
-from sqlalchemy import func
+from sqlalchemy import func, inspect, text
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from pytz import timezone
@@ -78,6 +78,16 @@ def _normalize_text(value: Optional[str]) -> Optional[str]:
     return trimmed if trimmed else None
 
 
+def _ensure_nc_note_column(db: Session) -> None:
+    bind = db.get_bind()
+    inspector = inspect(bind)
+    columns = {col["name"] for col in inspector.get_columns("nc_escalation_forms")}
+    if "nc_note" in columns:
+        return
+    with bind.begin() as conn:
+        conn.execute(text("ALTER TABLE nc_escalation_forms ADD COLUMN nc_note TEXT"))
+
+
 def _parse_int(value: Optional[str]) -> Optional[int]:
     if value is None:
         return None
@@ -104,6 +114,7 @@ def build_root_cause_summary(flags: Optional[List[str]], other: Optional[str]) -
 
 
 def _upsert_escalation_form(db: Session, hiccup_id: str, form_data: Dict):
+    _ensure_nc_note_column(db)
     payload = {
         "staff_name": _normalize_text(form_data.get("staff_name")),
         "issue_description": _normalize_text(form_data.get("issue_description")),
@@ -120,6 +131,8 @@ def _upsert_escalation_form(db: Session, hiccup_id: str, form_data: Dict):
         "preventive_details": _normalize_text(form_data.get("preventive_details")),
         "assigned_staff_id": _parse_int(form_data.get("staff_id")),
     }
+    if "nc_note" in form_data:
+        payload["nc_note"] = _normalize_text(form_data.get("nc_note"))
     form = (
         db.query(NCEscalationForm)
         .filter(NCEscalationForm.hiccup_id == hiccup_id)
@@ -136,6 +149,7 @@ def _map_escalation_form(form: NCEscalationForm) -> Dict:
     return {
         "staff_name": form.staff_name,
         "staff_id": form.assigned_staff_id,
+        "nc_note": form.nc_note,
         "root_cause_flags": _deserialize_list(form.root_cause_flags),
         "root_cause_other": form.root_cause_other,
         "corrective_action": form.corrective_action,
@@ -150,6 +164,7 @@ def _map_escalation_form(form: NCEscalationForm) -> Dict:
 
 def get_nc_escalation_form(db: Session, hiccup_id: str) -> Dict:
     get_hiccup(db, hiccup_id)
+    _ensure_nc_note_column(db)
     form = (
         db.query(NCEscalationForm)
         .filter(NCEscalationForm.hiccup_id == hiccup_id)
@@ -450,6 +465,7 @@ def _apply_common_hiccup_filters(
     date_to: Optional[date] = None,
     escalated_only: bool = False,
     overdue_only: bool = False,
+    response_blocked_only: bool = False,
     search: Optional[str] = None,
 ):
     if status:
@@ -477,6 +493,11 @@ def _apply_common_hiccup_filters(
                 Hiccup.was_response_overdue.is_(True),
                 Hiccup.is_closure_overdue.is_(True),
             )
+        )
+    if response_blocked_only:
+        query = query.filter(
+            Hiccup.status == "Open",
+            Hiccup.response_blocked.is_(True),
         )
     if search:
         term = f"%{search.strip()}%"
@@ -529,6 +550,7 @@ def list_hiccups_for_user_paginated(
     date_to: Optional[date] = None,
     escalated_only: bool = False,
     overdue_only: bool = False,
+    response_blocked_only: bool = False,
     search: Optional[str] = None,
 ):
     query = db.query(Hiccup).filter(Hiccup.raised_by == user.user_id)
@@ -540,6 +562,7 @@ def list_hiccups_for_user_paginated(
         date_to=date_to,
         escalated_only=escalated_only,
         overdue_only=overdue_only,
+        response_blocked_only=response_blocked_only,
         search=search,
     )
     return _paginate_hiccup_query(query, db, page, page_size)
@@ -557,6 +580,7 @@ def list_hiccups_for_me_paginated(
     date_to: Optional[date] = None,
     escalated_only: bool = False,
     overdue_only: bool = False,
+    response_blocked_only: bool = False,
     search: Optional[str] = None,
 ):
     query = db.query(Hiccup).filter(Hiccup.raised_against == str(user.user_id))
@@ -568,6 +592,7 @@ def list_hiccups_for_me_paginated(
         date_to=date_to,
         escalated_only=escalated_only,
         overdue_only=overdue_only,
+        response_blocked_only=response_blocked_only,
         search=search,
     )
     return _paginate_hiccup_query(query, db, page, page_size)
@@ -601,6 +626,7 @@ def list_assigned_hiccups_paginated(
     date_to: Optional[date] = None,
     escalated_only: bool = False,
     overdue_only: bool = False,
+    response_blocked_only: bool = False,
     search: Optional[str] = None,
 ):
     query = db.query(Hiccup).filter(Hiccup.nc_assigned_staff_id == user.user_id)
@@ -613,6 +639,7 @@ def list_assigned_hiccups_paginated(
         date_to=date_to,
         escalated_only=escalated_only,
         overdue_only=overdue_only,
+        response_blocked_only=response_blocked_only,
         search=search,
     )
     return _paginate_hiccup_query(query, db, page, page_size)
@@ -646,6 +673,7 @@ def list_all_hiccups_paginated(
     date_to: Optional[date] = None,
     escalated_only: bool = False,
     overdue_only: bool = False,
+    response_blocked_only: bool = False,
     search: Optional[str] = None,
 ):
     query = db.query(Hiccup)
@@ -658,6 +686,7 @@ def list_all_hiccups_paginated(
         date_to=date_to,
         escalated_only=escalated_only,
         overdue_only=overdue_only,
+        response_blocked_only=response_blocked_only,
         search=search,
     )
     return _paginate_hiccup_query(query, db, page, page_size)
@@ -679,8 +708,6 @@ def _can_view_nc_form(hiccup: Hiccup, user) -> bool:
 def _can_edit_nc_form(hiccup: Hiccup, user) -> bool:
     if hiccup.status == "Closed":
         return False
-    if _has_management_access(getattr(user, "designation", None), getattr(user, "role", None)):
-        return True
     if hiccup.nc_assigned_staff_id and str(hiccup.nc_assigned_staff_id) == str(user.user_id):
         return True
     return False
@@ -742,10 +769,8 @@ def update_status(
             hiccup.response_text = response_text
         hiccup.response_by_name = user.name
     if status == "Closed":
-        is_mgmt_user = _is_management_user(user)
-        if not closure_notes and not is_mgmt_user:
-            raise HTTPException(status_code=400, detail="Closure notes required")
-        hiccup.closure_notes = closure_notes or hiccup.closure_notes or ""
+        note = str(closure_notes or "").strip()
+        hiccup.closure_notes = note or "N/A"
         hiccup.closed_at = now_local()
     if status == "Escalated to NC":
         if root_cause is not None:

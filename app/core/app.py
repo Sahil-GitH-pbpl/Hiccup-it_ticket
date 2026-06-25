@@ -118,6 +118,8 @@ def _ensure_nc_escalation_columns(engine):
         statements.append("ALTER TABLE nc_escalation_forms ADD COLUMN preventive_other TEXT")
     if "assigned_staff_id" not in columns:
         statements.append("ALTER TABLE nc_escalation_forms ADD COLUMN assigned_staff_id INTEGER")
+    if "nc_note" not in columns:
+        statements.append("ALTER TABLE nc_escalation_forms ADD COLUMN nc_note TEXT")
     if statements:
         with engine.begin() as conn:
             for stmt in statements:

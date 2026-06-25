@@ -36,6 +36,14 @@ def get_db():
     finally:
         db.close()
 
+
+def _infra_redirect_url(return_to: Optional[str] = None) -> str:
+    if return_to:
+        candidate = return_to.strip()
+        if candidate.startswith("/infra/all"):
+            return candidate
+    return "/infra/all"
+
 UPLOAD_DIR = Path("uploads/infra")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -380,6 +388,10 @@ def _start_reminder_loop_once():
     """
     Start the reminder thread only if we hold the singleton lock.
     """
+    if not settings.enable_infra_reminder:
+        logger.info("InfraReminder disabled by ENABLE_INFRA_REMINDER=0")
+        return None
+
     lock_path = Path("/tmp") / "hiccup_infra_reminder.lock"
     if _acquire_reminder_lock(lock_path):
         thread = threading.Thread(target=_reminder_loop, daemon=True)
@@ -920,6 +932,7 @@ def pick_ticket(
     callback_time: str = Form(None),
     commitment_at: str = Form(None),
     preset_hours: str = Form(None),
+    return_to: str = Form(None),
     db: Session = Depends(get_db),
     user: TokenData = Depends(get_current_user),
 ):
@@ -935,11 +948,11 @@ def pick_ticket(
     )
 
     if not ticket:
-        return RedirectResponse(url="/infra/all", status_code=303)
+        return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     # If another member already owns this ticket, block reassignment
     if ticket.assigned_to and ticket.assigned_to != username:
-        return RedirectResponse(url="/infra/all", status_code=303)
+        return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     # Calculate commitment time based on different input methods
     ct = None
@@ -993,7 +1006,7 @@ def pick_ticket(
 
     # Validate commitment time is in future
     if ct <= now_local_naive():
-        return RedirectResponse(url="/infra/all", status_code=303)
+        return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     is_delayed = now_local_naive() > ct
 
@@ -1034,7 +1047,7 @@ def pick_ticket(
                 status,
                 (resp[:300] if resp else ""),
             )
-    return RedirectResponse(url="/infra/all", status_code=303)
+    return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
 def parse_predefined_to_hours(predefined):
     """Parse predefined time string to hours"""
@@ -1059,6 +1072,7 @@ def parse_predefined_to_hours(predefined):
 def resolve_ticket(
     ticket_id: int,
     request: Request,
+    return_to: str = Form(None),
     db: Session = Depends(get_db),
     user: TokenData = Depends(get_current_user),
 ):
@@ -1072,13 +1086,13 @@ def resolve_ticket(
     )
 
     if not ticket:
-        return RedirectResponse(url="/infra/all", status_code=303)
+        return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     # Only the assigned member can resolve
     username = user.name if user else None
     username_norm = username.lower() if username else ""
     if ticket.assigned_to and ticket.assigned_to.lower() != username_norm:
-        return RedirectResponse(url="/infra/all", status_code=303)
+        return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     # If resolving after commitment time, mark delayed
     if ticket.commitment_time and now_local_naive() > ticket.commitment_time:
@@ -1106,7 +1120,7 @@ def resolve_ticket(
                 (resp[:300] if resp else ""),
             )
 
-    return RedirectResponse(url="/infra/all", status_code=303)
+    return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
 
 # -------------------------------------------------------------
@@ -1117,6 +1131,7 @@ def mark_invalid(
     ticket_id: int,
     request: Request,
     invalid_reason: str = Form(...),
+    return_to: str = Form(None),
     db: Session = Depends(get_db),
     user: TokenData = Depends(get_current_user),
 ):
@@ -1130,13 +1145,13 @@ def mark_invalid(
     )
 
     if not ticket:
-        return RedirectResponse(url="/infra/all", status_code=303)
+        return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     # Only the assigned member can mark invalid
     username = user.name if user else None
     username_norm = username.lower() if username else ""
     if ticket.assigned_to and ticket.assigned_to.lower() != username_norm:
-        return RedirectResponse(url="/infra/all", status_code=303)
+        return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     db.query(InfraTicket).filter(InfraTicket.ticket_id == ticket_id).update(
         {
@@ -1163,7 +1178,7 @@ def mark_invalid(
                 (resp[:300] if resp else ""),
             )
 
-    return RedirectResponse(url="/infra/all", status_code=303)
+    return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
 
 _reminder_thread = _start_reminder_loop_once()

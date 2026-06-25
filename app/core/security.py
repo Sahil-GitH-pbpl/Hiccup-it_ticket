@@ -18,13 +18,13 @@ settings = get_settings()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 ALLOWED_HICCUP_ADMINS = [
-    {"name": "dr vishu bhasin", "contact": "9810637037", "dob": "24031985"},
-    {"name": "dr vipul bhasin", "contact": "9810030372", "dob": "21031991"},
+    {"id": 124, "name": "dr vishu bhasin", "contact": "9810637037", "dob": "24031985"},
+    {"id": 125, "name": "dr vipul bhasin", "contact": "9810030372", "dob": "21031991"},
 ]
 
 # Allowlisted infra admin (ankita)
 ALLOWED_INFRA_ADMINS = [
-    {"name": "ankita", "contact": "8700004157", "employee_code": "PBPL00188"},
+    {"id": 95, "name": "ankita", "contact": "8700004157", "employee_code": "PBPL00188"},
 ]
 
 
@@ -39,6 +39,7 @@ def is_allowlisted_infra_admin_by_staff(staff: Staff) -> bool:
     """
     if not staff:
         return False
+    staff_id = getattr(staff, "id", None)
     normalized_name = (staff.name or "").strip().lower()
     mobile_number = _digits(staff.contact)
 
@@ -58,6 +59,8 @@ def is_allowlisted_infra_admin_by_staff(staff: Staff) -> bool:
             candidate_codes.add(text.upper())
 
     for entry in ALLOWED_INFRA_ADMINS:
+        if staff_id == entry.get("id"):
+            return True
         if normalized_name != entry["name"]:
             continue
         if mobile_number != entry["contact"]:
@@ -91,10 +94,13 @@ def is_allowlisted_hiccup_admin_staff(staff: Optional[Staff]) -> bool:
     if not staff:
         return False
     # Hiccup admins: explicit allowlist only (no infra override)
+    staff_id = getattr(staff, "id", None)
     name = (staff.name or "").strip().lower()
     contact = _digits(staff.contact)
     dob_digits = _digits(staff.dob)
     for entry in ALLOWED_HICCUP_ADMINS:
+        if staff_id == entry.get("id"):
+            return True
         if (
             name == entry["name"]
             and contact == entry["contact"]

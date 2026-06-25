@@ -8454,3 +8454,37 @@ requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='10.1.1.44', port=30
 2026-06-24 16:49:25,198 [INFO] app.api.routes_infra: WA[c580bd1a] -> sendMessage | target=120363141953100908@g.us | len=351
 2026-06-24 16:49:25,249 [INFO] app.api.routes_infra: WA[c580bd1a] <- status=200 | body={"success":true}
 2026-06-24 16:49:25,249 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=946 status=200
+2026-06-24 19:48:08,282 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=7100); skipping start
+2026-06-24 19:50:07,292 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=3760); skipping start
+2026-06-24 19:50:27,348 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=4072); skipping start
+2026-06-25 11:39:48,627 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=11088); skipping start
+2026-06-25 11:40:38,532 [INFO] app.api.routes_infra: InfraReminder -> processing 1 pending tickets
+2026-06-25 11:40:38,533 [INFO] app.api.routes_infra: WA[2d107aa0] -> sendMessage | target=120363141953100908@g.us | len=266
+2026-06-25 11:40:38,589 [INFO] app.api.routes_infra: WA[2d107aa0] <- status=200 | body={"success":true}
+2026-06-25 11:40:38,589 [INFO] app.api.routes_infra: InfraReminder sent | ticket_id=949 status=200
+2026-06-25 11:40:40,903 [INFO] app.api.routes_infra: InfraReminder loop already running (pid=12964); skipping start
+2026-06-25 11:48:27,600 [INFO] app.api.routes_infra: InfraReminder lock contention; skipping start
+2026-06-25 14:30:29,929 [INFO] app.api.routes_infra: WA[0ada8106] -> sendMessage | target=918076741165 | len=125
+2026-06-25 14:30:30,297 [INFO] app.api.routes_infra: WA[0ada8106] <- status=200 | body={"success":true}
+2026-06-25 14:30:30,297 [INFO] app.api.routes_infra: PickNotify sent to 8076741165 | ticket_id=950
+2026-06-25 14:30:32,669 [INFO] app.api.routes_infra: WA[84fed0d1] -> sendMessage | target=918130931547 | len=125
+2026-06-25 14:30:33,003 [INFO] app.api.routes_infra: WA[84fed0d1] <- status=200 | body={"success":true}
+2026-06-25 14:30:33,003 [INFO] app.api.routes_infra: PickNotify sent to 8130931547 | ticket_id=949
+2026-06-25 14:37:32,735 [INFO] app.api.routes_infra: WA[644cf468] -> sendMessage | target=918126382045 | len=121
+2026-06-25 14:37:33,022 [INFO] app.api.routes_infra: WA[644cf468] <- status=200 | body={"success":true}
+2026-06-25 14:37:33,023 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=946
+2026-06-25 14:37:47,685 [INFO] app.api.routes_infra: WA[0dceabb1] -> sendMessage | target=918126382045 | len=125
+2026-06-25 14:37:47,971 [INFO] app.api.routes_infra: WA[0dceabb1] <- status=200 | body={"success":true}
+2026-06-25 14:37:47,971 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=945
+2026-06-25 14:38:04,142 [INFO] app.api.routes_infra: WA[bc8c409c] -> sendMessage | target=918126382045 | len=125
+2026-06-25 14:38:04,456 [INFO] app.api.routes_infra: WA[bc8c409c] <- status=200 | body={"success":true}
+2026-06-25 14:38:04,456 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=936
+2026-06-25 14:38:08,246 [INFO] app.api.routes_infra: WA[aae806c6] -> sendMessage | target=918126382045 | len=163
+2026-06-25 14:38:08,664 [INFO] app.api.routes_infra: WA[aae806c6] <- status=200 | body={"success":true}
+2026-06-25 14:38:08,665 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=950 contact=8126382045
+2026-06-25 14:40:39,503 [INFO] app.api.routes_infra: WA[6298878a] -> sendMessage | target=918126382045 | len=163
+2026-06-25 14:40:39,818 [INFO] app.api.routes_infra: WA[6298878a] <- status=200 | body={"success":true}
+2026-06-25 14:40:39,818 [INFO] app.api.routes_infra: ResolveNotify sent | ticket_id=949 contact=8126382045
+2026-06-25 14:40:57,544 [INFO] app.api.routes_infra: WA[773e0f90] -> sendMessage | target=918126382045 | len=125
+2026-06-25 14:40:57,871 [INFO] app.api.routes_infra: WA[773e0f90] <- status=200 | body={"success":true}
+2026-06-25 14:40:57,871 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=598

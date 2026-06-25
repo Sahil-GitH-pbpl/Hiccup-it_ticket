@@ -12,6 +12,7 @@ class NCEscalationForm(Base):
     hiccup_id = Column(String(20), ForeignKey("hiccups.hiccup_id"), nullable=False, unique=True)
     staff_name = Column(String(200), nullable=True)
     assigned_staff_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    nc_note = Column(Text, nullable=True)
     issue_description = Column(Text, nullable=True)
     root_cause_flags = Column(Text, nullable=True)
     root_cause_explanation = Column(Text, nullable=True)
