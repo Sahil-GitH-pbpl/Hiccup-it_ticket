@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time as dt_time
 import time
 import logging
 import threading
@@ -19,8 +19,11 @@ from app.db.session import MainSessionLocal
 from app.core.security import TokenData, get_current_user
 from app.db.session import SessionLocal
 from app.models.infra import InfraTicket, InfraTicketImage, InfraUpdate
+from app.models.hiccup import Hiccup, HiccupAuditLog
 from app.models.staff import Staff
-from app.utils.time_utils import now_local_naive
+from app.services.notification_service import enqueue_creation_notification
+from app.utils.id_generator import generate_hiccup_id
+from app.utils.time_utils import now_local, now_local_naive
 
 
 router = APIRouter()
@@ -56,6 +59,15 @@ WHATSAPP_GROUP_TARGET = (
 REMINDER_THRESHOLD_HOURS = 24
 REMINDER_INTERVAL_SECONDS = 60 * 60  # 1 hour
 DELAYED_FLAGS_REFRESH_INTERVAL_SECONDS = 30
+AUTO_HICCUP_CREATED_BY_ID = 125
+AUTO_HICCUP_CREATED_BY_NAME = "Dr Vipul Bhasin"
+AUTO_HICCUP_SOURCE = "infra_pick_sla"
+RESOLVE_SLA_HICCUP_SOURCE = "infra_resolution_sla"
+AUTO_HICCUP_OWNER_MAP = {
+    "software": [8, 52, 2241],
+    "hardware": [2318, 41],
+    "office infra": [41],
+}
 _delayed_flags_lock = threading.Lock()
 _last_delayed_flags_refresh = 0.0
 
@@ -319,6 +331,365 @@ def _send_pick_reminders(db: Session):
         db.commit()
 
 
+def _parse_hhmm(value: str, default: dt_time) -> dt_time:
+    try:
+        hour, minute = (value or "").strip().split(":", 1)
+        return dt_time(hour=int(hour), minute=int(minute))
+    except Exception:
+        return default
+
+
+def _infra_sla_holidays() -> set[date]:
+    holidays: set[date] = set()
+    for raw in (settings.infra_sla_holidays or "").split(","):
+        text_value = raw.strip()
+        if not text_value:
+            continue
+        try:
+            holidays.add(date.fromisoformat(text_value))
+        except ValueError:
+            logger.warning("Ignoring invalid INFRA_SLA_HOLIDAYS value: %s", text_value)
+    return holidays
+
+
+def _is_infra_sla_working_day(day: date) -> bool:
+    # Sunday is treated as non-working; explicit holidays are also skipped.
+    return day.weekday() != 6 and day not in _infra_sla_holidays()
+
+
+def _next_infra_sla_working_day(day: date) -> date:
+    candidate = day
+    while not _is_infra_sla_working_day(candidate):
+        candidate = candidate + timedelta(days=1)
+    return candidate
+
+
+def is_infra_sla_check_window(moment: Optional[datetime] = None) -> bool:
+    current = moment or now_local_naive()
+    if not _is_infra_sla_working_day(current.date()):
+        return False
+    start_time = _parse_hhmm(settings.infra_pick_sla_start, dt_time(12, 0))
+    end_time = _parse_hhmm(settings.infra_pick_sla_end, dt_time(16, 0))
+    return start_time <= current.time() <= end_time
+
+
+def calculate_pick_sla_deadline(created_at: Optional[datetime]) -> datetime:
+    """
+    Infra pick SLA: every ticket gets 4 working hours to be picked.
+    Working window is configurable, default 12 PM to 4 PM.
+
+    - Created before the window -> timer starts same working day at 12 PM.
+    - Created during the window -> timer starts immediately.
+    - Created after the window/off/holiday -> timer starts next working day at 12 PM.
+    """
+    created = created_at or now_local_naive()
+    start_time = _parse_hhmm(settings.infra_pick_sla_start, dt_time(12, 0))
+    end_time = _parse_hhmm(settings.infra_pick_sla_end, dt_time(16, 0))
+    remaining = timedelta(hours=4)
+
+    current_day = _next_infra_sla_working_day(created.date())
+    if current_day != created.date():
+        cursor = datetime.combine(current_day, start_time)
+    elif created.time() < start_time:
+        cursor = datetime.combine(created.date(), start_time)
+    elif created.time() >= end_time:
+        current_day = _next_infra_sla_working_day(created.date() + timedelta(days=1))
+        cursor = datetime.combine(current_day, start_time)
+    else:
+        cursor = created
+
+    while remaining > timedelta(0):
+        current_day = _next_infra_sla_working_day(cursor.date())
+        if current_day != cursor.date():
+            cursor = datetime.combine(current_day, start_time)
+            continue
+
+        window_end = datetime.combine(cursor.date(), end_time)
+        if cursor >= window_end:
+            next_day = _next_infra_sla_working_day(cursor.date() + timedelta(days=1))
+            cursor = datetime.combine(next_day, start_time)
+            continue
+
+        available = window_end - cursor
+        if remaining <= available:
+            return cursor + remaining
+
+        remaining -= available
+        next_day = _next_infra_sla_working_day(cursor.date() + timedelta(days=1))
+        cursor = datetime.combine(next_day, start_time)
+
+    return cursor
+
+
+def _infra_auto_hiccup_owner_ids(ticket: InfraTicket) -> list[int]:
+    category = (ticket.category or "").strip().lower()
+    subcategory = (ticket.subcategory or "").strip().lower()
+    if category == "office infra" or subcategory == "office infra":
+        return AUTO_HICCUP_OWNER_MAP["office infra"]
+    if category == "software":
+        return AUTO_HICCUP_OWNER_MAP["software"]
+    if category == "hardware":
+        return AUTO_HICCUP_OWNER_MAP["hardware"]
+    return []
+
+
+def _staff_map_for_ids(db: Session, staff_ids: list[int]) -> dict[int, Staff]:
+    if not staff_ids:
+        return {}
+    rows = db.query(Staff).filter(Staff.id.in_(staff_ids)).all()
+    return {staff.id: staff for staff in rows}
+
+
+def _find_staff_by_name(db: Session, name: Optional[str]) -> Optional[Staff]:
+    normalized = (name or "").strip().lower()
+    if not normalized:
+        return None
+    return db.query(Staff).filter(func.lower(Staff.name) == normalized).first()
+
+
+def _create_infra_pick_sla_hiccup(db: Session, ticket: InfraTicket, owner: Staff, group_names: str) -> Hiccup:
+    hiccup_id = generate_hiccup_id(db)
+    deadline = ticket.pick_sla_deadline_at or calculate_pick_sla_deadline(ticket.created_at)
+    created_str = ticket.created_at.strftime("%d-%b-%Y %I:%M %p") if ticket.created_at else "-"
+    deadline_str = deadline.strftime("%d-%b-%Y %I:%M %p") if deadline else "-"
+    description = "\n".join(
+        [
+            f"Infra ticket #{ticket.ticket_id} was not picked within the working-hour SLA.",
+            "",
+            f"Ticket created by: {ticket.created_by or '-'}",
+            f"Department/location: {ticket.department or '-'}",
+            f"Category/type: {ticket.category or '-'} / {ticket.subcategory or '-'}",
+            f"Workstation: {ticket.workstation or '-'}",
+            f"Created at: {created_str}",
+            f"Pick deadline: {deadline_str}",
+            f"Responsible group: {group_names or owner.name or owner.id}",
+            "",
+            f"Ticket description: {ticket.description or '-'}",
+        ]
+    )
+    current_ts = now_local()
+    hiccup = Hiccup(
+        hiccup_id=hiccup_id,
+        raised_by=AUTO_HICCUP_CREATED_BY_ID,
+        raised_by_name=AUTO_HICCUP_CREATED_BY_NAME,
+        raised_by_department=None,
+        hiccup_type="Person Related",
+        raised_against=str(owner.id),
+        raised_against_name=owner.name,
+        raised_against_department=getattr(owner, "department_id", None),
+        raised_against_department_name=getattr(owner, "departments", None),
+        description=description,
+        immediate_effect="Infra ticket remained unpicked during the 12 PM to 4 PM working SLA window.",
+        status="Open",
+        is_auto_generated=True,
+        source_module=AUTO_HICCUP_SOURCE,
+        confidential_flag=False,
+        created_at=current_ts,
+        updated_at=current_ts,
+    )
+    db.add(hiccup)
+    db.add(
+        HiccupAuditLog(
+            hiccup_id=hiccup_id,
+            action="Created",
+            performed_by=AUTO_HICCUP_CREATED_BY_ID,
+            remarks=f"Auto-created from infra ticket #{ticket.ticket_id}",
+        )
+    )
+    db.flush()
+    return hiccup
+
+
+def _create_infra_resolution_sla_hiccup(
+    db: Session, ticket: InfraTicket, creator: Staff, assignee: Staff
+) -> Hiccup:
+    hiccup_id = generate_hiccup_id(db)
+    created_str = ticket.created_at.strftime("%d-%b-%Y %I:%M %p") if ticket.created_at else "-"
+    commitment_str = (
+        ticket.commitment_time.strftime("%d-%b-%Y %I:%M %p")
+        if ticket.commitment_time
+        else "-"
+    )
+    description = "\n".join(
+        [
+            f"Infra ticket #{ticket.ticket_id} was picked but not resolved within the committed SLA time.",
+            "",
+            f"Ticket created by: {ticket.created_by or '-'}",
+            f"Picked/assigned to: {ticket.assigned_to or '-'}",
+            f"Department/location: {ticket.department or '-'}",
+            f"Category/type: {ticket.category or '-'} / {ticket.subcategory or '-'}",
+            f"Workstation: {ticket.workstation or '-'}",
+            f"Created at: {created_str}",
+            f"Commitment time: {commitment_str}",
+            "",
+            f"Ticket description: {ticket.description or '-'}",
+        ]
+    )
+    current_ts = now_local()
+    hiccup = Hiccup(
+        hiccup_id=hiccup_id,
+        raised_by=creator.id,
+        raised_by_name=creator.name,
+        raised_by_department=getattr(creator, "department_id", None),
+        hiccup_type="Person Related",
+        raised_against=str(assignee.id),
+        raised_against_name=assignee.name,
+        raised_against_department=getattr(assignee, "department_id", None),
+        raised_against_department_name=getattr(assignee, "departments", None),
+        description=description,
+        immediate_effect="Infra ticket resolution SLA was breached after the ticket was picked.",
+        status="Open",
+        is_auto_generated=True,
+        source_module=RESOLVE_SLA_HICCUP_SOURCE,
+        confidential_flag=False,
+        created_at=current_ts,
+        updated_at=current_ts,
+    )
+    db.add(hiccup)
+    db.add(
+        HiccupAuditLog(
+            hiccup_id=hiccup_id,
+            action="Created",
+            performed_by=creator.id,
+            remarks=f"Auto-created from infra ticket #{ticket.ticket_id} resolution SLA breach",
+        )
+    )
+    db.flush()
+    return hiccup
+
+
+def _generate_resolution_sla_hiccup_for_ticket(db: Session, ticket: InfraTicket) -> Optional[Hiccup]:
+    if not ticket:
+        return None
+    if ticket.resolve_sla_hiccup_generated:
+        return None
+    if not ticket.commitment_time or ticket.commitment_time > now_local_naive():
+        return None
+    if not ticket.pick_sla_deadline_at:
+        return None
+    if ticket.status == "Resolved" or ticket.is_invalid:
+        return None
+    if not (ticket.assigned_to or "").strip():
+        return None
+
+    creator = _find_staff_by_name(db, ticket.created_by)
+    assignee = _find_staff_by_name(db, ticket.assigned_to)
+    if not creator or not assignee:
+        logger.warning(
+            "Infra resolution SLA hiccup skipped: staff not found | ticket_id=%s creator=%s assignee=%s",
+            ticket.ticket_id,
+            ticket.created_by,
+            ticket.assigned_to,
+        )
+        return None
+
+    hiccup = _create_infra_resolution_sla_hiccup(db, ticket, creator, assignee)
+    ticket.resolve_sla_hiccup_generated = True
+    ticket.resolve_sla_hiccup_id = hiccup.hiccup_id
+    ticket.resolve_sla_hiccup_generated_at = now_local_naive()
+    ticket.is_delayed_pick = True
+    logger.info(
+        "Infra resolution SLA hiccup generated | ticket_id=%s hiccup=%s",
+        ticket.ticket_id,
+        hiccup.hiccup_id,
+    )
+    return hiccup
+
+
+def generate_infra_pick_sla_hiccups(db: Session) -> int:
+    """
+    Create automatic hiccups for New/unpicked infra tickets once their 4 PM
+    working-day pick deadline has passed.
+    """
+    now = now_local_naive()
+    pending = (
+        db.query(InfraTicket)
+        .filter(
+            InfraTicket.status == "New",
+            or_(InfraTicket.assigned_to.is_(None), InfraTicket.assigned_to == ""),
+            InfraTicket.is_invalid == False,
+            InfraTicket.auto_hiccup_generated == False,
+            InfraTicket.pick_sla_deadline_at.isnot(None),
+            InfraTicket.pick_sla_deadline_at <= now,
+        )
+        .all()
+    )
+    if not pending:
+        return 0
+
+    created_count = 0
+    for ticket in pending:
+        owner_ids = _infra_auto_hiccup_owner_ids(ticket)
+        staff_map = _staff_map_for_ids(db, owner_ids)
+        owners = [staff_map[owner_id] for owner_id in owner_ids if owner_id in staff_map]
+        if not owners:
+            logger.warning(
+                "Infra auto hiccup skipped: no mapped owners found for ticket_id=%s category=%s subcategory=%s",
+                ticket.ticket_id,
+                ticket.category,
+                ticket.subcategory,
+            )
+            ticket.auto_hiccup_generated = True
+            ticket.auto_hiccup_generated_at = now
+            continue
+
+        group_names = ", ".join(owner.name for owner in owners if owner.name)
+        generated_ids: list[str] = []
+        for owner in owners:
+            hiccup = _create_infra_pick_sla_hiccup(db, ticket, owner, group_names)
+            generated_ids.append(hiccup.hiccup_id)
+            created_count += 1
+
+        ticket.auto_hiccup_generated = True
+        ticket.auto_hiccup_id = ", ".join(generated_ids)
+        ticket.auto_hiccup_generated_at = now
+        logger.info(
+            "Infra auto hiccup generated | ticket_id=%s hiccups=%s",
+            ticket.ticket_id,
+            ticket.auto_hiccup_id,
+        )
+
+    if created_count:
+        db.commit()
+    else:
+        db.commit()
+    for ticket in pending:
+        if ticket.auto_hiccup_id:
+            for hiccup_id in [part.strip() for part in ticket.auto_hiccup_id.split(",") if part.strip()]:
+                enqueue_creation_notification(hiccup_id)
+    return created_count
+
+
+def generate_infra_resolution_sla_hiccups(db: Session) -> int:
+    now = now_local_naive()
+    pending = (
+        db.query(InfraTicket)
+        .filter(
+            InfraTicket.status != "Resolved",
+            InfraTicket.assigned_to.isnot(None),
+            InfraTicket.assigned_to != "",
+            InfraTicket.is_invalid == False,
+            InfraTicket.commitment_time.isnot(None),
+            InfraTicket.commitment_time < now,
+            InfraTicket.pick_sla_deadline_at.isnot(None),
+            InfraTicket.resolve_sla_hiccup_generated == False,
+        )
+        .all()
+    )
+    created_count = 0
+    generated_ids: list[str] = []
+    for ticket in pending:
+        hiccup = _generate_resolution_sla_hiccup_for_ticket(db, ticket)
+        if hiccup:
+            generated_ids.append(hiccup.hiccup_id)
+            created_count += 1
+    if created_count:
+        db.commit()
+    for hiccup_id in generated_ids:
+        enqueue_creation_notification(hiccup_id)
+    return created_count
+
+
 # -------------------------------------------------------------
 # HELPER: UPDATE DELAYED FLAGS (SLA BREACH)
 # -------------------------------------------------------------
@@ -470,6 +841,7 @@ async def create_ticket(
         status="New",
         image_path=primary_image_path,
         contact=user_contact,
+        pick_sla_deadline_at=calculate_pick_sla_deadline(now_local_naive()),
     )
 
     db.add(ticket)
@@ -1014,8 +1386,12 @@ def resolve_ticket(
         return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
 
     # If resolving after commitment time, mark delayed
+    generated_resolution_hiccup_id = None
     if ticket.commitment_time and now_local_naive() > ticket.commitment_time:
         ticket.is_delayed_pick = True
+        generated_resolution_hiccup = _generate_resolution_sla_hiccup_for_ticket(db, ticket)
+        if generated_resolution_hiccup:
+            generated_resolution_hiccup_id = generated_resolution_hiccup.hiccup_id
 
     db.query(InfraTicket).filter(InfraTicket.ticket_id == ticket_id).update(
         {
@@ -1025,6 +1401,8 @@ def resolve_ticket(
         synchronize_session=False,
     )
     db.commit()
+    if generated_resolution_hiccup_id:
+        enqueue_creation_notification(generated_resolution_hiccup_id)
 
     if ticket.contact:
         msg = _build_resolved_message(ticket)

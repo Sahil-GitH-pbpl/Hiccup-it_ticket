@@ -1,0 +1,104 @@
+Implemented Infra SLA auto-hiccup flow.
+Changes done:
+Infra ticket pick SLANew Infra tickets now get pick_sla_deadline_at.
+Working hours: 12:00 PM – 4:00 PM.
+SLA duration: 4 working hours.
+Sunday and fixed holidays are skipped.
+Fixed holidays configured:2026-01-26
+2026-08-15
+2026-10-02
+2026-12-25
+
+
+If a ticket remains New and unpicked after SLA deadline, auto hiccups are created.
+Mapping:
+Software → Rahnuma 8, Sahil 52, Rohit 2241
+Hardware → Vishal Kumar 2318, Ritesh Kumar 41
+Office Infra → Ritesh Kumar 41
+Auto hiccup created by:
+Dr Vipul Bhasin 125
+Source module:
+infra_pick_sla
+Infra resolution SLA
+If a ticket is picked/assigned, has commitment_time, and is not resolved after commitment time:
+Auto hiccup is created by the ticket creator.
+Hiccup is raised against the person who picked/was assigned the ticket.
+Source module:
+infra_resolution_sla
+Scheduler
+Added scheduler job:
+Runs every 10 minutes
+Only runs during working day + 12 PM – 4 PM
+Skips outside window
+Local command required:
+python -m app.core.scheduler_runner
+In Docker production, scheduler service should run this command already.
+Notifications
+Auto-created hiccups now call normal hiccup notification flow:
+enqueue_creation_notification(hiccup_id)
+Notification is triggered after DB commit.
+DB columns added to infra_tickets
+pick_sla_deadline_at DATETIME NULL;
+auto_hiccup_generated TINYINT(1) NOT NULL DEFAULT 0;
+auto_hiccup_id VARCHAR(255) NULL;
+auto_hiccup_generated_at DATETIME NULL;
+
+resolve_sla_hiccup_generated TINYINT(1) NOT NULL DEFAULT 0;
+resolve_sla_hiccup_id VARCHAR(255) NULL;
+resolve_sla_hiccup_generated_at DATETIME NULL;
+Indexes:
+CREATE INDEX idx_infra_tickets_auto_hiccup
+ON infra_tickets (auto_hiccup_generated, pick_sla_deadline_at);
+
+CREATE INDEX idx_infra_tickets_resolve_sla_hiccup
+ON infra_tickets (resolve_sla_hiccup_generated, commitment_time);
+Env added
+INFRA_PICK_SLA_START=12:00
+INFRA_PICK_SLA_END=16:00
+INFRA_SLA_HOLIDAYS=2026-01-26,2026-08-15,2026-10-02,2026-12-25
+Add these to both backend and scheduler services in production Docker env.
+Files touched
+app/api/routes_infra.py
+app/models/infra.py
+app/core/app.py
+app/core/config.py
+app/core/scheduler.py
+.env
+docker-compose.yml
+Production deployment notes
+Before/after pull:
+git pull
+docker compose up -d --build
+docker compose logs -f scheduler
+Check DB columns exist. If ENABLE_SCHEMA_BOOTSTRAP=1 is enabled, columns should auto-create. Otherwise run ALTER commands manually.
+Important checks after deploy
+Create test tickets:
+Software
+Hardware
+Office Infra
+Set pick_sla_deadline_at to past for testing:
+UPDATE infra_tickets
+SET
+  status = 'New',
+  assigned_to = NULL,
+  is_invalid = 0,
+  auto_hiccup_generated = 0,
+  auto_hiccup_id = NULL,
+  auto_hiccup_generated_at = NULL,
+  pick_sla_deadline_at = NOW() - INTERVAL 5 MINUTE
+WHERE ticket_id = YOUR_TICKET_ID;
+Then wait up to 10 min during 12–4 window or run scheduler manually.
+Verify:
+SELECT ticket_id, auto_hiccup_generated, auto_hiccup_id
+FROM infra_tickets
+WHERE ticket_id = YOUR_TICKET_ID;
+And:
+SELECT hiccup_id, raised_by_name, raised_against_name, source_module
+FROM hiccups
+WHERE source_module IN ('infra_pick_sla', 'infra_resolution_sla')
+ORDER BY created_at DESC
+LIMIT 10;
+Known local note
+py main.py does not start scheduler locally. Need separate terminal:
+python -m app.core.scheduler_runner
+Production Docker scheduler service should handle this.

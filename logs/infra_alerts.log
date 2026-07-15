@@ -8488,3 +8488,319 @@ requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='10.1.1.44', port=30
 2026-06-25 14:40:57,544 [INFO] app.api.routes_infra: WA[773e0f90] -> sendMessage | target=918126382045 | len=125
 2026-06-25 14:40:57,871 [INFO] app.api.routes_infra: WA[773e0f90] <- status=200 | body={"success":true}
 2026-06-25 14:40:57,871 [INFO] app.api.routes_infra: PickNotify sent to 8126382045 | ticket_id=598
+2026-07-15 14:22:47,130 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=572 hiccups=HCP-26-1025, HCP-26-1025, HCP-26-1025
+2026-07-15 14:22:47,144 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=951 hiccups=HCP-26-1025, HCP-26-1025
+2026-07-15 14:22:47,161 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=952 hiccups=HCP-26-1025, HCP-26-1025, HCP-26-1025
+2026-07-15 14:22:47,166 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=953 hiccups=HCP-26-1025
+2026-07-15 14:23:26,325 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=951 hiccups=HCP-26-1025, HCP-26-1026
+2026-07-15 14:23:26,367 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=952 hiccups=HCP-26-1027, HCP-26-1028, HCP-26-1029
+2026-07-15 14:23:26,387 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=953 hiccups=HCP-26-1030
+2026-07-15 14:31:02,567 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=598 hiccup=HCP-26-1031
+2026-07-15 14:31:02,587 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=800 hiccup=HCP-26-1032
+2026-07-15 14:31:02,604 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=886 hiccup=HCP-26-1033
+2026-07-15 14:31:02,621 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=926 hiccup=HCP-26-1034
+2026-07-15 14:31:02,638 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=927 hiccup=HCP-26-1035
+2026-07-15 14:31:02,658 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=936 hiccup=HCP-26-1036
+2026-07-15 14:31:02,676 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=937 hiccup=HCP-26-1037
+2026-07-15 14:31:02,693 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=945 hiccup=HCP-26-1038
+2026-07-15 14:31:02,711 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=946 hiccup=HCP-26-1039
+2026-07-15 14:31:02,747 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=947 hiccup=HCP-26-1040
+2026-07-15 14:31:02,790 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=948 hiccup=HCP-26-1041
+2026-07-15 14:31:02,849 [INFO] app.api.routes_infra: Infra resolution SLA hiccup generated | ticket_id=954 hiccup=HCP-26-1042
+2026-07-15 14:33:57,880 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=955 created_by=Dr Vipul Bhasin dept=Technical category=Software
+2026-07-15 14:33:57,881 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=955 | msg_len=226
+2026-07-15 14:33:57,883 [INFO] app.api.routes_infra: WA[89428918] -> sendMessage | target=120363141953100908@g.us | len=226
+2026-07-15 14:34:07,894 [ERROR] app.api.routes_infra: WA[89428918] send_whatsapp_to_number exception: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x191795782f0>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+    raise err
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 213, in _new_conn
+    raise ConnectTimeoutError(
+    ...<2 lines>...
+    ) from e
+urllib3.exceptions.ConnectTimeoutError: (<HTTPConnection(host='10.1.1.34', port=3004) at 0x191795782f0>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\retry.py", line 543, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x191795782f0>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Hiccup-it_ticket\app\api\routes_infra.py", line 149, in send_whatsapp_to_number
+    
+    
+    ...<7 lines>...
+        timeout=10,
+        ^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\api.py", line 134, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\adapters.py", line 717, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x191795782f0>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+2026-07-15 14:34:08,067 [ERROR] app.api.routes_infra: InfraAlert failed | status=500 | resp=HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x191795782f0>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+2026-07-15 14:35:14,917 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=956 created_by=Dr Vipul Bhasin dept=Technical category=Hardware
+2026-07-15 14:35:14,918 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=956 | msg_len=230
+2026-07-15 14:35:14,918 [INFO] app.api.routes_infra: WA[ff5bfcad] -> sendMessage | target=120363141953100908@g.us | len=230
+2026-07-15 14:35:24,926 [ERROR] app.api.routes_infra: WA[ff5bfcad] send_whatsapp_to_number exception: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16d50>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+    raise err
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 213, in _new_conn
+    raise ConnectTimeoutError(
+    ...<2 lines>...
+    ) from e
+urllib3.exceptions.ConnectTimeoutError: (<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16d50>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\retry.py", line 543, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16d50>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Hiccup-it_ticket\app\api\routes_infra.py", line 149, in send_whatsapp_to_number
+    
+    
+    ...<7 lines>...
+        timeout=10,
+        ^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\api.py", line 134, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\adapters.py", line 717, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16d50>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+2026-07-15 14:35:24,931 [ERROR] app.api.routes_infra: InfraAlert failed | status=500 | resp=HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16d50>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+2026-07-15 14:35:28,892 [INFO] app.api.routes_infra: InfraAlert trigger -> ticket_id=957 created_by=Dr Vipul Bhasin dept=Technical category=Office Infra
+2026-07-15 14:35:28,893 [INFO] app.api.routes_infra: InfraAlert -> sending WA for ticket_id=957 | msg_len=243
+2026-07-15 14:35:28,894 [INFO] app.api.routes_infra: WA[d3128ba1] -> sendMessage | target=120363141953100908@g.us | len=243
+2026-07-15 14:35:38,899 [ERROR] app.api.routes_infra: WA[d3128ba1] send_whatsapp_to_number exception: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16990>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+    raise err
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+    sock.connect(sa)
+    ~~~~~~~~~~~~^^^^
+TimeoutError: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+    ~~~~~~~~~~~~^
+        method,
+        ^^^^^^^
+    ...<6 lines>...
+        enforce_content_length=enforce_content_length,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 500, in request
+    self.endheaders()
+    ~~~~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1093, in _send_output
+    self.send(msg)
+    ~~~~~~~~~^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\http\client.py", line 1037, in send
+    self.connect()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ~~~~~~~~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connection.py", line 213, in _new_conn
+    raise ConnectTimeoutError(
+    ...<2 lines>...
+    ) from e
+urllib3.exceptions.ConnectTimeoutError: (<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16990>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\urllib3\util\retry.py", line 543, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16990>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\Hiccup-it_ticket\app\api\routes_infra.py", line 149, in send_whatsapp_to_number
+    
+    
+    ...<7 lines>...
+        timeout=10,
+        ^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\api.py", line 134, in post
+    return request("post", url, data=data, json=json, **kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\user\AppData\Local\Programs\Python\Python313\Lib\site-packages\requests\adapters.py", line 717, in send
+    raise ConnectTimeout(e, request=request)
+requests.exceptions.ConnectTimeout: HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16990>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+2026-07-15 14:35:38,903 [ERROR] app.api.routes_infra: InfraAlert failed | status=500 | resp=HTTPConnectionPool(host='10.1.1.34', port=3004): Max retries exceeded with url: /api/messages/send (Caused by ConnectTimeoutError(<HTTPConnection(host='10.1.1.34', port=3004) at 0x19179b16990>, 'Connection to 10.1.1.34 timed out. (connect timeout=10)'))
+2026-07-15 15:11:08,444 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=955 hiccups=HCP-26-001, HCP-26-002, HCP-26-003
+2026-07-15 15:11:08,466 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=956 hiccups=HCP-26-004, HCP-26-005
+2026-07-15 15:11:08,473 [INFO] app.api.routes_infra: Infra auto hiccup generated | ticket_id=957 hiccups=HCP-26-006

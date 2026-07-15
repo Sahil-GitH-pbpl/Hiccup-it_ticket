@@ -190,6 +190,41 @@ if _schema_bootstrap_enabled:
     _ensure_infra_ticket_autoincrement(engine)
 
 
+def _ensure_infra_sla_columns(engine):
+    inspector = inspect(engine)
+    try:
+        columns = {col["name"] for col in inspector.get_columns("infra_tickets")}
+    except NoSuchTableError:
+        return
+    statements = []
+    if "pick_sla_deadline_at" not in columns:
+        statements.append("ALTER TABLE infra_tickets ADD COLUMN pick_sla_deadline_at DATETIME NULL")
+    if "auto_hiccup_generated" not in columns:
+        statements.append(
+            "ALTER TABLE infra_tickets ADD COLUMN auto_hiccup_generated TINYINT(1) NOT NULL DEFAULT 0"
+        )
+    if "auto_hiccup_id" not in columns:
+        statements.append("ALTER TABLE infra_tickets ADD COLUMN auto_hiccup_id VARCHAR(255) NULL")
+    if "auto_hiccup_generated_at" not in columns:
+        statements.append("ALTER TABLE infra_tickets ADD COLUMN auto_hiccup_generated_at DATETIME NULL")
+    if "resolve_sla_hiccup_generated" not in columns:
+        statements.append(
+            "ALTER TABLE infra_tickets ADD COLUMN resolve_sla_hiccup_generated TINYINT(1) NOT NULL DEFAULT 0"
+        )
+    if "resolve_sla_hiccup_id" not in columns:
+        statements.append("ALTER TABLE infra_tickets ADD COLUMN resolve_sla_hiccup_id VARCHAR(255) NULL")
+    if "resolve_sla_hiccup_generated_at" not in columns:
+        statements.append("ALTER TABLE infra_tickets ADD COLUMN resolve_sla_hiccup_generated_at DATETIME NULL")
+    if statements:
+        with engine.begin() as conn:
+            for stmt in statements:
+                conn.execute(text(stmt))
+
+
+if _schema_bootstrap_enabled:
+    _ensure_infra_sla_columns(engine)
+
+
 def _ensure_infra_ticket_images_autoincrement(engine):
     inspector = inspect(engine)
     try:
@@ -252,6 +287,8 @@ def _ensure_infra_indexes(engine):
         "idx_infra_tickets_department": "CREATE INDEX idx_infra_tickets_department ON infra_tickets (department)",
         "idx_infra_tickets_category": "CREATE INDEX idx_infra_tickets_category ON infra_tickets (category)",
         "idx_infra_tickets_delayed": "CREATE INDEX idx_infra_tickets_delayed ON infra_tickets (is_delayed_pick)",
+        "idx_infra_tickets_auto_hiccup": "CREATE INDEX idx_infra_tickets_auto_hiccup ON infra_tickets (auto_hiccup_generated, pick_sla_deadline_at)",
+        "idx_infra_tickets_resolve_sla_hiccup": "CREATE INDEX idx_infra_tickets_resolve_sla_hiccup ON infra_tickets (resolve_sla_hiccup_generated, commitment_time)",
     }
     with engine.begin() as conn:
         for index_name, statement in statements.items():

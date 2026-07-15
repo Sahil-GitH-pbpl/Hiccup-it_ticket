@@ -35,6 +35,13 @@ class InfraTicket(Base):
     created_at = Column(DateTime, default=now_local_naive, nullable=False)
     updated_at = Column(DateTime, default=now_local_naive, onupdate=now_local_naive, nullable=False)
     reminder_sent = Column(Boolean, nullable=False, default=False)
+    pick_sla_deadline_at = Column(DateTime)
+    auto_hiccup_generated = Column(Boolean, nullable=False, default=False)
+    auto_hiccup_id = Column(String(255))
+    auto_hiccup_generated_at = Column(DateTime)
+    resolve_sla_hiccup_generated = Column(Boolean, nullable=False, default=False)
+    resolve_sla_hiccup_id = Column(String(255))
+    resolve_sla_hiccup_generated_at = Column(DateTime)
 
     images = relationship(
         "InfraTicketImage",
@@ -81,3 +88,5 @@ Index("idx_infra_tickets_assigned_to", InfraTicket.assigned_to)
 Index("idx_infra_tickets_department", InfraTicket.department)
 Index("idx_infra_tickets_category", InfraTicket.category)
 Index("idx_infra_tickets_delayed", InfraTicket.is_delayed_pick)
+Index("idx_infra_tickets_auto_hiccup", InfraTicket.auto_hiccup_generated, InfraTicket.pick_sla_deadline_at)
+Index("idx_infra_tickets_resolve_sla_hiccup", InfraTicket.resolve_sla_hiccup_generated, InfraTicket.commitment_time)

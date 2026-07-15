@@ -28,6 +28,9 @@ services:
       - WHATSAPP_RESPONSE_BASE_URL=http://10.1.1.53:3010
       - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
       - TIMEZONE=Asia/Kolkata
+      - INFRA_PICK_SLA_START=12:00
+      - INFRA_PICK_SLA_END=16:00
+      - INFRA_SLA_HOLIDAYS=2026-01-26,2026-08-15,2026-10-02,2026-12-25
     ports:
       - "3010:3010"
     volumes:
@@ -62,6 +65,9 @@ services:
       - WHATSAPP_RESPONSE_BASE_URL=http://10.1.1.53:3010
       - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
       - TIMEZONE=Asia/Kolkata
+      - INFRA_PICK_SLA_START=12:00
+      - INFRA_PICK_SLA_END=16:00
+      - INFRA_SLA_HOLIDAYS=2026-01-26,2026-08-15,2026-10-02,2026-12-25
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads

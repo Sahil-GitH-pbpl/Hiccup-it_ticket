@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     # response_escalate_minutes: int = Field(4, env="RESPONSE_ESCALATE_MINUTES")
     session_secret: str = Field("change-this-session-secret", env="SESSION_SECRET")
     enable_infra_reminder: bool = Field(True, env="ENABLE_INFRA_REMINDER")
+    infra_pick_sla_start: str = Field("12:00", env="INFRA_PICK_SLA_START")
+    infra_pick_sla_end: str = Field("16:00", env="INFRA_PICK_SLA_END")
+    infra_sla_holidays: str = Field("", env="INFRA_SLA_HOLIDAYS")
     local_reload: bool = Field(False, env="LOCAL_RELOAD")
 
     model_config = SettingsConfigDict(

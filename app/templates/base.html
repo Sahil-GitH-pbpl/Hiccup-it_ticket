@@ -281,10 +281,10 @@
         </div>
 
             <div class="relative nav-dropdown-parent">
-              <button id="nav-it-toggle" class="hover:text-tealbrand transition-colors font-semibold">IT Ticket &#9662;</button>
+              <button id="nav-it-toggle" class="hover:text-tealbrand transition-colors font-semibold">Infra Ticket &#9662;</button>
               <div id="nav-it-menu" class="nav-dropdown hidden">
-                <a href="/infra/create-form" class="nav-dropdown__item">Create IT Ticket</a>
-              <a href="/my-tickets" class="nav-dropdown__item">My IT Tickets</a>
+                <a href="/infra/create-form" class="nav-dropdown__item">Create Infra Ticket</a>
+              <a href="/my-tickets" class="nav-dropdown__item">My Infra Tickets</a>
           {% if user is defined and user and (
               (user.user_id == 95 if user.user_id is defined else false)
               or
@@ -296,7 +296,7 @@
               or ('it' in (user.role or '')|lower)
               or ('infra' in (user.role or '')|lower)
             ) %}
-            <a id="nav-it-all" href="/infra/all" class="nav-dropdown__item">All IT Tickets</a>
+            <a id="nav-it-all" href="/infra/all" class="nav-dropdown__item">All Infra Tickets</a>
           {% endif %}
           </div>
         </div>
@@ -344,9 +344,9 @@
           <a href="/assigned" class="mobile-nav-link">Assigned to Me</a>
         </div>
         <div class="mobile-nav-section">
-          <div class="mobile-nav-section-title">IT Ticket</div>
-          <a href="/infra/create-form" class="mobile-nav-link">Create IT Ticket</a>
-          <a href="/my-tickets" class="mobile-nav-link">My IT Tickets</a>
+          <div class="mobile-nav-section-title">Infra Ticket</div>
+          <a href="/infra/create-form" class="mobile-nav-link">Create Infra Ticket</a>
+          <a href="/my-tickets" class="mobile-nav-link">My Infra Tickets</a>
           {% if user is defined and user and (
               (user.user_id == 95 if user.user_id is defined else false)
               or
@@ -358,7 +358,7 @@
               or ('it' in (user.role or '')|lower)
               or ('infra' in (user.role or '')|lower)
             ) %}
-          <a id="nav-it-all-mobile" href="/infra/all" class="mobile-nav-link">All IT Tickets</a>
+          <a id="nav-it-all-mobile" href="/infra/all" class="mobile-nav-link">All Infra Tickets</a>
           {% endif %}
         </div>
         <div class="mobile-nav-section">

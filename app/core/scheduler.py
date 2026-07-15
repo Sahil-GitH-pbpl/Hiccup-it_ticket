@@ -8,7 +8,12 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.db.session import SessionLocal
-from app.api.routes_infra import _send_pick_reminders
+from app.api.routes_infra import (
+    _send_pick_reminders,
+    generate_infra_pick_sla_hiccups,
+    generate_infra_resolution_sla_hiccups,
+    is_infra_sla_check_window,
+)
 from app.services.hiccup_service import mark_overdue_flags
 from app.services.notification_service import (
     send_daily_summary,
@@ -61,6 +66,29 @@ def start_scheduler():
         finally:
             db.close()
 
+    def infra_pick_sla_job():
+        logger.info("Running infra pick SLA auto-hiccup check")
+        if not is_infra_sla_check_window():
+            logger.info("Skipping infra pick SLA check outside working window")
+            return
+        db: Session = SessionLocal()
+        try:
+            pick_created_count = generate_infra_pick_sla_hiccups(db)
+            resolution_created_count = generate_infra_resolution_sla_hiccups(db)
+            db.commit()
+            if pick_created_count:
+                logger.info("Infra pick SLA auto-hiccup created %s hiccups", pick_created_count)
+            if resolution_created_count:
+                logger.info(
+                    "Infra resolution SLA auto-hiccup created %s hiccups",
+                    resolution_created_count,
+                )
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("Infra pick SLA auto-hiccup check failed: %s", exc)
+            db.rollback()
+        finally:
+            db.close()
+
     def previous_day_hiccup_report_job():
         report_date = now_local().date() - timedelta(days=1)
         logger.info("Running previous-day Hiccup WhatsApp report for %s", report_date)
@@ -80,6 +108,13 @@ def start_scheduler():
 
     scheduler.add_job(
         hourly_job, "interval", minutes=60, id="sla-check", replace_existing=True
+    )
+    scheduler.add_job(
+        infra_pick_sla_job,
+        "interval",
+        minutes=10,
+        id="infra-pick-sla-auto-hiccup",
+        replace_existing=True,
     )
     scheduler.add_job(
         daily_summary_job,
