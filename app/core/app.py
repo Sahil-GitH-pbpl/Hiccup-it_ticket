@@ -23,7 +23,6 @@ from app.api import (
     routes_internal,
     routes_staff,
 )
-from app.core.scheduler import start_scheduler
 from app.core.security import (
     get_current_user,
     decode_jwt,
@@ -1067,6 +1066,4 @@ def create_app() -> FastAPI:
             target = f"{base}/public/hiccups/{hiccup_id}?public_token={quote_plus(token_value)}"
         return RedirectResponse(target)
 
-    if os.getenv("SCHEDULER_PRIMARY", "0") == "1":
-        start_scheduler()
     return app

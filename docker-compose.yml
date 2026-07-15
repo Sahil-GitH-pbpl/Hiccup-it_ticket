@@ -28,9 +28,40 @@ services:
       - WHATSAPP_RESPONSE_BASE_URL=http://10.1.1.53:3010
       - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
       - TIMEZONE=Asia/Kolkata
-      - SCHEDULER_PRIMARY=1
     ports:
       - "3010:3010"
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+  scheduler:
+    build: .
+    container_name: hiccup_scheduler
+    depends_on:
+      - mysql
+    command: ["python", "-m", "app.core.scheduler_runner"]
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=example
+      - DB_NAME=hiccup_ticket
+      - ENABLE_SCHEMA_BOOTSTRAP=1
+      - MAIN_DB_HOST=remote-db-host
+      - MAIN_DB_PORT=3306
+      - MAIN_DB_USER=remote-db-user
+      - MAIN_DB_PASSWORD=remote-db-password
+      - MAIN_DB_NAME=lead_management
+      - JWT_SECRET=supersecret
+      - JWT_ALGO=HS256
+      - WHATSAPP_API_URL=http://10.1.1.44:3004/api/messages/send
+      - WHATSAPP_API_TOKEN=61e3f2cd978650537d9223e7
+      - MANAGEMENT_GROUP_NUMBERS=120363141953100908@g.us
+      - INTERNAL_SERVICE_TOKEN=internal-token
+      - FRONTEND_BASE_URL=http://10.1.1.53:3010
+      - WHATSAPP_RESPONSE_BASE_URL=http://10.1.1.53:3010
+      - EXTERNAL_WHATSAPP_RESPONSE_BASE_URL=https://labmate.bhasinpathlabs.com:4666
+      - TIMEZONE=Asia/Kolkata
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads

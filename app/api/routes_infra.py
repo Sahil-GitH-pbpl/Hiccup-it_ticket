@@ -1,7 +1,6 @@
 from pathlib import Path
 from typing import Optional
 from datetime import datetime, timedelta
-import os
 import time
 import logging
 import threading
@@ -318,86 +317,6 @@ def _send_pick_reminders(db: Session):
 
     if updated:
         db.commit()
-
-
-def _reminder_loop():
-    """
-    Background loop to send reminders even when no web requests occur.
-    """
-    while True:
-        try:
-            db = SessionLocal()
-            _send_pick_reminders(db)
-        except Exception as exc:
-            logger.exception("InfraReminder background loop error: %s", exc)
-        finally:
-            try:
-                db.close()
-            except Exception:
-                pass
-        time.sleep(REMINDER_INTERVAL_SECONDS)
-
-
-def _pid_alive(pid: int) -> bool:
-    """
-    Best-effort check if a process is alive.
-    """
-    try:
-        # On Windows and Unix, signal 0 checks existence.
-        os.kill(pid, 0)
-        return True
-    except Exception:
-        return False
-
-
-def _acquire_reminder_lock(lock_path: Path) -> bool:
-    """
-    Ensure only one process starts the reminder loop by using a pid file lock.
-    """
-    lock_path.parent.mkdir(exist_ok=True)
-    pid = os.getpid()
-    try:
-        fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        os.write(fd, str(pid).encode())
-        os.close(fd)
-        return True
-    except FileExistsError:
-        try:
-            existing_pid = int((lock_path.read_text() or "0").strip())
-        except Exception:
-            existing_pid = 0
-        if existing_pid and _pid_alive(existing_pid):
-            logger.info("InfraReminder loop already running (pid=%s); skipping start", existing_pid)
-            return False
-        # Stale lock; reclaim
-        try:
-            lock_path.unlink()
-        except Exception:
-            pass
-        try:
-            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.write(fd, str(pid).encode())
-            os.close(fd)
-            return True
-        except Exception:
-            logger.info("InfraReminder lock contention; skipping start")
-            return False
-
-
-def _start_reminder_loop_once():
-    """
-    Start the reminder thread only if we hold the singleton lock.
-    """
-    if not settings.enable_infra_reminder:
-        logger.info("InfraReminder disabled by ENABLE_INFRA_REMINDER=0")
-        return None
-
-    lock_path = Path("/tmp") / "hiccup_infra_reminder.lock"
-    if _acquire_reminder_lock(lock_path):
-        thread = threading.Thread(target=_reminder_loop, daemon=True)
-        thread.start()
-        return thread
-    return None
 
 
 # -------------------------------------------------------------
@@ -1179,6 +1098,3 @@ def mark_invalid(
             )
 
     return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
-
-
-_reminder_thread = _start_reminder_loop_once()
