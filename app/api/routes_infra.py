@@ -269,10 +269,15 @@ def _build_invalid_message(ticket: InfraTicket) -> str:
 def _build_resolved_message(ticket: InfraTicket) -> str:
     resolver = ticket.assigned_to or "IT team"
     commitment = ticket.commitment_time.strftime("%d-%b-%Y %I:%M %p") if ticket.commitment_time else "-"
+    category = ticket.category or "-"
+    subcategory = ticket.subcategory or "-"
+    description = (ticket.description or "-").strip() or "-"
     lines = [
         "✅ *Ticket Resolved*",
         f"Ticket #{ticket.ticket_id} has been resolved by {resolver}.",
         f"Commitment Time: {commitment}",
+        f"Category: {category} / {subcategory}",
+        f"Description: {description}",
         "",
         "Thank you for your patience!",
         "",
@@ -449,21 +454,13 @@ def _find_staff_by_name(db: Session, name: Optional[str]) -> Optional[Staff]:
 
 def _create_infra_pick_sla_hiccup(db: Session, ticket: InfraTicket, owner: Staff, group_names: str) -> Hiccup:
     hiccup_id = generate_hiccup_id(db)
-    deadline = ticket.pick_sla_deadline_at or calculate_pick_sla_deadline(ticket.created_at)
     created_str = ticket.created_at.strftime("%d-%b-%Y %I:%M %p") if ticket.created_at else "-"
-    deadline_str = deadline.strftime("%d-%b-%Y %I:%M %p") if deadline else "-"
     description = "\n".join(
         [
             f"Infra ticket #{ticket.ticket_id} was not picked within the working-hour SLA.",
             "",
             f"Ticket created by: {ticket.created_by or '-'}",
-            f"Department/location: {ticket.department or '-'}",
-            f"Category/type: {ticket.category or '-'} / {ticket.subcategory or '-'}",
-            f"Workstation: {ticket.workstation or '-'}",
             f"Created at: {created_str}",
-            f"Pick deadline: {deadline_str}",
-            f"Responsible group: {group_names or owner.name or owner.id}",
-            "",
             f"Ticket description: {ticket.description or '-'}",
         ]
     )
@@ -504,7 +501,6 @@ def _create_infra_resolution_sla_hiccup(
     db: Session, ticket: InfraTicket, creator: Staff, assignee: Staff
 ) -> Hiccup:
     hiccup_id = generate_hiccup_id(db)
-    created_str = ticket.created_at.strftime("%d-%b-%Y %I:%M %p") if ticket.created_at else "-"
     commitment_str = (
         ticket.commitment_time.strftime("%d-%b-%Y %I:%M %p")
         if ticket.commitment_time
@@ -516,12 +512,7 @@ def _create_infra_resolution_sla_hiccup(
             "",
             f"Ticket created by: {ticket.created_by or '-'}",
             f"Picked/assigned to: {ticket.assigned_to or '-'}",
-            f"Department/location: {ticket.department or '-'}",
-            f"Category/type: {ticket.category or '-'} / {ticket.subcategory or '-'}",
-            f"Workstation: {ticket.workstation or '-'}",
-            f"Created at: {created_str}",
             f"Commitment time: {commitment_str}",
-            "",
             f"Ticket description: {ticket.description or '-'}",
         ]
     )
@@ -565,8 +556,6 @@ def _generate_resolution_sla_hiccup_for_ticket(db: Session, ticket: InfraTicket)
         return None
     if not ticket.commitment_time or ticket.commitment_time > now_local_naive():
         return None
-    if not ticket.pick_sla_deadline_at:
-        return None
     if ticket.status == "Resolved" or ticket.is_invalid:
         return None
     if not (ticket.assigned_to or "").strip():
@@ -609,8 +598,6 @@ def generate_infra_pick_sla_hiccups(db: Session) -> int:
             or_(InfraTicket.assigned_to.is_(None), InfraTicket.assigned_to == ""),
             InfraTicket.is_invalid == False,
             InfraTicket.auto_hiccup_generated == False,
-            InfraTicket.pick_sla_deadline_at.isnot(None),
-            InfraTicket.pick_sla_deadline_at <= now,
         )
         .all()
     )
@@ -619,6 +606,10 @@ def generate_infra_pick_sla_hiccups(db: Session) -> int:
 
     created_count = 0
     for ticket in pending:
+        if not ticket.pick_sla_deadline_at:
+            ticket.pick_sla_deadline_at = calculate_pick_sla_deadline(ticket.created_at)
+        if ticket.pick_sla_deadline_at and ticket.pick_sla_deadline_at > now:
+            continue
         owner_ids = _infra_auto_hiccup_owner_ids(ticket)
         staff_map = _staff_map_for_ids(db, owner_ids)
         owners = [staff_map[owner_id] for owner_id in owner_ids if owner_id in staff_map]
@@ -671,7 +662,6 @@ def generate_infra_resolution_sla_hiccups(db: Session) -> int:
             InfraTicket.is_invalid == False,
             InfraTicket.commitment_time.isnot(None),
             InfraTicket.commitment_time < now,
-            InfraTicket.pick_sla_deadline_at.isnot(None),
             InfraTicket.resolve_sla_hiccup_generated == False,
         )
         .all()

@@ -327,7 +327,7 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
         f"Time: {hiccup.created_at.strftime('%Y-%m-%d %H:%M')}",
         f"Summary: {(hiccup.description or '').strip()[:120] or 'N/A'}",
         "Tap to respond (choose link based on location):",
-        f"- In office (192.168.0.173): {internal_url}",
+        f"- In office (10.1.1.53): {internal_url}",
         f"- Outside office (internet): {external_url}",
         "Copy-paste the text box, submit it, and you're done.",
     ]
@@ -490,7 +490,7 @@ def send_nc_assignment_notice(db: Session, hiccup: Hiccup):
         "- Login to the portal.",
         "- Open 'Assigned to Me' and use the Hiccup ID above.",
         "Assigned list:",
-        f"- In office (192.168.0.173): {assigned_link_internal}",
+        f"- In office (10.1.1.53): {assigned_link_internal}",
         f"- Outside office (internet): {assigned_link_external}",
         f"Hiccup page: {hiccup_link}",
     ]
@@ -627,7 +627,7 @@ def send_response_reminders(db: Session):
                     "Management will escalate to NC soon.",
                     f"Overdue flag: {hiccup.is_response_overdue}",
                     "Respond here (choose based on location):",
-                    f"- In office (192.168.0.173): {internal_url}",
+                    f"- In office (10.1.1.53): {internal_url}",
                     f"- Outside office (internet): {external_url}",
                 ]
             )
@@ -666,7 +666,7 @@ def send_response_reminders(db: Session):
                     f"Hiccup {hiccup.hiccup_id} is overdue (24h).",
                     "This hiccup is now marked response_overdue.",
                     "Please respond (choose based on location):",
-                    f"- In office (192.168.0.173): {internal_url}",
+                    f"- In office (10.1.1.53): {internal_url}",
                     f"- Outside office (internet): {external_url}",
                 ]
             )
@@ -691,7 +691,7 @@ def send_response_reminders(db: Session):
                     f"Reminder: Hiccup {hiccup.hiccup_id} needs response soon.",
                     "Submit within 24 hours to avoid overdue flag.",
                     "Respond here (choose based on location):",
-                    f"- In office (192.168.0.173): {internal_url}",
+                    f"- In office (10.1.1.53): {internal_url}",
                     f"- Outside office (internet): {external_url}",
                 ]
             )

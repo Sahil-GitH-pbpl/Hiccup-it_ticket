@@ -596,7 +596,9 @@ function renderBulkCloseBar(rows = []) {
 
 function managementActionButtons(hiccup) {
     const { hiccup_id: id, status, escalated_by, nc_assigned_staff_id } = hiccup;
-    const hasEscalation = Boolean(escalated_by);
+    const hasEscalation = Boolean(
+        status === 'Escalated to NC' || escalated_by || nc_assigned_staff_id
+    );
     const assignedToCurrentUser =
         nc_assigned_staff_id &&
         currentUserId &&
@@ -615,7 +617,7 @@ function managementActionButtons(hiccup) {
         });
     }
     const escalationAction =
-        status === 'Escalated to NC' || (status === 'Closed' && hasEscalation)
+        hasEscalation
             ? {
                   label: 'View NC Form',
                   classes: 'text-amber-600 border-amber-300',
