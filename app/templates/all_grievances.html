@@ -1,0 +1,200 @@
+{% extends 'layout.html' %}
+
+{% block page_head_extra %}
+<link rel="stylesheet" href="/static/css/grievance.css" />
+{% endblock %}
+
+{% block content %}
+<section class="hiccup-shell rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-2xl shadow-slate-200/60">
+  <div class="mb-5 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs font-black uppercase tracking-[0.3em] text-tealbrand">HRMS</p>
+      <h1 class="mt-1 text-3xl font-black text-slate-900">All Grievances</h1>
+      <p class="mt-1 text-sm text-slate-500">Read-only grievance records submitted by employees.</p>
+    </div>
+    <div class="rounded-full border border-teal-200 bg-teal-50 px-4 py-2 text-sm font-black text-teal-700">
+      {{ pagination.total }} total
+    </div>
+  </div>
+
+  <form class="grievance-filterbar" method="get" action="/grievances">
+    <label>
+      <span>Date From</span>
+      <input name="date_from" type="date" value="{{ filters.date_from or '' }}">
+    </label>
+    <label>
+      <span>Date To</span>
+      <input name="date_to" type="date" value="{{ filters.date_to or '' }}">
+    </label>
+    <label>
+      <span>Category</span>
+      <select name="category">
+        <option value="">All</option>
+        {% for category in categories %}
+        <option value="{{ category }}" {% if filters.category == category %}selected{% endif %}>{{ category }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label class="grievance-filterbar__search">
+      <span>Search</span>
+      <input name="search" type="search" placeholder="employee / staff / description" value="{{ filters.search or '' }}">
+    </label>
+    <label>
+      <span>Limit</span>
+      <select name="page_size">
+        {% for size in [50, 100, 200] %}
+        <option value="{{ size }}" {% if filters.page_size == size %}selected{% endif %}>{{ size }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <div class="grievance-filterbar__actions">
+      <button class="grievance-filterbar__apply" type="submit">Apply</button>
+      <a class="grievance-filterbar__clear" href="/grievances">Clear</a>
+    </div>
+  </form>
+
+  <div class="table-scroll mt-4 hidden md:block">
+    <table class="enhanced-table">
+      <thead class="bg-slate-50 text-xs uppercase tracking-[0.3em] text-slate-400">
+        <tr>
+          <th class="px-4 py-3 text-left">ID</th>
+          <th class="px-4 py-3 text-left">Employee</th>
+          <th class="px-4 py-3 text-left">Category</th>
+          <th class="px-4 py-3 text-left">Staff</th>
+          <th class="px-4 py-3 text-left">Created</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 bg-white text-sm text-slate-600">
+        {% if grievances %}
+          {% for grievance in grievances %}
+          <tr class="align-top grievance-summary-row" data-grievance-row="{{ grievance.grievance_id }}">
+            <td class="px-4 py-3 font-black text-tealbrand">#GRV-{{ grievance.grievance_id }}</td>
+            <td class="px-4 py-3">
+              <button
+                class="grievance-expand-btn inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-2 text-left font-black text-tealbrand"
+                type="button"
+                data-grievance-toggle="{{ grievance.grievance_id }}"
+                aria-expanded="false"
+                aria-controls="grievance-detail-{{ grievance.grievance_id }}"
+              >
+                <span class="grievance-arrow">▾</span>
+                <span>{{ grievance.employee_name }}</span>
+              </button>
+            </td>
+            <td class="px-4 py-3">{{ grievance.category }}</td>
+            <td class="px-4 py-3">
+              {% if grievance.staff_names %}
+                {{ grievance.staff_names | join(', ') }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">{{ grievance.created_at.strftime('%d-%m-%Y %H:%M') if grievance.created_at else '-' }}</td>
+          </tr>
+          <tr id="grievance-detail-{{ grievance.grievance_id }}" class="grievance-detail-row hidden">
+            <td colspan="5" class="px-4 py-0">
+              <div class="my-3 rounded-3xl border border-teal-100 bg-gradient-to-br from-sky-50 via-white to-teal-50 p-4 shadow-inner">
+                <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <h3 class="text-lg font-black text-slate-900">#GRV-{{ grievance.grievance_id }} Summary</h3>
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Employee grievance details</p>
+                  </div>
+                </div>
+                <div class="grid gap-3 md:grid-cols-2">
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Employee</p>
+                    <p class="mt-2 text-sm font-semibold text-slate-800">{{ grievance.employee_name }}</p>
+                    <p class="mt-1 text-xs font-bold text-slate-400">ID: {{ grievance.employee_id }}{% if grievance.designation and grievance.designation != '-' %} · {{ grievance.designation }}{% endif %}</p>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Involved Staff</p>
+                    <p class="mt-2 text-sm font-semibold text-slate-800">{{ grievance.staff_names | join(', ') if grievance.staff_names else '-' }}</p>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Description</p>
+                    <p class="mt-2 whitespace-pre-line text-sm font-semibold text-slate-800">{{ grievance.description }}</p>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Expected Resolution</p>
+                    <p class="mt-2 whitespace-pre-line text-sm font-semibold text-slate-800">{{ grievance.expected_resolution }}</p>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Incident</p>
+                    <p class="mt-2 text-sm font-semibold text-slate-800">
+                      {{ grievance.incident_date.strftime('%d-%m-%Y') if grievance.incident_date else '-' }}
+                      {% if grievance.incident_time %} · {{ grievance.incident_time }}{% endif %}
+                    </p>
+                  </div>
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p class="text-xs font-black uppercase tracking-[0.22em] text-slate-400">Evidence</p>
+                    {% if grievance.evidence_path %}
+                    <a class="mt-2 inline-block text-sm font-black text-tealbrand underline" href="{{ grievance.evidence_path }}" target="_blank" rel="noopener">View attachment</a>
+                    {% else %}
+                    <p class="mt-2 text-sm font-semibold text-slate-800">No attachment</p>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="5" class="px-4 py-8 text-center text-xs font-bold uppercase tracking-[0.3em] text-slate-400">
+              No grievances found.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-4 space-y-3 md:hidden">
+    {% for grievance in grievances %}
+    <article class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <button
+            class="grievance-expand-btn inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-2 text-left font-black text-tealbrand"
+            type="button"
+            data-grievance-toggle="mobile-{{ grievance.grievance_id }}"
+            aria-expanded="false"
+            aria-controls="grievance-detail-mobile-{{ grievance.grievance_id }}"
+          >
+            <span class="grievance-arrow">▾</span>
+            <span>#GRV-{{ grievance.grievance_id }}</span>
+          </button>
+          <h2 class="text-lg font-black text-slate-900">{{ grievance.employee_name }}</h2>
+          <p class="text-xs font-bold text-slate-400">{{ grievance.created_at.strftime('%d-%m-%Y %H:%M') if grievance.created_at else '-' }}</p>
+        </div>
+      </div>
+      <div class="mt-3 grid gap-2 text-sm">
+        <p><span class="font-black text-slate-500">Category:</span> {{ grievance.category }}</p>
+        <p><span class="font-black text-slate-500">Staff:</span> {{ grievance.staff_names | join(', ') if grievance.staff_names else '-' }}</p>
+      </div>
+      <div id="grievance-detail-mobile-{{ grievance.grievance_id }}" class="grievance-detail-row mt-3 hidden rounded-2xl bg-slate-50 p-3 text-sm">
+        <p><span class="font-black text-slate-500">Description:</span> {{ grievance.description }}</p>
+        <p><span class="font-black text-slate-500">Expected:</span> {{ grievance.expected_resolution }}</p>
+      </div>
+    </article>
+    {% else %}
+    <div class="rounded-3xl border border-slate-200 bg-white p-6 text-center text-sm font-bold text-slate-400">No grievances found.</div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm font-bold text-slate-500">
+    <span>Showing {{ pagination.start }}-{{ pagination.end }} of {{ pagination.total }}</span>
+    <div class="flex items-center gap-2">
+      {% set base_q = 'date_from=' ~ (filters.date_from or '') ~ '&date_to=' ~ (filters.date_to or '') ~ '&category=' ~ (filters.category or '') ~ '&search=' ~ (filters.search or '') ~ '&page_size=' ~ filters.page_size %}
+      {% if pagination.page > 1 %}
+      <a class="rounded-full border border-slate-200 bg-white px-4 py-2 text-slate-700 hover:text-tealbrand" href="/grievances?{{ base_q }}&page={{ pagination.page - 1 }}">Previous</a>
+      {% endif %}
+      <span class="rounded-full bg-slate-100 px-4 py-2">Page {{ pagination.page }} of {{ pagination.total_pages }}</span>
+      {% if pagination.page < pagination.total_pages %}
+      <a class="rounded-full border border-slate-200 bg-white px-4 py-2 text-slate-700 hover:text-tealbrand" href="/grievances?{{ base_q }}&page={{ pagination.page + 1 }}">Next</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+<script src="/static/js/grievances.js?v=20260723a" defer></script>
+{% endblock %}

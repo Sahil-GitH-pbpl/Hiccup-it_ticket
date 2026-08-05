@@ -8,6 +8,6 @@ app = create_app()
 settings = get_settings()
 
 if __name__ == "__main__":
-    host = os.getenv("HOST", "127.0.0.1")
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "3010"))
     uvicorn.run("main:app", host=host, port=port, reload=settings.local_reload)

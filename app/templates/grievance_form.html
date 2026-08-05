@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+<link rel="stylesheet" href="/static/css/grievance.css" />
+{% endblock %}
+
+{% block content %}
+<section class="grievance-page">
+  <div class="grievance-shell">
+    <div class="grievance-hero">
+      <div>
+        <p class="grievance-kicker">Employee Support</p>
+        <h1>Employee Grievance Form</h1>
+        <p class="grievance-subtitle">
+          Share workplace concerns securely with clear context and expected resolution.
+        </p>
+      </div>
+      <div class="grievance-badge">HRMS</div>
+    </div>
+
+    {% if success_message %}
+    <div class="grievance-alert grievance-alert--success" role="status">
+      {{ success_message }}
+    </div>
+    <script>
+      window.grievanceSuccessMessage = {{ success_message|tojson }};
+    </script>
+    {% endif %}
+
+    <form
+      id="grievance-form"
+      class="grievance-card"
+      action="/grievance"
+      method="post"
+      enctype="multipart/form-data"
+      novalidate
+    >
+      <div class="grievance-section">
+        <div class="grievance-section__head">
+          <div>
+            <span class="grievance-step">01</span>
+            <h2>Grievance Information</h2>
+          </div>
+          <p>Fields marked with * are required.</p>
+        </div>
+
+        <div class="grievance-grid">
+          <label class="grievance-field">
+            <span>Grievance Category *</span>
+            <select id="category" name="category" required>
+              <option value="">Select category</option>
+              {% for category in categories %}
+              <option value="{{ category }}" {% if form.category == category %}selected{% endif %}>
+                {{ category }}
+              </option>
+              {% endfor %}
+            </select>
+            <small class="field-error" data-error-for="category">{{ errors.category or "" }}</small>
+          </label>
+
+          <label id="staff-field" class="grievance-field grievance-field--hidden">
+            <span>Staff Name *</span>
+            <div class="staff-picker" id="staff-picker">
+              <div id="selected-staff" class="selected-staff" aria-live="polite"></div>
+              <input
+                id="staff-search"
+                class="staff-search"
+                type="search"
+                placeholder="Type staff name..."
+                autocomplete="off"
+              />
+              <div id="staff-suggestions" class="staff-suggestions hidden"></div>
+            </div>
+            <div id="staff-hidden-inputs">
+              {% for selected_id in form.staff_ids or [] %}
+              <input type="hidden" name="staff_ids" value="{{ selected_id }}" />
+              {% endfor %}
+            </div>
+            <script type="application/json" id="staff-data">
+              [
+                {% for employee in employees %}
+                {
+                  "id": "{{ employee.id }}",
+                  "name": {{ employee.name|tojson }},
+                  "designation": {{ (employee.designation or "")|tojson }}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+              ]
+            </script>
+            <script type="application/json" id="preselected-staff-data">
+              {{ (form.staff_ids or [])|tojson }}
+            </script>
+            <small class="field-error" data-error-for="staff_ids">{{ errors.staff_ids or "" }}</small>
+          </label>
+        </div>
+
+        <label class="grievance-field grievance-field--wide">
+          <span>Grievance Description *</span>
+          <textarea
+            id="description"
+            name="description"
+            rows="5"
+            placeholder="Please explain your grievance in detail..."
+            required
+          >{{ form.description or "" }}</textarea>
+          <div class="field-meta">
+            <small class="field-error" data-error-for="description">{{ errors.description or "" }}</small>
+            <small><span id="description-count">0</span> characters</small>
+          </div>
+        </label>
+
+        <div class="grievance-grid grievance-grid--three">
+          <label class="grievance-field">
+            <span>Date of Incident</span>
+            <input type="date" name="incident_date" value="{{ form.incident_date or '' }}" />
+            <small class="field-error" data-error-for="incident_date">{{ errors.incident_date or "" }}</small>
+          </label>
+          <label class="grievance-field">
+            <span>Time of Incident</span>
+            <input type="time" name="incident_time" value="{{ form.incident_time or '' }}" />
+          </label>
+          <label class="grievance-field">
+            <span>Supporting Evidence</span>
+            <input
+              id="evidence"
+              type="file"
+              name="evidence"
+              accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+            />
+            <small id="selected-file-name" class="file-name">No file selected</small>
+            <small class="field-error" data-error-for="evidence">{{ errors.evidence or "" }}</small>
+          </label>
+        </div>
+
+        <label class="grievance-field grievance-field--wide">
+          <span>Expected Resolution *</span>
+          <textarea
+            id="expected-resolution"
+            name="expected_resolution"
+            rows="4"
+            placeholder="Describe what resolution you expect from HR."
+            required
+          >{{ form.expected_resolution or "" }}</textarea>
+          <small class="field-error" data-error-for="expected_resolution">{{ errors.expected_resolution or "" }}</small>
+        </label>
+      </div>
+
+      <div class="grievance-actions">
+        <button class="grievance-submit" type="submit">Submit Grievance</button>
+      </div>
+    </form>
+  </div>
+</section>
+<script src="/static/js/grievance.js" defer></script>
+{% endblock %}

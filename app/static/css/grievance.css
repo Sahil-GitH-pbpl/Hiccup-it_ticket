@@ -1,0 +1,494 @@
+.grievance-page {
+  padding: 24px;
+}
+
+.grievance-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.grievance-hero,
+.grievance-card,
+.grievance-alert {
+  border: 1px solid #dbeafe;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.grievance-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 26px;
+  margin-bottom: 18px;
+}
+
+.grievance-kicker {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.grievance-hero h1 {
+  color: #0f172a;
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.grievance-subtitle {
+  color: #64748b;
+  margin: 10px 0 0;
+}
+
+.grievance-badge {
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2563eb, #0db29c);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  padding: 12px 18px;
+}
+
+.grievance-alert {
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  font-weight: 800;
+}
+
+.grievance-alert--success {
+  background: #ecfdf5;
+  border-color: #99f6e4;
+  color: #047857;
+}
+
+.grievance-card {
+  padding: 24px;
+}
+
+.grievance-section + .grievance-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.grievance-section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.grievance-section__head div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grievance-step {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-weight: 900;
+}
+
+.grievance-section h2 {
+  color: #0f172a;
+  font-size: 20px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.grievance-section__head p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+}
+
+.employee-grid,
+.grievance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.grievance-grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.grievance-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grievance-field--wide {
+  margin-top: 16px;
+}
+
+.grievance-field--hidden {
+  display: none;
+}
+
+.grievance-field span {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.grievance-field input,
+.grievance-field select,
+.grievance-field textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 15px;
+  outline: none;
+  padding: 12px 14px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.grievance-field input[readonly] {
+  background: #f8fafc;
+  color: #475569;
+  cursor: default;
+}
+
+.grievance-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.grievance-field input:focus,
+.grievance-field select:focus,
+.grievance-field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.staff-search {
+  border: 0 !important;
+  box-shadow: none !important;
+  flex: 1 1 100%;
+  min-width: 100%;
+  padding: 8px 4px !important;
+}
+
+.staff-picker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  min-height: 50px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 8px 12px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.staff-picker:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.selected-staff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  order: 2;
+}
+
+.staff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  border: 1px solid #99f6e4;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #0f766e;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1.1;
+  padding: 5px 8px;
+}
+
+.staff-chip__name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.staff-chip button {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #ccfbf1;
+  color: #0f766e;
+  cursor: pointer;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.staff-suggestions {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 25;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+  padding: 8px;
+}
+
+.staff-suggestion {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #0f172a;
+  cursor: pointer;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.staff-suggestion:hover {
+  background: #eff6ff;
+}
+
+.staff-suggestion strong {
+  font-size: 14px;
+}
+
+.staff-suggestion span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.staff-empty {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 12px;
+}
+
+.field-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.field-meta small:last-child,
+.file-name {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.field-error {
+  min-height: 16px;
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.grievance-field.has-error input,
+.grievance-field.has-error select,
+.grievance-field.has-error textarea {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.grievance-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.grievance-submit {
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2563eb, #0db29c);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 900;
+  min-width: 240px;
+  padding: 15px 28px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 16px 30px rgba(13, 178, 156, 0.28);
+}
+
+.grievance-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 36px rgba(37, 99, 235, 0.24);
+}
+
+.grievance-expand-btn {
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.grievance-expand-btn:hover {
+  background: #ccfbf1;
+  border-color: #5eead4;
+  transform: translateY(-1px);
+}
+
+.grievance-arrow {
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+
+.grievance-arrow.is-open {
+  transform: rotate(180deg);
+}
+
+.grievance-filterbar {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(130px, 1fr));
+  gap: 12px;
+  align-items: end;
+  border: 1px solid #99f6e4;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(240, 253, 250, 0.9), rgba(239, 246, 255, 0.9));
+  padding: 16px;
+}
+
+.grievance-filterbar label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.grievance-filterbar span {
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.grievance-filterbar input,
+.grievance-filterbar select {
+  min-height: 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 9px 12px;
+  outline: none;
+}
+
+.grievance-filterbar input:focus,
+.grievance-filterbar select:focus {
+  border-color: #0db29c;
+  box-shadow: 0 0 0 4px rgba(13, 178, 156, 0.12);
+}
+
+.grievance-filterbar__search {
+  grid-column: span 2;
+}
+
+.grievance-filterbar__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.grievance-filterbar__apply,
+.grievance-filterbar__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 0 18px;
+}
+
+.grievance-filterbar__apply {
+  border: 0;
+  background: #0db29c;
+  color: #ffffff;
+}
+
+.grievance-filterbar__clear {
+  border: 1px solid #99f6e4;
+  background: #ffffff;
+  color: #0f766e;
+}
+
+@media (max-width: 1024px) {
+  .grievance-filterbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grievance-filterbar__search {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .grievance-filterbar {
+    grid-template-columns: 1fr;
+  }
+
+  .grievance-filterbar__search {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 760px) {
+  .grievance-page {
+    padding: 14px;
+  }
+
+  .grievance-hero,
+  .grievance-section__head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .employee-grid,
+  .grievance-grid,
+  .grievance-grid--three {
+    grid-template-columns: 1fr;
+  }
+
+  .grievance-card,
+  .grievance-hero {
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .grievance-actions,
+  .grievance-submit {
+    width: 100%;
+  }
+}
