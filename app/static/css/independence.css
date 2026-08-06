@@ -1,0 +1,445 @@
+.independence-theme {
+  --india-saffron: #ff9933;
+  --india-white: #ffffff;
+  --india-green: #138808;
+  --india-navy: #1a3c8b;
+}
+
+html.independence-theme,
+body.independence-theme {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(255, 153, 51, 0.24), transparent 34%),
+    radial-gradient(circle at 92% 4%, rgba(19, 136, 8, 0.2), transparent 34%),
+    linear-gradient(180deg, rgba(255, 248, 238, 0.82), rgba(255, 255, 255, 0.55) 38%, rgba(237, 252, 245, 0.78)),
+    #f8fafc !important;
+  background-attachment: fixed;
+}
+
+body.independence-theme .relative.isolate.min-h-screen {
+  background:
+    linear-gradient(120deg, rgba(255, 153, 51, 0.08), transparent 38%, rgba(19, 136, 8, 0.08)),
+    radial-gradient(circle at 50% 8%, rgba(26, 60, 139, 0.07), transparent 26%);
+}
+
+.independence-theme::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 6px;
+  z-index: 90;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--india-saffron) 0 33%,
+    var(--india-white) 33% 66%,
+    var(--india-green) 66% 100%
+  );
+  box-shadow: 0 8px 30px rgba(19, 136, 8, 0.24);
+  animation: independence-top-glow 3.5s ease-in-out infinite;
+}
+
+.independence-theme header {
+  position: sticky;
+  overflow: visible;
+  z-index: 120;
+}
+
+.independence-theme .nav-dropdown {
+  z-index: 140;
+}
+
+.independence-theme header::after {
+  z-index: -1;
+}
+
+.independence-theme header::after {
+  content: "";
+  position: absolute;
+  inset: auto -10% 0 -10%;
+  height: 3px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 153, 51, 0.7),
+    rgba(255, 255, 255, 0.95),
+    rgba(19, 136, 8, 0.7),
+    transparent
+  );
+  animation: independence-ribbon 6s linear infinite;
+}
+
+.independence-banner {
+  width: min(1180px, calc(100% - 32px));
+  margin: 16px auto 0;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 28px;
+  background:
+    linear-gradient(120deg, rgba(255, 153, 51, 0.22), rgba(255, 255, 255, 0.82) 32%, rgba(19, 136, 8, 0.18)),
+    radial-gradient(circle at 12% 22%, rgba(255, 153, 51, 0.35), transparent 30%),
+    radial-gradient(circle at 84% 18%, rgba(19, 136, 8, 0.28), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(240, 253, 250, 0.94));
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  overflow: hidden;
+  backdrop-filter: blur(14px);
+  position: relative;
+  z-index: 10;
+}
+
+.independence-banner::before,
+.independence-banner::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.independence-banner::before {
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 153, 51, 0.9) 0 33%, rgba(255, 255, 255, 0.65) 33% 66%, rgba(19, 136, 8, 0.78) 66% 100%);
+  height: 4px;
+}
+
+.independence-banner::after {
+  right: -80px;
+  bottom: -110px;
+  width: 240px;
+  height: 240px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(26, 60, 139, 0.16), transparent 68%);
+  animation: independence-pulse 3.8s ease-in-out infinite;
+}
+
+.independence-banner__inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 92px;
+  padding: 16px 20px;
+  z-index: 1;
+}
+
+.independence-banner__inner::before {
+  content: "";
+  position: absolute;
+  inset: -90px auto -90px 48%;
+  width: 260px;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(26, 60, 139, 0.16) 0 5deg,
+    transparent 5deg 10deg
+  );
+  border-radius: 999px;
+  opacity: 0.85;
+  animation: independence-wheel 18s linear infinite;
+}
+
+.independence-banner__shine {
+  position: absolute;
+  inset: -80px auto -80px -140px;
+  width: 160px;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.78), transparent);
+  animation: independence-shine 5s ease-in-out infinite;
+}
+
+.independence-banner__copy {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.independence-emblem {
+  position: relative;
+  flex: 0 0 auto;
+  width: 82px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+}
+
+.independence-emblem::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 22px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.2));
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.14);
+}
+
+.independence-flag {
+  position: relative;
+  width: 68px;
+  height: 45px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16);
+  transform-origin: left center;
+  animation: independence-flag-float 2.2s ease-in-out infinite;
+  z-index: 2;
+}
+
+.independence-flag span {
+  display: block;
+  height: 15px;
+}
+
+.independence-flag span:nth-child(1) {
+  background: var(--india-saffron);
+}
+
+.independence-flag span:nth-child(2) {
+  position: relative;
+  background: var(--india-white);
+}
+
+.independence-chakra,
+.independence-flag span:nth-child(2)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  border: 1.7px solid var(--india-navy);
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+}
+
+.independence-chakra {
+  z-index: 1;
+  top: auto;
+  left: auto;
+  right: -6px;
+  bottom: -5px;
+  width: 28px;
+  height: 28px;
+  background: repeating-conic-gradient(from 0deg, rgba(26, 60, 139, 0.28) 0 4deg, transparent 4deg 15deg);
+  border: 1px solid rgba(26, 60, 139, 0.26);
+  opacity: 0.42;
+  transform: none;
+  animation: independence-wheel-soft 9s linear infinite;
+}
+
+.independence-flag span:nth-child(3) {
+  background: var(--india-green);
+}
+
+.independence-banner__eyebrow {
+  margin: 0 0 2px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #0f766e;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.independence-banner__title {
+  margin: 0;
+  background: linear-gradient(90deg, #f97316, #0f172a 44%, #15803d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(20px, 2.6vw, 32px);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.independence-banner__text {
+  margin: 3px 0 0;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.independence-banner__close {
+  position: relative;
+  margin-left: auto;
+  flex: 0 0 auto;
+  border: 1px solid rgba(13, 178, 156, 0.28);
+  background: rgba(255, 255, 255, 0.78);
+  color: #0f766e;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 900;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.independence-banner__close:hover {
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(13, 178, 156, 0.16);
+  transform: translateY(-1px);
+}
+
+.independence-spark {
+  position: fixed;
+  top: -16px;
+  z-index: 5;
+  width: 7px;
+  height: 14px;
+  pointer-events: none;
+  border-radius: 8px;
+  opacity: 0.66;
+  animation: independence-fall var(--fall-duration, 9s) linear infinite;
+  animation-delay: var(--fall-delay, 0s);
+}
+
+.independence-spark--star {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  clip-path: polygon(50% 0%, 61% 34%, 98% 35%, 68% 56%, 79% 91%, 50% 70%, 21% 91%, 32% 56%, 2% 35%, 39% 34%);
+}
+
+.independence-spark:nth-child(3n) {
+  background: var(--india-saffron);
+}
+
+.independence-spark:nth-child(3n + 1) {
+  background: var(--india-green);
+}
+
+.independence-spark:nth-child(3n + 2) {
+  background: var(--india-navy);
+}
+
+@keyframes independence-ribbon {
+  from {
+    transform: translateX(-20%);
+  }
+  to {
+    transform: translateX(20%);
+  }
+}
+
+@keyframes independence-top-glow {
+  0%,
+  100% {
+    filter: saturate(1);
+  }
+  50% {
+    filter: saturate(1.4) brightness(1.08);
+  }
+}
+
+@keyframes independence-wave {
+  0%,
+  100% {
+    transform: skewY(-2deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(2deg) scaleX(0.96);
+  }
+}
+
+@keyframes independence-flag-float {
+  0%,
+  100% {
+    transform: translateY(0) skewY(-1.5deg);
+  }
+  50% {
+    transform: translateY(-2px) skewY(1.5deg);
+  }
+}
+
+@keyframes independence-wheel {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes independence-wheel-soft {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes independence-pulse {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.95;
+  }
+}
+
+@keyframes independence-shine {
+  0%,
+  55% {
+    transform: translateX(0) rotate(18deg);
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(980px) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes independence-fall {
+  0% {
+    transform: translate3d(0, -20px, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(var(--fall-drift, 30px), calc(100vh + 30px), 0) rotate(220deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .independence-banner {
+    width: calc(100% - 20px);
+    margin-top: 10px;
+    border-radius: 18px;
+  }
+
+  .independence-banner__inner {
+    align-items: flex-start;
+    padding: 12px;
+    min-height: 78px;
+  }
+
+  .independence-emblem {
+    width: 62px;
+    height: 48px;
+  }
+
+  .independence-flag {
+    width: 50px;
+    height: 33px;
+    border-radius: 8px;
+  }
+
+  .independence-flag span {
+    height: 11px;
+  }
+
+  .independence-banner__text {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .independence-theme header::after,
+  .independence-banner__inner::before,
+  .independence-banner::after,
+  .independence-banner__shine,
+  .independence-chakra,
+  .independence-flag,
+  .independence-spark {
+    animation: none;
+  }
+}
