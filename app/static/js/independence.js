@@ -22,13 +22,11 @@
     banner.setAttribute("aria-label", "Independence Day theme");
     banner.innerHTML = `
       <div class="independence-banner__inner">
-        <div class="independence-banner__shine" aria-hidden="true"></div>
         <div class="independence-banner__copy">
           <div class="independence-emblem" aria-hidden="true">
             <div class="independence-flag">
               <span></span><span></span><span></span>
             </div>
-            <div class="independence-chakra"></div>
           </div>
           <div>
             <p class="independence-banner__eyebrow">15 August Special</p>
@@ -48,33 +46,11 @@
     wrapper.parentNode.insertBefore(banner, wrapper);
   }
 
-  function createSparks() {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (document.querySelector(".independence-spark")) return;
-
-    const fragment = document.createDocumentFragment();
-    const sparkCount = window.innerWidth < 720 ? 14 : 28;
-
-    for (let index = 0; index < sparkCount; index += 1) {
-      const spark = document.createElement("span");
-      spark.className = index % 5 === 0 ? "independence-spark independence-spark--star" : "independence-spark";
-      spark.style.left = `${Math.round(Math.random() * 100)}vw`;
-      spark.style.setProperty("--fall-duration", `${7 + Math.random() * 7}s`);
-      spark.style.setProperty("--fall-delay", `${Math.random() * 8}s`);
-      spark.style.setProperty("--fall-drift", `${Math.round((Math.random() - 0.5) * 90)}px`);
-      fragment.appendChild(spark);
-    }
-
-    document.body.appendChild(fragment);
-  }
-
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       createBanner();
-      createSparks();
     });
   } else {
     createBanner();
-    createSparks();
   }
 })();
