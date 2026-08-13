@@ -18,6 +18,52 @@
         <button id="mgmt-reset-filters" type="button" class="hiccup-inline-clear">Clear</button>
     </div>
     <div id="mgmt-active-filters" class="hiccup-active-filters mt-3"></div>
+    <div class="hiccup-shortcut-bar" aria-label="All Hiccups keyboard shortcuts">
+        <div>
+            <span class="hiccup-shortcut-bar__title">Shortcuts</span>
+            <span><kbd>/</kbd> Search</span>
+            <span><kbd>↑</kbd><kbd>↓</kbd> Open details</span>
+            <span><kbd>Enter</kbd> Toggle</span>
+            <span><kbd>X</kbd> Select</span>
+            <span><kbd>L</kbd> Close</span>
+            <span><kbd>E</kbd> Escalate NC</span>
+            <span><kbd>O</kbd>/<kbd>R</kbd>/<kbd>D</kbd> Status</span>
+            <span><kbd>B</kbd> Bulk Close</span>
+            <span><kbd>N</kbd>/<kbd>P</kbd> Page</span>
+        </div>
+        <button id="mgmt-shortcut-help-toggle" type="button">View all</button>
+    </div>
+    <div id="mgmt-shortcut-help" class="hiccup-shortcut-help hidden">
+        <div><kbd>/</kbd><span>Focus search box</span></div>
+        <div><kbd>A</kbd><span>Apply selected filters</span></div>
+        <div><kbd>C</kbd><span>Clear all filters</span></div>
+        <div><kbd>↑</kbd><kbd>↓</kbd><span>Move and open hiccup details directly</span></div>
+        <div><kbd>Enter</kbd><span>Close or reopen highlighted hiccup details</span></div>
+        <div><kbd>X</kbd><span>Select highlighted hiccup for bulk close</span></div>
+        <div><kbd>L</kbd><span>Close highlighted hiccup</span></div>
+        <div><kbd>E</kbd><span>Escalate highlighted hiccup to NC</span></div>
+        <div><kbd>B</kbd><span>Bulk close selected hiccups</span></div>
+        <div><kbd>O</kbd><span>Filter status: Open</span></div>
+        <div><kbd>R</kbd><span>Filter status: Responded</span></div>
+        <div><kbd>D</kbd><span>Filter status: Closed</span></div>
+        <div><kbd>Shift</kbd><kbd>E</kbd><span>Filter status: Escalated to NC</span></div>
+        <div><kbd>F</kbd><span>Toggle Response Blocked filter</span></div>
+        <div><kbd>V</kbd><span>Toggle Overdue filter</span></div>
+        <div><kbd>G</kbd><span>Toggle Escalated filter</span></div>
+        <div><kbd>Space</kbd><span>Select or unselect highlighted row</span></div>
+        <div><kbd>Home</kbd><span>Jump to first row</span></div>
+        <div><kbd>End</kbd><span>Jump to last row</span></div>
+        <div><kbd>Esc</kbd><span>Close details/help panel</span></div>
+        <div><kbd>Q</kbd><span>Clear search only</span></div>
+        <div><kbd>T</kbd><span>Toggle type Person/System</span></div>
+        <div><kbd>M</kbd><span>Toggle compact/comfort density</span></div>
+        <div><kbd>5</kbd><span>Show 50 rows</span></div>
+        <div><kbd>1</kbd><span>Show 100 rows</span></div>
+        <div><kbd>2</kbd><span>Show 200 rows</span></div>
+        <div><kbd>N</kbd><span>Next page</span></div>
+        <div><kbd>P</kbd><span>Previous page</span></div>
+        <div><kbd>?</kbd><span>Show or hide this help</span></div>
+    </div>
     {% if management_actions_allowed %}
     <div id="bulk-close-bar" class="hiccup-bulkbar hidden mt-3">
         <label class="hiccup-bulkbar__select">
@@ -55,5 +101,5 @@
     </script>
 </section>
 <script src="/static/js/hiccups-helpers.js?v=20260309c"></script>
-<script src="/static/js/hiccups.js?v=20260715a"></script>
+<script src="/static/js/hiccups.js?v=20260813g"></script>
 {% endblock %}

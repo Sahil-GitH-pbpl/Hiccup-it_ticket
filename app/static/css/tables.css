@@ -190,6 +190,96 @@ body.hiccup-density-compact .hiccup-shell #assigned-nc-cards article {
     box-shadow: none;
 }
 
+.hiccup-shortcut-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(13, 178, 156, 0.22);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(240, 253, 250, 0.88), rgba(255, 255, 255, 0.94));
+    color: #0f766e;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.hiccup-shortcut-bar > div,
+.hiccup-shortcut-help div {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.hiccup-shortcut-bar__title {
+    color: #0f172a;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.hiccup-shortcut-bar kbd,
+.hiccup-shortcut-help kbd {
+    min-width: 22px;
+    display: inline-grid;
+    place-items: center;
+    padding: 2px 6px;
+    border: 1px solid rgba(15, 118, 110, 0.18);
+    border-bottom-width: 2px;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1.35;
+}
+
+.hiccup-shortcut-bar button {
+    flex: 0 0 auto;
+    border: 1px solid rgba(13, 178, 156, 0.22);
+    border-radius: 999px;
+    background: #ffffff;
+    color: #0f766e;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.hiccup-shortcut-bar button:hover {
+    background: #ecfeff;
+}
+
+.hiccup-shortcut-help {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 16px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.hiccup-shortcut-help.hidden {
+    display: none;
+}
+
+.enhanced-table tbody tr.hiccup-shortcut-selected {
+    background: linear-gradient(90deg, rgba(204, 251, 241, 0.72), rgba(255, 255, 255, 0.98));
+    outline: 2px solid rgba(13, 178, 156, 0.34);
+    outline-offset: -2px;
+}
+
+.enhanced-table tbody tr.hiccup-shortcut-selected td:first-child {
+    box-shadow: inset 4px 0 0 #0db29c;
+}
+
 .hiccup-sticky-toolbar {
     position: sticky;
     top: 76px;

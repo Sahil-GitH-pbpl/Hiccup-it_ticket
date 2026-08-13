@@ -64,6 +64,9 @@ const expandedHiccupByScope = {
     management: null,
     assigned: null,
 };
+let managementShortcutIndex = -1;
+let openFirstManagementRowAfterLoad = false;
+let scrollManagementTopAfterLoad = false;
 
 function getSavedDensityMode() {
     const saved = window.localStorage.getItem(DENSITY_STORAGE_KEY);
@@ -1040,6 +1043,355 @@ function toggleHiccupAccordion(scope, hiccupId) {
     renderAllTables();
 }
 
+function isManagementShortcutPage() {
+    return Boolean(window.managementView && !assignedViewMode && document.getElementById('management-table'));
+}
+
+function isShortcutTypingTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName ? target.tagName.toLowerCase() : '';
+    return (
+        tagName === 'input' ||
+        tagName === 'textarea' ||
+        tagName === 'select' ||
+        target.isContentEditable ||
+        Boolean(target.closest?.('[contenteditable="true"]'))
+    );
+}
+
+function getManagementShortcutRows() {
+    return Array.from(document.querySelectorAll('#management-table tbody tr:not(.hiccup-accordion-row)')).filter((row) =>
+        row.querySelector('[data-hiccup-detail]')
+    );
+}
+
+function getManagementShortcutRowId(row) {
+    return row?.querySelector('[data-hiccup-detail]')?.dataset?.hiccupDetail || '';
+}
+
+function setManagementShortcutRow(index, options = {}) {
+    if (!isManagementShortcutPage()) return null;
+    const rows = getManagementShortcutRows();
+    if (!rows.length) {
+        managementShortcutIndex = -1;
+        return null;
+    }
+    const normalizedIndex = Math.max(0, Math.min(index, rows.length - 1));
+    managementShortcutIndex = normalizedIndex;
+    rows.forEach((row, rowIndex) => {
+        row.classList.toggle('hiccup-shortcut-selected', rowIndex === normalizedIndex);
+    });
+    const activeRow = rows[normalizedIndex];
+    if (options.scroll !== false) {
+        activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    return activeRow;
+}
+
+function refreshManagementShortcutSelection() {
+    if (!isManagementShortcutPage()) return;
+    const rows = getManagementShortcutRows();
+    if (!rows.length) {
+        managementShortcutIndex = -1;
+        return;
+    }
+    setManagementShortcutRow(managementShortcutIndex >= 0 ? managementShortcutIndex : 0, { scroll: false });
+}
+
+function scrollManagementPageTop() {
+    const target =
+        document.querySelector('.hiccup-shortcut-bar') ||
+        document.getElementById('mgmt-active-filters') ||
+        document.querySelector('#management-table');
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function moveManagementShortcutRow(direction) {
+    const rows = getManagementShortcutRows();
+    if (!rows.length) return;
+    const current = managementShortcutIndex >= 0 ? managementShortcutIndex : 0;
+    const row = setManagementShortcutRow(current + direction);
+    const hiccupId = getManagementShortcutRowId(row);
+    if (hiccupId && expandedHiccupByScope.management !== hiccupId) {
+        toggleHiccupAccordion('management', hiccupId);
+    }
+}
+
+function triggerManagementCurrentDetail() {
+    const row = setManagementShortcutRow(managementShortcutIndex >= 0 ? managementShortcutIndex : 0, { scroll: false });
+    const hiccupId = getManagementShortcutRowId(row);
+    if (hiccupId) {
+        toggleHiccupAccordion('management', hiccupId);
+    }
+}
+
+function toggleManagementCurrentBulkSelection() {
+    if (!bulkCloseEnabled) return;
+    const row = setManagementShortcutRow(managementShortcutIndex >= 0 ? managementShortcutIndex : 0, { scroll: false });
+    const checkbox = row?.querySelector('[data-bulk-close-id]');
+    if (!checkbox || checkbox.disabled) return;
+    checkbox.checked = !checkbox.checked;
+    const hiccupId = checkbox.dataset.bulkCloseId;
+    if (checkbox.checked) {
+        selectedBulkCloseIds.add(hiccupId);
+    } else {
+        selectedBulkCloseIds.delete(hiccupId);
+    }
+    renderBulkCloseBar(managementListState.items || []);
+}
+
+async function applyManagementShortcutFilters() {
+    paginationState.management = 1;
+    openFirstManagementRowAfterLoad = true;
+    scrollManagementTopAfterLoad = true;
+    await loadMyHiccups();
+}
+
+async function setManagementStatusShortcut(status) {
+    if (!mgmtStatusFilter) return;
+    mgmtStatusFilter.value = status;
+    if (mgmtResponseBlockedFilter && status !== 'Open') {
+        mgmtResponseBlockedFilter.checked = false;
+    }
+    await applyManagementShortcutFilters();
+}
+
+async function toggleManagementCheckboxShortcut(checkbox) {
+    if (!checkbox) return;
+    checkbox.checked = !checkbox.checked;
+    await applyManagementShortcutFilters();
+}
+
+async function clearManagementSearchShortcut() {
+    if (!mgmtGlobalSearchInput) return;
+    mgmtGlobalSearchInput.value = '';
+    await applyManagementShortcutFilters();
+}
+
+async function setManagementPageSizeShortcut(size) {
+    if (!PAGE_SIZE_OPTIONS.includes(size) || size === hiccupPageSize) return;
+    hiccupPageSize = size;
+    window.localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(hiccupPageSize));
+    paginationState.management = 1;
+    openFirstManagementRowAfterLoad = true;
+    scrollManagementTopAfterLoad = true;
+    await loadMyHiccups();
+}
+
+function jumpManagementShortcutRow(index) {
+    const row = setManagementShortcutRow(index);
+    const hiccupId = getManagementShortcutRowId(row);
+    if (hiccupId && expandedHiccupByScope.management !== hiccupId) {
+        toggleHiccupAccordion('management', hiccupId);
+    }
+}
+
+function closeManagementShortcutOverlays() {
+    document.getElementById('mgmt-shortcut-help')?.classList.add('hidden');
+    if (expandedHiccupByScope.management) {
+        expandedHiccupByScope.management = null;
+        renderAllTables();
+    }
+    if (typeof closeOverlayModals === 'function') {
+        closeOverlayModals();
+    }
+}
+
+async function triggerManagementCurrentStatus(status) {
+    if (!showManagementActions) return;
+    const row = setManagementShortcutRow(managementShortcutIndex >= 0 ? managementShortcutIndex : 0, { scroll: false });
+    const hiccupId = getManagementShortcutRowId(row);
+    if (!hiccupId) return;
+    const hiccup = (managementListState.items || []).find((entry) => entry.hiccup_id === hiccupId);
+    if (!hiccup || hiccup.status === 'Closed') return;
+    if (status === 'Escalated to NC' && (hiccup.status === 'Escalated to NC' || hiccup.escalated_by || hiccup.nc_assigned_staff_id)) {
+        await openNCEscalationForm(hiccupId, { readonly: true });
+        return;
+    }
+    await quickStatus(hiccupId, status);
+}
+
+function clickManagementPagination(direction) {
+    const action = direction > 0 ? 'next' : 'prev';
+    const button = document.querySelector(`[data-pagination-target="management"][data-pagination-action="${action}"]`);
+    if (button && !button.disabled) {
+        button.click();
+    }
+}
+
+function toggleManagementShortcutHelp() {
+    document.getElementById('mgmt-shortcut-help')?.classList.toggle('hidden');
+}
+
+async function handleManagementShortcutKey(event) {
+    if (!isManagementShortcutPage() || event.defaultPrevented || isShortcutTypingTarget(event.target)) {
+        return;
+    }
+    if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+    }
+    const key = event.key;
+    const normalized = key.length === 1 ? key.toLowerCase() : key;
+    if (key === '?' || (key === '/' && event.shiftKey)) {
+        event.preventDefault();
+        toggleManagementShortcutHelp();
+        return;
+    }
+    if (key === '/') {
+        event.preventDefault();
+        mgmtGlobalSearchInput?.focus();
+        return;
+    }
+    if (key === 'ArrowDown') {
+        event.preventDefault();
+        moveManagementShortcutRow(1);
+        return;
+    }
+    if (key === 'ArrowUp') {
+        event.preventDefault();
+        moveManagementShortcutRow(-1);
+        return;
+    }
+    if (key === 'Enter') {
+        event.preventDefault();
+        triggerManagementCurrentDetail();
+        return;
+    }
+    if (key === ' ') {
+        event.preventDefault();
+        toggleManagementCurrentBulkSelection();
+        return;
+    }
+    if (key === 'Home') {
+        event.preventDefault();
+        jumpManagementShortcutRow(0);
+        return;
+    }
+    if (key === 'End') {
+        event.preventDefault();
+        jumpManagementShortcutRow(getManagementShortcutRows().length - 1);
+        return;
+    }
+    if (key === 'Escape') {
+        event.preventDefault();
+        closeManagementShortcutOverlays();
+        return;
+    }
+    if (normalized === 'x') {
+        event.preventDefault();
+        toggleManagementCurrentBulkSelection();
+        return;
+    }
+    if (normalized === 'b') {
+        event.preventDefault();
+        document.getElementById('bulk-close-action')?.click();
+        return;
+    }
+    if (normalized === 'l') {
+        event.preventDefault();
+        await triggerManagementCurrentStatus('Closed');
+        return;
+    }
+    if (normalized === 'e' && event.shiftKey) {
+        event.preventDefault();
+        await setManagementStatusShortcut('Escalated to NC');
+        return;
+    }
+    if (normalized === 'e') {
+        event.preventDefault();
+        await triggerManagementCurrentStatus('Escalated to NC');
+        return;
+    }
+    if (normalized === 'o') {
+        event.preventDefault();
+        await setManagementStatusShortcut('Open');
+        return;
+    }
+    if (normalized === 'r') {
+        event.preventDefault();
+        await setManagementStatusShortcut('Responded');
+        return;
+    }
+    if (normalized === 'd') {
+        event.preventDefault();
+        await setManagementStatusShortcut('Closed');
+        return;
+    }
+    if (normalized === 'f') {
+        event.preventDefault();
+        if (mgmtResponseBlockedFilter) {
+            mgmtResponseBlockedFilter.checked = !mgmtResponseBlockedFilter.checked;
+            if (mgmtResponseBlockedFilter.checked && mgmtStatusFilter) {
+                mgmtStatusFilter.value = 'Open';
+            }
+            await applyManagementShortcutFilters();
+        }
+        return;
+    }
+    if (normalized === 'v') {
+        event.preventDefault();
+        await toggleManagementCheckboxShortcut(mgmtOverdueFilter);
+        return;
+    }
+    if (normalized === 'g') {
+        event.preventDefault();
+        await toggleManagementCheckboxShortcut(mgmtEscalatedFilter);
+        return;
+    }
+    if (normalized === 'q') {
+        event.preventDefault();
+        await clearManagementSearchShortcut();
+        return;
+    }
+    if (normalized === 't') {
+        event.preventDefault();
+        if (mgmtTypeFilter) {
+            mgmtTypeFilter.value = mgmtTypeFilter.value === 'Person Related' ? 'System Related' : 'Person Related';
+            await applyManagementShortcutFilters();
+        }
+        return;
+    }
+    if (normalized === 'm') {
+        event.preventDefault();
+        toggleDensityMode();
+        return;
+    }
+    if (normalized === '5') {
+        event.preventDefault();
+        await setManagementPageSizeShortcut(50);
+        return;
+    }
+    if (normalized === '1') {
+        event.preventDefault();
+        await setManagementPageSizeShortcut(100);
+        return;
+    }
+    if (normalized === '2') {
+        event.preventDefault();
+        await setManagementPageSizeShortcut(200);
+        return;
+    }
+    if (normalized === 'a') {
+        event.preventDefault();
+        document.querySelector('[data-filter-apply="mgmt"]')?.click();
+        return;
+    }
+    if (normalized === 'c') {
+        event.preventDefault();
+        mgmtResetFilters?.click();
+        return;
+    }
+    if (normalized === 'n') {
+        event.preventDefault();
+        clickManagementPagination(1);
+        return;
+    }
+    if (normalized === 'p') {
+        event.preventDefault();
+        clickManagementPagination(-1);
+    }
+}
+
 function matchesCurrentUser(value, fallbackName) {
     const userIdStr = currentUserId ? String(currentUserId).trim() : '';
     const valueStr = value !== undefined && value !== null ? String(value).trim() : '';
@@ -1291,6 +1643,11 @@ function renderManagementTable() {
     if (!mgmtBody && !document.getElementById(mgmtCardsId)) return;
     const finalFiltered = Array.isArray(managementListState.items) ? managementListState.items : [];
     const visibleRows = finalFiltered;
+    if (openFirstManagementRowAfterLoad && !assignedViewMode) {
+        managementShortcutIndex = 0;
+        expandedHiccupByScope.management = visibleRows[0]?.hiccup_id || null;
+        openFirstManagementRowAfterLoad = false;
+    }
     renderMgmtActiveFilters();
     pruneBulkCloseSelection(visibleRows);
     renderBulkCloseBar(visibleRows);
@@ -1319,6 +1676,10 @@ function renderManagementTable() {
     renderPagination(paginationContainerId, paginationKey, managementListState);
     if (managementListState.total === 0 || finalFiltered.length === 0) {
         mgmtBody.innerHTML = `<tr><td colspan="${managementColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
+        if (scrollManagementTopAfterLoad && !assignedViewMode) {
+            scrollManagementTopAfterLoad = false;
+            window.requestAnimationFrame(scrollManagementPageTop);
+        }
         return;
     }
     mgmtBody.innerHTML = visibleRows
@@ -1332,6 +1693,11 @@ function renderManagementTable() {
             })
         )
         .join('');
+    refreshManagementShortcutSelection();
+    if (scrollManagementTopAfterLoad && !assignedViewMode) {
+        scrollManagementTopAfterLoad = false;
+        window.requestAnimationFrame(scrollManagementPageTop);
+    }
 }
 
 function renderAllTables() {
@@ -1899,6 +2265,14 @@ function showStatusModal({ title, confirmText, fields }) {
                     input?.classList.add('status-modal__textarea--invalid');
                     return;
                 }
+                if (field.requireSelection && field.hiddenTargetId) {
+                    const hiddenInput = document.getElementById(field.hiddenTargetId);
+                    if (!hiddenInput?.value) {
+                        input?.focus();
+                        input?.classList.add('status-modal__textarea--invalid');
+                        return;
+                    }
+                }
                 input?.classList.remove('status-modal__textarea--invalid');
                 values[field.key] = value;
             }
@@ -1910,7 +2284,7 @@ function showStatusModal({ title, confirmText, fields }) {
         confirmBtn.addEventListener('click', onConfirm);
         modal.classList.remove('hidden');
         modal.setAttribute('aria-hidden', 'false');
-        const firstInput = modal.querySelector('.status-modal__textarea');
+        const firstInput = modal.querySelector('.status-modal__input:not([type="hidden"]), .status-modal__textarea');
         firstInput?.focus();
     });
 }
@@ -1972,6 +2346,8 @@ function buildStaffNameFields(initial = {}) {
             label: "Staff name",
             placeholder: "Enter staff or team lead name",
             type: "text",
+            required: true,
+            requireSelection: true,
             suggestions: STAFF_SUGGESTION_CONFIG,
             value: nameValue,
             hiddenTargetId: "escalation-staff-id",
@@ -2349,10 +2725,40 @@ async function openNCEscalationForm(hiccupId, options = {}) {
     }
 }
 
+async function gatherNCEscalationPayload() {
+    const escalationResult = await showStatusModal({
+        title: 'Escalate to NC - assign staff',
+        confirmText: 'Escalate',
+        fields: [
+            ...buildStaffNameFields(),
+            {
+                id: 'escalation-nc-note',
+                key: 'nc_note',
+                label: 'NC note (optional)',
+                placeholder: 'Add a short note for this NC escalation',
+                required: false,
+                type: 'textarea',
+            },
+        ],
+    });
+    if (!escalationResult) {
+        return null;
+    }
+    return {
+        escalation_form: {
+            staff_name: escalationResult.staff_name,
+            staff_id: escalationResult.staff_id,
+            nc_note: escalationResult.nc_note,
+        },
+    };
+}
+
 async function quickStatus(id, status) {
     let statusExtras = null;
     try {
-        statusExtras = await gatherStatusPayload(status);
+        statusExtras = status === 'Escalated to NC'
+            ? await gatherNCEscalationPayload()
+            : await gatherStatusPayload(status);
     } catch (err) {
         return;
     }
@@ -2576,6 +2982,10 @@ document.addEventListener('click', async (event) => {
         const requestedPage = Number(paginationButton.dataset.paginationPage || '1');
         if (target && Object.prototype.hasOwnProperty.call(paginationState, target)) {
             paginationState[target] = Math.max(requestedPage, 1);
+            if (target === 'management') {
+                openFirstManagementRowAfterLoad = true;
+                scrollManagementTopAfterLoad = true;
+            }
             await loadMyHiccups();
         }
         return;
@@ -2720,7 +3130,13 @@ document.addEventListener('change', async (event) => {
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && activeFilterDrawerId) {
         closeFilterDrawer(activeFilterDrawerId);
+        return;
     }
+    handleManagementShortcutKey(event);
+});
+
+document.getElementById('mgmt-shortcut-help-toggle')?.addEventListener('click', () => {
+    toggleManagementShortcutHelp();
 });
 
 window.addEventListener('popstate', () => {
