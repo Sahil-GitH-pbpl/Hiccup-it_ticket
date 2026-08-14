@@ -53,9 +53,6 @@ const hasHiccupTables =
     Boolean(document.querySelector('#assigned-table'));
 let activeFilterDrawerId = null;
 const DENSITY_STORAGE_KEY = 'hiccupDensityMode';
-const SEARCH_INPUT_DEBOUNCE = 180;
-let mySearchTimer = null;
-let mgmtSearchTimer = null;
 let latestLoadRequestId = 0;
 const selectedBulkCloseIds = new Set();
 const expandedHiccupByScope = {
@@ -85,26 +82,6 @@ function applyDensityMode(mode) {
 function toggleDensityMode() {
     const current = getSavedDensityMode();
     applyDensityMode(current === 'compact' ? 'comfortable' : 'compact');
-}
-
-function debounceRender(timerRefName, callback, delay = SEARCH_INPUT_DEBOUNCE) {
-    const existingTimer = timerRefName === 'my' ? mySearchTimer : mgmtSearchTimer;
-    if (existingTimer) {
-        window.clearTimeout(existingTimer);
-    }
-    const nextTimer = window.setTimeout(() => {
-        callback();
-        if (timerRefName === 'my') {
-            mySearchTimer = null;
-        } else {
-            mgmtSearchTimer = null;
-        }
-    }, delay);
-    if (timerRefName === 'my') {
-        mySearchTimer = nextTimer;
-    } else {
-        mgmtSearchTimer = nextTimer;
-    }
 }
 
 function defaultListState(page = 1) {
@@ -438,65 +415,6 @@ async function hydrateRaisedAgainstNames(rows) {
 
 const SUGGESTION_DEBOUNCE = 300;
 
-function isEscalated(entry) {
-    return (
-        entry.status === 'Escalated to NC' ||
-        Boolean(entry.escalated_by) ||
-        Boolean(entry.nc_assigned_staff_id)
-    );
-}
-
-function isOverdue(entry) {
-    return Boolean(entry.is_response_overdue || entry.was_response_overdue || entry.is_closure_overdue);
-}
-
-function inDateRange(createdAt, fromValue, toValue) {
-    if (!createdAt) return true;
-    const createdDate = new Date(createdAt);
-    if (Number.isNaN(createdDate.getTime())) return true;
-    if (fromValue) {
-        const fromDate = new Date(`${fromValue}T00:00:00`);
-        if (createdDate < fromDate) return false;
-    }
-    if (toValue) {
-        const toDate = new Date(`${toValue}T23:59:59`);
-        if (createdDate > toDate) return false;
-    }
-    return true;
-}
-
-function paginateRows(rows, stateKey) {
-    const total = rows.length;
-    if (!total) {
-        paginationState[stateKey] = 1;
-        return {
-            pagedRows: [],
-            meta: {
-                page: 1,
-                totalPages: 1,
-                total,
-                start: 0,
-                end: 0,
-            },
-        };
-    }
-    const totalPages = Math.max(Math.ceil(total / hiccupPageSize), 1);
-    const currentPage = Math.min(Math.max(paginationState[stateKey] || 1, 1), totalPages);
-    paginationState[stateKey] = currentPage;
-    const startIndex = (currentPage - 1) * hiccupPageSize;
-    const endIndex = Math.min(startIndex + hiccupPageSize, total);
-    return {
-        pagedRows: rows.slice(startIndex, endIndex),
-        meta: {
-            page: currentPage,
-            totalPages,
-            total,
-            start: startIndex + 1,
-            end: endIndex,
-        },
-    };
-}
-
 function renderPagination(containerId, stateKey, meta, label = 'hiccups') {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -614,9 +532,15 @@ function managementActionButtons(hiccup) {
     if (status !== 'Closed') {
         actions.push({
             status: 'Closed',
-            label: 'Close',
+            label: 'Close without note',
             classes: 'text-rose-600 border-rose-300',
-            behavior: 'status-change',
+            behavior: 'close-without-note',
+        });
+        actions.push({
+            status: 'Closed',
+            label: 'Close with note',
+            classes: 'text-rose-600 border-rose-300',
+            behavior: 'close-with-note',
         });
     }
     const escalationAction =
@@ -697,12 +621,6 @@ function actionControlsHtml(h, includeMgmtActions = false, options = {}) {
             ${ncViewButton}
             ${respondButton}
         </div>`;
-}
-
-function actionCellHtml(h, includeMgmtActions = false, options = {}) {
-    return `<td class="px-4 py-3 align-top">
-        ${actionControlsHtml(h, includeMgmtActions, options)}
-    </td>`;
 }
 
 function getActiveDetailCollection() {
@@ -936,6 +854,9 @@ async function presentHiccupDetails(h, collection = getActiveDetailCollection())
             if (!popup) {
                 return;
             }
+            if (typeof bindModalKeyboardShortcuts === 'function') {
+                bindModalKeyboardShortcuts(popup);
+            }
             const prevBtn = popup.querySelector('[data-detail-nav="prev"]');
             const nextBtn = popup.querySelector('[data-detail-nav="next"]');
             prevBtn?.addEventListener('click', () => {
@@ -1035,6 +956,13 @@ function toggleHiccupAccordion(scope, hiccupId) {
     if (!scope || !Object.prototype.hasOwnProperty.call(expandedHiccupByScope, scope)) {
         return;
     }
+    if (scope === 'management' && isManagementFocusMode()) {
+        expandedHiccupByScope.management = hiccupId;
+        const rowIndex = (managementListState.items || []).findIndex((entry) => entry?.hiccup_id === hiccupId);
+        managementShortcutIndex = rowIndex >= 0 ? rowIndex : managementShortcutIndex;
+        renderAllTables();
+        return;
+    }
     expandedHiccupByScope[scope] = expandedHiccupByScope[scope] === hiccupId ? null : hiccupId;
     document.querySelectorAll('.mgmt-action-group.open').forEach((group) => {
         group.classList.remove('open');
@@ -1044,7 +972,15 @@ function toggleHiccupAccordion(scope, hiccupId) {
 }
 
 function isManagementShortcutPage() {
-    return Boolean(window.managementView && !assignedViewMode && document.getElementById('management-table'));
+    return Boolean(
+        window.managementView &&
+        !assignedViewMode &&
+        (document.getElementById('management-focus-view') || document.getElementById('management-table'))
+    );
+}
+
+function isManagementFocusMode() {
+    return Boolean(window.managementView && !assignedViewMode && document.getElementById('management-focus-view'));
 }
 
 function isShortcutTypingTarget(target) {
@@ -1060,13 +996,41 @@ function isShortcutTypingTarget(target) {
 }
 
 function getManagementShortcutRows() {
+    const focusRows = Array.from(document.querySelectorAll('[data-management-focus-item]'));
+    if (focusRows.length) {
+        return focusRows;
+    }
     return Array.from(document.querySelectorAll('#management-table tbody tr:not(.hiccup-accordion-row)')).filter((row) =>
         row.querySelector('[data-hiccup-detail]')
     );
 }
 
 function getManagementShortcutRowId(row) {
-    return row?.querySelector('[data-hiccup-detail]')?.dataset?.hiccupDetail || '';
+    return row?.dataset?.managementFocusItem || row?.querySelector('[data-hiccup-detail]')?.dataset?.hiccupDetail || '';
+}
+
+function scrollManagementFocusQueueToItem(item, behavior = 'smooth') {
+    const queue = item?.closest?.('.hiccup-focus-queue');
+    if (!queue || !item) {
+        return false;
+    }
+    const itemTop = item.offsetTop;
+    const itemBottom = itemTop + item.offsetHeight;
+    const visibleTop = queue.scrollTop;
+    const visibleBottom = visibleTop + queue.clientHeight;
+    const padding = 10;
+    if (itemTop >= visibleTop + padding && itemBottom <= visibleBottom - padding) {
+        return true;
+    }
+    const nextTop =
+        itemTop < visibleTop
+            ? itemTop - padding
+            : itemBottom - queue.clientHeight + padding;
+    queue.scrollTo({
+        top: Math.max(nextTop, 0),
+        behavior,
+    });
+    return true;
 }
 
 function setManagementShortcutRow(index, options = {}) {
@@ -1080,10 +1044,13 @@ function setManagementShortcutRow(index, options = {}) {
     managementShortcutIndex = normalizedIndex;
     rows.forEach((row, rowIndex) => {
         row.classList.toggle('hiccup-shortcut-selected', rowIndex === normalizedIndex);
+        row.classList.toggle('is-active', rowIndex === normalizedIndex);
     });
     const activeRow = rows[normalizedIndex];
     if (options.scroll !== false) {
-        activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        if (!scrollManagementFocusQueueToItem(activeRow, options.behavior || 'smooth')) {
+            activeRow.scrollIntoView({ block: 'nearest', behavior: options.behavior || 'smooth' });
+        }
     }
     return activeRow;
 }
@@ -1100,6 +1067,7 @@ function refreshManagementShortcutSelection() {
 
 function scrollManagementPageTop() {
     const target =
+        document.getElementById('management-focus-view') ||
         document.querySelector('.hiccup-shortcut-bar') ||
         document.getElementById('mgmt-active-filters') ||
         document.querySelector('#management-table');
@@ -1117,17 +1085,23 @@ function moveManagementShortcutRow(direction) {
     }
 }
 
-function triggerManagementCurrentDetail() {
-    const row = setManagementShortcutRow(managementShortcutIndex >= 0 ? managementShortcutIndex : 0, { scroll: false });
-    const hiccupId = getManagementShortcutRowId(row);
-    if (hiccupId) {
-        toggleHiccupAccordion('management', hiccupId);
-    }
-}
-
 function toggleManagementCurrentBulkSelection() {
     if (!bulkCloseEnabled) return;
     const row = setManagementShortcutRow(managementShortcutIndex >= 0 ? managementShortcutIndex : 0, { scroll: false });
+    if (isManagementFocusMode()) {
+        const hiccupId = getManagementShortcutRowId(row);
+        const hiccup = (managementListState.items || []).find((entry) => entry.hiccup_id === hiccupId);
+        if (!hiccup || !isBulkClosable(hiccup)) return;
+        const id = String(hiccupId);
+        if (selectedBulkCloseIds.has(id)) {
+            selectedBulkCloseIds.delete(id);
+        } else {
+            selectedBulkCloseIds.add(id);
+        }
+        renderBulkCloseBar(managementListState.items || []);
+        renderManagementFocusView(managementListState.items || []);
+        return;
+    }
     const checkbox = row?.querySelector('[data-bulk-close-id]');
     if (!checkbox || checkbox.disabled) return;
     checkbox.checked = !checkbox.checked;
@@ -1168,16 +1142,6 @@ async function clearManagementSearchShortcut() {
     await applyManagementShortcutFilters();
 }
 
-async function setManagementPageSizeShortcut(size) {
-    if (!PAGE_SIZE_OPTIONS.includes(size) || size === hiccupPageSize) return;
-    hiccupPageSize = size;
-    window.localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(hiccupPageSize));
-    paginationState.management = 1;
-    openFirstManagementRowAfterLoad = true;
-    scrollManagementTopAfterLoad = true;
-    await loadMyHiccups();
-}
-
 function jumpManagementShortcutRow(index) {
     const row = setManagementShortcutRow(index);
     const hiccupId = getManagementShortcutRowId(row);
@@ -1197,7 +1161,7 @@ function closeManagementShortcutOverlays() {
     }
 }
 
-async function triggerManagementCurrentStatus(status) {
+async function triggerManagementCurrentStatus(status, options = {}) {
     if (!showManagementActions) return;
     const row = setManagementShortcutRow(managementShortcutIndex >= 0 ? managementShortcutIndex : 0, { scroll: false });
     const hiccupId = getManagementShortcutRowId(row);
@@ -1208,7 +1172,7 @@ async function triggerManagementCurrentStatus(status) {
         await openNCEscalationForm(hiccupId, { readonly: true });
         return;
     }
-    await quickStatus(hiccupId, status);
+    await quickStatus(hiccupId, status, options);
 }
 
 function clickManagementPagination(direction) {
@@ -1252,11 +1216,6 @@ async function handleManagementShortcutKey(event) {
         moveManagementShortcutRow(-1);
         return;
     }
-    if (key === 'Enter') {
-        event.preventDefault();
-        triggerManagementCurrentDetail();
-        return;
-    }
     if (key === ' ') {
         event.preventDefault();
         toggleManagementCurrentBulkSelection();
@@ -1289,7 +1248,12 @@ async function handleManagementShortcutKey(event) {
     }
     if (normalized === 'l') {
         event.preventDefault();
-        await triggerManagementCurrentStatus('Closed');
+        await triggerManagementCurrentStatus('Closed', { closeMode: 'with-note' });
+        return;
+    }
+    if (normalized === 'z') {
+        event.preventDefault();
+        await triggerManagementCurrentStatus('Closed', { closeMode: 'without-note' });
         return;
     }
     if (normalized === 'e' && event.shiftKey) {
@@ -1343,39 +1307,6 @@ async function handleManagementShortcutKey(event) {
         await clearManagementSearchShortcut();
         return;
     }
-    if (normalized === 't') {
-        event.preventDefault();
-        if (mgmtTypeFilter) {
-            mgmtTypeFilter.value = mgmtTypeFilter.value === 'Person Related' ? 'System Related' : 'Person Related';
-            await applyManagementShortcutFilters();
-        }
-        return;
-    }
-    if (normalized === 'm') {
-        event.preventDefault();
-        toggleDensityMode();
-        return;
-    }
-    if (normalized === '5') {
-        event.preventDefault();
-        await setManagementPageSizeShortcut(50);
-        return;
-    }
-    if (normalized === '1') {
-        event.preventDefault();
-        await setManagementPageSizeShortcut(100);
-        return;
-    }
-    if (normalized === '2') {
-        event.preventDefault();
-        await setManagementPageSizeShortcut(200);
-        return;
-    }
-    if (normalized === 'a') {
-        event.preventDefault();
-        document.querySelector('[data-filter-apply="mgmt"]')?.click();
-        return;
-    }
     if (normalized === 'c') {
         event.preventDefault();
         mgmtResetFilters?.click();
@@ -1390,17 +1321,6 @@ async function handleManagementShortcutKey(event) {
         event.preventDefault();
         clickManagementPagination(-1);
     }
-}
-
-function matchesCurrentUser(value, fallbackName) {
-    const userIdStr = currentUserId ? String(currentUserId).trim() : '';
-    const valueStr = value !== undefined && value !== null ? String(value).trim() : '';
-    if (userIdStr && valueStr && userIdStr === valueStr) {
-        return true;
-    }
-    const userNameNorm = currentUserName ? currentUserName.trim().toLowerCase() : '';
-    const nameNorm = fallbackName ? String(fallbackName).trim().toLowerCase() : '';
-    return Boolean(userNameNorm && nameNorm && userNameNorm === nameNorm);
 }
 
 function resolveOptionValue(option, hiccup) {
@@ -1512,6 +1432,89 @@ function renderHiccupCards(containerId, data, options = {}) {
     container.innerHTML = rows.map((h) => hiccupCardHtml(h, options)).join('');
 }
 
+function renderManagementFocusView(rows = [], options = {}) {
+    const container = document.getElementById('management-focus-view');
+    if (!container || assignedViewMode) return;
+    const visibleRows = Array.isArray(rows) ? rows : [];
+    if (!visibleRows.length) {
+        managementShortcutIndex = -1;
+        expandedHiccupByScope.management = null;
+        container.innerHTML = `
+            <div class="hiccup-focus-empty">
+                <p>No hiccups found</p>
+                <span>Change filters or clear search to see records.</span>
+            </div>
+        `;
+        return;
+    }
+
+    const activeId = expandedHiccupByScope.management;
+    let activeIndex = visibleRows.findIndex((entry) => entry?.hiccup_id === activeId);
+    if (activeIndex < 0) {
+        activeIndex = managementShortcutIndex >= 0 ? managementShortcutIndex : 0;
+    }
+    activeIndex = Math.max(0, Math.min(activeIndex, visibleRows.length - 1));
+    managementShortcutIndex = activeIndex;
+    const activeHiccup = visibleRows[activeIndex];
+    expandedHiccupByScope.management = activeHiccup.hiccup_id;
+    const prevDisabled = activeIndex === 0 ? 'disabled' : '';
+    const nextDisabled = activeIndex >= visibleRows.length - 1 ? 'disabled' : '';
+    const queueItems = visibleRows
+        .map((hiccup, index) => {
+            const isActive = index === activeIndex;
+            const isSelected = selectedBulkCloseIds.has(String(hiccup.hiccup_id));
+            return `
+                <button
+                    type="button"
+                    class="hiccup-focus-queue__item ${isActive ? 'is-active hiccup-shortcut-selected' : ''} ${isSelected ? 'is-selected' : ''}"
+                    data-management-focus-item="${escapeHtml(hiccup.hiccup_id)}"
+                    aria-current="${isActive ? 'true' : 'false'}"
+                >
+                    <span class="hiccup-focus-queue__id">#${escapeHtml(hiccup.hiccup_id)}</span>
+                    <span class="hiccup-focus-queue__meta">${normalizeText(hiccup.hiccup_type)} • ${formatPersonDisplay(hiccup.raised_against_name, hiccup.raised_against)}</span>
+                    <span class="hiccup-focus-queue__status">${statusWithBadges(hiccup)}</span>
+                    ${isSelected ? '<span class="hiccup-focus-queue__selected">Selected for bulk close</span>' : ''}
+                </button>
+            `;
+        })
+        .join('');
+    const detail = detailMarkup(activeHiccup, null, visibleRows, {
+        includeNavigation: false,
+        includeActions: false,
+        inline: true,
+        extraActionsHtml: actionControlsHtml(activeHiccup, showManagementActions, {
+            includeDetail: false,
+            directActions: true,
+        }),
+    });
+
+    container.innerHTML = `
+        <div class="hiccup-focus-toolbar">
+            <div>
+                <p class="hiccup-focus-eyebrow">Focus mode</p>
+                <h2>#${escapeHtml(activeHiccup.hiccup_id)}</h2>
+                <span>${activeIndex + 1} of ${visibleRows.length} on this page • ${formatDate(activeHiccup.created_at)}</span>
+            </div>
+            <div class="hiccup-focus-toolbar__actions">
+                <button type="button" data-management-focus-nav="prev" ${prevDisabled}>Prev</button>
+                <button type="button" data-management-focus-nav="next" ${nextDisabled}>Next</button>
+            </div>
+        </div>
+        <div class="hiccup-focus-layout">
+            <aside class="hiccup-focus-queue" aria-label="Hiccup queue">
+                ${queueItems}
+            </aside>
+            <section class="hiccup-focus-detail">
+                ${detail}
+            </section>
+        </div>
+    `;
+    window.requestAnimationFrame(() => {
+        const activeItem = container.querySelector('[data-management-focus-item].is-active');
+        scrollManagementFocusQueueToItem(activeItem, options.scrollBehavior || 'auto');
+    });
+}
+
 function renderMyHiccupsTable() {
     const tbody = document.querySelector('#my-hiccups-table tbody');
     if (!tbody && !document.getElementById('raised-by-cards')) return;
@@ -1609,38 +1612,11 @@ function renderAssignedTable() {
     }
 }
 
-function applyManagementFilters(rows) {
-    let filtered = rows;
-    const statusValue = mgmtStatusFilter?.value;
-    const typeValue = mgmtTypeFilter?.value;
-    const rootValue = mgmtRootFilter?.value;
-    if (statusValue) {
-        filtered = filtered.filter((entry) => entry.status === statusValue);
-    }
-    if (typeValue) {
-        filtered = filtered.filter((entry) => entry.hiccup_type === typeValue);
-    }
-    if (rootValue) {
-        filtered = filtered.filter((entry) => entry.root_cause_category === rootValue);
-    }
-    const fromValue = mgmtDateFromFilter?.value;
-    const toValue = mgmtDateToFilter?.value;
-    if (fromValue || toValue) {
-        filtered = filtered.filter((entry) => inDateRange(entry.created_at, fromValue, toValue));
-    }
-    if (mgmtEscalatedFilter?.checked) {
-        filtered = filtered.filter((entry) => isEscalated(entry));
-    }
-    if (mgmtOverdueFilter?.checked) {
-        filtered = filtered.filter((entry) => isOverdue(entry));
-    }
-    return filtered;
-}
-
 function renderManagementTable() {
     const mgmtBody = document.querySelector('#management-table tbody');
     const mgmtCardsId = assignedViewMode ? 'assigned-nc-cards' : 'management-cards';
-    if (!mgmtBody && !document.getElementById(mgmtCardsId)) return;
+    const focusView = document.getElementById('management-focus-view');
+    if (!mgmtBody && !document.getElementById(mgmtCardsId) && !focusView) return;
     const finalFiltered = Array.isArray(managementListState.items) ? managementListState.items : [];
     const visibleRows = finalFiltered;
     if (openFirstManagementRowAfterLoad && !assignedViewMode) {
@@ -1664,6 +1640,9 @@ function renderManagementTable() {
         if (h.status === 'Closed') return true;
         return !isAssignedNc(h);
     };
+    if (focusView && !assignedViewMode) {
+        renderManagementFocusView(visibleRows);
+    }
     renderHiccupCards(mgmtCardsId, visibleRows, {
         displayRaisedAgainst: true,
         includeMgmtActions: showManagementActions,
@@ -1675,24 +1654,28 @@ function renderManagementTable() {
     });
     renderPagination(paginationContainerId, paginationKey, managementListState);
     if (managementListState.total === 0 || finalFiltered.length === 0) {
-        mgmtBody.innerHTML = `<tr><td colspan="${managementColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
+        if (mgmtBody) {
+            mgmtBody.innerHTML = `<tr><td colspan="${managementColumnCount}" class="px-4 py-4 text-center text-xs uppercase tracking-[0.3em] text-slate-400">No hiccups yet.</td></tr>`;
+        }
         if (scrollManagementTopAfterLoad && !assignedViewMode) {
             scrollManagementTopAfterLoad = false;
             window.requestAnimationFrame(scrollManagementPageTop);
         }
         return;
     }
-    mgmtBody.innerHTML = visibleRows
-        .map((h) =>
-            summaryRowHtml(h, showManagementActions, showManagementActions, {
-                allowNcView: allowNcViewFn(h),
-                ncReadonly: ncReadonlyFor(h),
-                inlineDetails: true,
-                accordionScope: assignedViewMode ? 'assigned' : 'management',
-                includeBulkSelect: true,
-            })
-        )
-        .join('');
+    if (mgmtBody) {
+        mgmtBody.innerHTML = visibleRows
+            .map((h) =>
+                summaryRowHtml(h, showManagementActions, showManagementActions, {
+                    allowNcView: allowNcViewFn(h),
+                    ncReadonly: ncReadonlyFor(h),
+                    inlineDetails: true,
+                    accordionScope: assignedViewMode ? 'assigned' : 'management',
+                    includeBulkSelect: true,
+                })
+            )
+            .join('');
+    }
     refreshManagementShortcutSelection();
     if (scrollManagementTopAfterLoad && !assignedViewMode) {
         scrollManagementTopAfterLoad = false;
@@ -2085,6 +2068,33 @@ function attachSuggestionHandlers(modal, fields) {
             : null;
         let timer = null;
         let suggestionsCache = [];
+        let activeSuggestionIndex = -1;
+        const getSuggestionOptions = () =>
+            suggestionBox ? Array.from(suggestionBox.querySelectorAll('.status-modal__suggestion')) : [];
+        const setActiveSuggestion = (index) => {
+            const options = getSuggestionOptions();
+            if (!options.length) {
+                activeSuggestionIndex = -1;
+                return;
+            }
+            activeSuggestionIndex = Math.max(0, Math.min(index, options.length - 1));
+            options.forEach((option, optionIndex) => {
+                const isActive = optionIndex === activeSuggestionIndex;
+                option.classList.toggle('is-active', isActive);
+                option.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            options[activeSuggestionIndex]?.scrollIntoView({ block: 'nearest' });
+        };
+        const selectSuggestionOption = (option) => {
+            if (!option) {
+                return;
+            }
+            input.value = option.dataset.staffName || '';
+            if (hiddenInput) {
+                hiddenInput.value = option.dataset.staffId || '';
+            }
+            hideSuggestions();
+        };
         const applyHiddenValue = () => {
             if (!hiddenInput) {
                 return;
@@ -2100,6 +2110,7 @@ function attachSuggestionHandlers(modal, fields) {
                 suggestionBox.classList.remove('is-open');
                 suggestionBox.innerHTML = '';
             }
+            activeSuggestionIndex = -1;
         };
         const renderSuggestions = (list) => {
             if (!suggestionBox) {
@@ -2108,12 +2119,13 @@ function attachSuggestionHandlers(modal, fields) {
             if (!list.length) {
                 suggestionBox.innerHTML = '<div class="status-modal__suggestion-empty">No active staff found</div>';
                 suggestionBox.classList.add('is-open');
+                activeSuggestionIndex = -1;
                 return;
             }
             suggestionBox.innerHTML = list
                 .map(
-                    (item) => `
-                        <button type="button" class="status-modal__suggestion" data-staff-id="${escapeHtml(String(item.id))}" data-staff-name="${escapeHtml(item.name)}">
+                    (item, index) => `
+                        <button type="button" class="status-modal__suggestion" role="option" aria-selected="false" data-suggestion-index="${index}" data-staff-id="${escapeHtml(String(item.id))}" data-staff-name="${escapeHtml(item.name)}">
                             <span class="status-modal__suggestion-name">${escapeHtml(item.name)}</span>
                             <span class="status-modal__suggestion-meta">${escapeHtml(
                                 item.designation || 'Staff'
@@ -2123,6 +2135,7 @@ function attachSuggestionHandlers(modal, fields) {
                 )
                 .join('');
             suggestionBox.classList.add('is-open');
+            setActiveSuggestion(0);
         };
         const handler = () => {
             const value = input.value.trim();
@@ -2154,11 +2167,30 @@ function attachSuggestionHandlers(modal, fields) {
             if (!option) {
                 return;
             }
-            input.value = option.dataset.staffName || '';
-            if (hiddenInput) {
-                hiddenInput.value = option.dataset.staffId || '';
+            selectSuggestionOption(option);
+        };
+        const keyHandler = (event) => {
+            const options = getSuggestionOptions();
+            const isOpen = Boolean(suggestionBox?.classList.contains('is-open'));
+            if (event.key === 'ArrowDown' && options.length) {
+                event.preventDefault();
+                setActiveSuggestion(activeSuggestionIndex < 0 ? 0 : activeSuggestionIndex + 1);
+                return;
             }
-            hideSuggestions();
+            if (event.key === 'ArrowUp' && options.length) {
+                event.preventDefault();
+                setActiveSuggestion(activeSuggestionIndex < 0 ? options.length - 1 : activeSuggestionIndex - 1);
+                return;
+            }
+            if (event.key === 'Enter' && isOpen && options.length && activeSuggestionIndex >= 0) {
+                event.preventDefault();
+                selectSuggestionOption(options[activeSuggestionIndex]);
+                return;
+            }
+            if (event.key === 'Escape' && isOpen) {
+                event.preventDefault();
+                hideSuggestions();
+            }
         };
         const blurHandler = () => {
             window.setTimeout(() => {
@@ -2169,9 +2201,10 @@ function attachSuggestionHandlers(modal, fields) {
         applyHiddenValue();
         input.addEventListener('input', handler);
         input.addEventListener('focus', handler);
+        input.addEventListener('keydown', keyHandler);
         input.addEventListener('blur', blurHandler);
         suggestionBox?.addEventListener('click', clickHandler);
-        handlers.push({ input, handler, timer, suggestionBox, clickHandler, blurHandler });
+        handlers.push({ input, handler, timer, suggestionBox, clickHandler, blurHandler, keyHandler });
     });
     return handlers;
 }
@@ -2205,12 +2238,14 @@ function showStatusModal({ title, confirmText, fields }) {
                 .forEach((wrapper) => wrapper.classList.remove('visible'));
             closeTriggers.forEach((btn) => btn.removeEventListener('click', onCancel));
             confirmBtn.removeEventListener('click', onConfirm);
+            modal.removeEventListener('keydown', onShortcut);
             otherHandlers.forEach(({ checkbox, handler }) => {
                 checkbox.removeEventListener('change', handler);
             });
-            suggestionHandlers.forEach(({ input, handler, timer, suggestionBox, clickHandler, blurHandler }) => {
+            suggestionHandlers.forEach(({ input, handler, timer, suggestionBox, clickHandler, blurHandler, keyHandler }) => {
                 input.removeEventListener('input', handler);
                 input.removeEventListener('focus', handler);
+                input.removeEventListener('keydown', keyHandler);
                 input.removeEventListener('blur', blurHandler);
                 if (timer) {
                     clearTimeout(timer);
@@ -2226,6 +2261,18 @@ function showStatusModal({ title, confirmText, fields }) {
         const onCancel = () => {
             cleanup();
             resolve(null);
+        };
+
+        const onShortcut = (event) => {
+            if (event.ctrlKey && event.key === 'Enter') {
+                event.preventDefault();
+                onConfirm();
+                return;
+            }
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                onCancel();
+            }
         };
 
         const onConfirm = () => {
@@ -2282,6 +2329,7 @@ function showStatusModal({ title, confirmText, fields }) {
 
         closeTriggers.forEach((btn) => btn.addEventListener('click', onCancel));
         confirmBtn.addEventListener('click', onConfirm);
+        modal.addEventListener('keydown', onShortcut);
         modal.classList.remove('hidden');
         modal.setAttribute('aria-hidden', 'false');
         const firstInput = modal.querySelector('.status-modal__input:not([type="hidden"]), .status-modal__textarea');
@@ -2306,29 +2354,6 @@ const PREVENTIVE_ACTION_OPTIONS = [
     { value: 'written_warning', label: 'Written Warning / Escalation' },
     { value: 'other', label: 'Other' },
 ];
-
-const ROOT_CAUSE_LABEL_MAP = new Map(
-    ROOT_CAUSE_OPTIONS.map((entry) => [entry.value, entry.label])
-);
-
-function buildRootCauseSummary(flags = [], other) {
-    const labels = [];
-    if (Array.isArray(flags)) {
-        flags.forEach((flag) => {
-            const label = ROOT_CAUSE_LABEL_MAP.get(flag);
-            if (label) {
-                labels.push(label);
-            }
-        });
-    }
-    if (other) {
-        labels.push(other);
-    }
-    if (labels.length) {
-        return labels.join(', ');
-    }
-    return null;
-}
 
 const STAFF_SUGGESTION_CONFIG = {
     listEnabled: true,
@@ -2468,8 +2493,11 @@ function buildNCEscalationFields(initial = {}, options = {}) {
     return fields;
 }
 
-async function gatherStatusPayload(status) {
+async function gatherStatusPayload(status, options = {}) {
     if (status === 'Closed') {
+        if (options.closeMode === 'without-note') {
+            return { closure_notes: 'N/A' };
+        }
         return await showStatusModal({
             title: 'Closure details',
             confirmText: 'Save',
@@ -2753,12 +2781,12 @@ async function gatherNCEscalationPayload() {
     };
 }
 
-async function quickStatus(id, status) {
+async function quickStatus(id, status, options = {}) {
     let statusExtras = null;
     try {
         statusExtras = status === 'Escalated to NC'
             ? await gatherNCEscalationPayload()
-            : await gatherStatusPayload(status);
+            : await gatherStatusPayload(status, options);
     } catch (err) {
         return;
     }
@@ -3027,6 +3055,25 @@ document.addEventListener('click', async (event) => {
         return;
     }
 
+    const focusNavButton = event.target.closest('[data-management-focus-nav]');
+    if (focusNavButton) {
+        event.preventDefault();
+        const direction = focusNavButton.dataset.managementFocusNav === 'next' ? 1 : -1;
+        moveManagementShortcutRow(direction);
+        return;
+    }
+
+    const focusItemButton = event.target.closest('[data-management-focus-item]');
+    if (focusItemButton) {
+        event.preventDefault();
+        const rows = getManagementShortcutRows();
+        const index = rows.indexOf(focusItemButton);
+        if (index >= 0) {
+            jumpManagementShortcutRow(index);
+        }
+        return;
+    }
+
     const ncTrigger = event.target.closest('[data-behavior="view-nc"]');
     if (ncTrigger) {
         event.preventDefault();
@@ -3060,7 +3107,13 @@ document.addEventListener('click', async (event) => {
         group?.querySelector('.mgmt-toggle')?.setAttribute('aria-expanded', 'false');
         closeOverlayModals();
         if (status) {
-            await quickStatus(hiccupId, status);
+            const closeMode =
+                behavior === 'close-without-note'
+                    ? 'without-note'
+                    : behavior === 'close-with-note'
+                    ? 'with-note'
+                    : undefined;
+            await quickStatus(hiccupId, status, { closeMode });
         }
         return;
     }

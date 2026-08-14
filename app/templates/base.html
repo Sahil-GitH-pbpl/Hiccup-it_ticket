@@ -65,6 +65,19 @@
           #f8fafc;
         min-height: 100vh;
         transition: opacity 0.25s ease;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+      .app-content-wrapper,
+      .app-shell {
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: clip;
       }
       body.page-exiting {
         opacity: 0.6;
@@ -374,7 +387,7 @@
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/static/js/main.js?v=20260625a" defer></script>
+    <script src="/static/js/main.js?v=20260814a" defer></script>
     <script src="/static/js/independence.js?v=20260805a" defer></script>
     <script>
       const authLinks = {

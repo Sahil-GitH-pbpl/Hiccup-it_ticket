@@ -22,6 +22,12 @@ function showAlert(options = {}) {
         confirmButtonText,
         timer,
         ...rest,
+        didOpen: (popup) => {
+            bindModalKeyboardShortcuts(popup);
+            if (typeof rest.didOpen === 'function') {
+                rest.didOpen(popup);
+            }
+        },
     });
 }
 
@@ -52,6 +58,42 @@ function confirmDialog(options = {}) {
     return Swal.fire({
         ...defaultOptions,
         ...options,
+        didOpen: (popup) => {
+            bindModalKeyboardShortcuts(popup);
+            if (typeof options.didOpen === 'function') {
+                options.didOpen(popup);
+            }
+        },
+    });
+}
+
+function bindModalKeyboardShortcuts(root) {
+    if (!root || root.dataset.modalShortcutBound === 'true') {
+        return;
+    }
+    root.dataset.modalShortcutBound = 'true';
+    root.addEventListener('keydown', (event) => {
+        if (event.ctrlKey && event.key === 'Enter') {
+            event.preventDefault();
+            const confirmButton =
+                root.querySelector('.swal2-confirm') ||
+                root.querySelector('[data-modal-confirm]') ||
+                root.querySelector('button[type="submit"]');
+            if (confirmButton && !confirmButton.disabled) {
+                confirmButton.click();
+            }
+            return;
+        }
+        if (event.key === 'Escape') {
+            const cancelButton =
+                root.querySelector('.swal2-cancel') ||
+                root.querySelector('[data-modal-close]') ||
+                root.querySelector('.swal2-close');
+            if (cancelButton && !cancelButton.disabled) {
+                event.preventDefault();
+                cancelButton.click();
+            }
+        }
     });
 }
 
