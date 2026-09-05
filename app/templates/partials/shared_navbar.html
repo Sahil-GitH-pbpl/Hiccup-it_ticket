@@ -1,0 +1,111 @@
+<header class="sticky top-0 z-20 bg-white/95 border-b border-slate-200 shadow-sm">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-6">
+    <a href="/" class="flex items-center gap-3">
+      <img src="/static/img/Logoicon.png" alt="Dr Bhasin logo" class="h-10 w-10" />
+      <div>
+        <p class="text-lg font-semibold text-slate-900">Dr Bhasin's Lab</p>
+        <p class="text-xs tracking-[0.2em] uppercase text-tealbrand">Trusted Quality & Service</p>
+      </div>
+    </a>
+    <nav class="desktop-nav flex flex-wrap items-center gap-5 text-sm font-semibold text-slate-700">
+      <a href="/home" class="hover:text-tealbrand transition-colors">My Desk</a>
+      {% if _can_view_dashboard_nav %}
+      <a href="/dashboard" class="hover:text-tealbrand transition-colors">Dashboard</a>
+      {% endif %}
+
+      <div class="relative nav-dropdown-parent">
+        <button id="nav-hiccup-toggle" class="hover:text-tealbrand transition-colors font-semibold">Hiccup &#9662;</button>
+        <div id="nav-hiccup-menu" class="nav-dropdown hidden">
+          <a href="/raise" class="nav-dropdown__item">Create Hiccup</a>
+          <a href="/my-hiccups" class="nav-dropdown__item">My Hiccups</a>
+          <a id="nav-hic-all" href="/management" class="nav-dropdown__item{% if not _can_view_all_hiccups_nav %} hidden{% endif %}">All Hiccups</a>
+          <a href="/assigned" class="nav-dropdown__item">Assigned to Me</a>
+        </div>
+      </div>
+
+      <div class="relative nav-dropdown-parent">
+        <button id="nav-it-toggle" class="hover:text-tealbrand transition-colors font-semibold">Infra Tickets &#9662;</button>
+        <div id="nav-it-menu" class="nav-dropdown hidden">
+          <a href="/infra/create-form" class="nav-dropdown__item">Create Infra Ticket</a>
+          <a href="/my-tickets" class="nav-dropdown__item">My Infra Tickets</a>
+          <a id="nav-it-all" href="/infra/all" class="nav-dropdown__item{% if not (user is defined and user and (
+              (user.user_id == 95 if user.user_id is defined else false)
+              or
+              (user.is_infra_admin if user.is_infra_admin is defined else false)
+              or ('admin' in (user.designation or '')|lower)
+              or ('it' in (user.designation or '')|lower)
+              or ('infra' in (user.designation or '')|lower)
+              or ('admin' in (user.role or '')|lower)
+              or ('it' in (user.role or '')|lower)
+              or ('infra' in (user.role or '')|lower)
+            )) %} hidden{% endif %}">All Infra Tickets</a>
+        </div>
+      </div>
+
+      <a href="/assets/" class="hover:text-tealbrand transition-colors">Assets</a>
+
+      <div id="nav-auth" class="flex items-center gap-4">
+        <span id="nav-user-label" class="hidden text-xs font-semibold text-slate-500 uppercase tracking-[0.3em]"></span>
+        <a id="nav-login" href="/login" class="hover:text-tealbrand transition-colors">Login</a>
+        <button id="nav-logout" class="hidden rounded-full bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800" type="button">
+          Logout
+        </button>
+      </div>
+    </nav>
+    <button id="mobile-nav-toggle" class="mobile-nav-toggle" type="button" aria-label="Toggle navigation">
+      <span></span>
+    </button>
+  </div>
+</header>
+<div id="mobile-nav-overlay" class="mobile-nav-overlay hidden"></div>
+<div id="mobile-nav-drawer" class="mobile-nav-drawer hidden" aria-label="Mobile navigation">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm font-semibold text-slate-900">Menu</p>
+      <p class="text-xs text-slate-500">Quick access</p>
+    </div>
+    <button id="mobile-nav-close" class="mobile-nav-toggle" aria-label="Close navigation">
+      <span></span>
+    </button>
+  </div>
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">Main</div>
+    <a href="/home" class="mobile-nav-link">My Desk</a>
+    {% if _can_view_dashboard_nav %}
+    <a href="/dashboard" class="mobile-nav-link">Dashboard</a>
+    {% endif %}
+  </div>
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">Hiccup</div>
+    <a href="/raise" class="mobile-nav-link">Create Hiccup</a>
+    <a href="/my-hiccups" class="mobile-nav-link">My Hiccups</a>
+    <a id="nav-hic-all-mobile" href="/management" class="mobile-nav-link{% if not _can_view_all_hiccups_nav %} hidden{% endif %}">All Hiccups</a>
+    <a href="/assigned" class="mobile-nav-link">Assigned to Me</a>
+  </div>
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">Infra Ticket</div>
+    <a href="/infra/create-form" class="mobile-nav-link">Create Infra Ticket</a>
+    <a href="/my-tickets" class="mobile-nav-link">My Infra Tickets</a>
+    <a id="nav-it-all-mobile" href="/infra/all" class="mobile-nav-link{% if not (user is defined and user and (
+        (user.user_id == 95 if user.user_id is defined else false)
+        or
+        (user.is_infra_admin if user.is_infra_admin is defined else false)
+        or ('admin' in (user.designation or '')|lower)
+        or ('it' in (user.designation or '')|lower)
+        or ('infra' in (user.designation or '')|lower)
+        or ('admin' in (user.role or '')|lower)
+        or ('it' in (user.role or '')|lower)
+        or ('infra' in (user.role or '')|lower)
+      )) %} hidden{% endif %}">All Infra Tickets</a>
+  </div>
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">Assets</div>
+    <a href="/assets/" class="mobile-nav-link">Asset Management</a>
+  </div>
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">Account</div>
+    <div id="nav-user-mobile" class="mobile-nav-link hidden"></div>
+    <a id="nav-login-mobile" href="/login" class="mobile-nav-link">Login</a>
+    <button id="nav-logout-mobile" class="mobile-nav-link text-left hidden" type="button">Logout</button>
+  </div>
+</div>

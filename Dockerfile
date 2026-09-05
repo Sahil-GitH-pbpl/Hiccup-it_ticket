@@ -14,4 +14,5 @@ RUN mkdir -p /app/logs /app/uploads
 
 EXPOSE 3010
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3010", "--workers", "3"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3010", "--workers", "
+"]

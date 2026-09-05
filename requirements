@@ -14,3 +14,6 @@ requests
 python-multipart
 wfastcgi
 itsdangerous
+pymysql
+passlib[bcrypt]
+qrcode[pil]

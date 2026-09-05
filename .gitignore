@@ -35,6 +35,7 @@ Thumbs.db
 
 # Uploads and runtime data
 uploads/
+asset_uploads/
 logs/
 
 # Coverage / testing

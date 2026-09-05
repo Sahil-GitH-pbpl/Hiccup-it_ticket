@@ -16,7 +16,8 @@ FastAPI + MySQL implementation of the pathology lab hiccup logging workflow with
 ## Docker
 
 ```bash
-docker-compose up --build
+
+
 ```
 
 The backend listens on port 7410 and persists uploads/logs via bind mounts.

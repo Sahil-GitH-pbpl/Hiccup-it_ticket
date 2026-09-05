@@ -82,44 +82,6 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username and password required"
         )
-    if username.lower() == "virendar" and password == "24031985":
-        token = create_jwt(
-            {
-                "user_id": -1,
-                "role": "form_only",
-                "department_id": None,
-                "name": "Virendar",
-                "designation": "Follow-up Form",
-                "is_admin_like": False,
-                "is_infra_admin": False,
-                "form_only": True,
-            }
-        )
-        token_response = TokenResponse(
-            access_token=token,
-            role="form_only",
-            name="Virendar",
-            department_id=None,
-            user_id=-1,
-            designation="Follow-up Form",
-            is_admin_like=False,
-            is_infra_admin=False,
-            form_only=True,
-        )
-        response.set_cookie(
-            "token",
-            token,
-            httponly=True,
-            secure=False,
-            samesite="lax",
-            path="/",
-        )
-        logger.info(
-            "form-only login response %s",
-            token_response.dict(exclude={"access_token"}),
-        )
-        return token_response
-
     contact_digits = digits_only(username)
     user = (
         db.query(Staff)
@@ -198,17 +160,6 @@ def list_users(q: str | None = None, limit: int = 50, db: Session = Depends(get_
 
 @router.get("/me", response_model=TokenDataResponse)
 def me(user=Depends(get_current_user)):
-    if getattr(user, "form_only", False):
-        return TokenDataResponse(
-            user_id=user.user_id,
-            role=user.role,
-            name=user.name,
-            department_id=user.department_id,
-            designation=user.designation,
-            is_admin_like=False,
-            is_infra_admin=False,
-            form_only=True,
-        )
     return TokenDataResponse(
         user_id=user.user_id,
         role=user.role,
@@ -217,7 +168,6 @@ def me(user=Depends(get_current_user)):
         designation=user.designation,
         is_admin_like=is_allowlisted_hiccup_admin(user.user_id),
         is_infra_admin=getattr(user, "is_infra_admin", False),
-        form_only=getattr(user, "form_only", False),
     )
 
 

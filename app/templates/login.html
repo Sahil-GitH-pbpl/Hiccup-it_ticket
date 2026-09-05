@@ -38,8 +38,16 @@ function isAdminLike(user){
     return user.is_admin_like === true;
 }
 
-function isFormOnly(user) {
-    return Boolean(user?.form_only) || user?.role === 'form_only';
+function requestedRedirectTarget() {
+    const next = new URLSearchParams(window.location.search).get('next');
+    if (next && next.startsWith('/') && !next.startsWith('//')) {
+        return next;
+    }
+    return null;
+}
+
+function defaultRedirectTarget(user) {
+    return requestedRedirectTarget() || (isAdminLike(user) ? '/dashboard' : '/home');
 }
 
 async function verifyTokenAndRedirect(){
@@ -50,8 +58,7 @@ async function verifyTokenAndRedirect(){
         });
         if(res.ok){
             const user = await res.json();
-            const target = isFormOnly(user) ? '/followup-form' : (isAdminLike(user) ? '/dashboard' : '/home');
-            window.location.href = target;
+            window.location.href = defaultRedirectTarget(user);
             return;
         }
     } catch {
@@ -113,8 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     timer: 1200,
                     showConfirmButton: false,
                 });
-                const target = isFormOnly(data) ? '/followup-form' : (isAdminLike(data) ? '/dashboard' : '/home');
-                window.location.href = target;
+                window.location.href = defaultRedirectTarget(data);
                 return;
             }
             await showAlert({

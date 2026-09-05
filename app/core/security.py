@@ -120,7 +120,6 @@ class TokenData:
         designation: Optional[str] = None,
         is_admin_like: bool = False,
         is_infra_admin: bool = False,
-        form_only: bool = False,
     ):
         self.user_id = user_id
         self.role = role
@@ -129,7 +128,6 @@ class TokenData:
         self.designation = designation or ""
         self.is_admin_like = is_admin_like
         self.is_infra_admin = is_infra_admin
-        self.form_only = form_only
 
 
 def create_jwt(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -193,7 +191,6 @@ def decode_jwt(token: str) -> TokenData:
             designation=payload.get("designation"),
             is_admin_like=bool(payload.get("is_admin_like")),
             is_infra_admin=bool(payload.get("is_infra_admin")),
-            form_only=bool(payload.get("form_only")),
         )
     except JWTError:
         raise HTTPException(

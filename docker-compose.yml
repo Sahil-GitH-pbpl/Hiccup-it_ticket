@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 services:
   backend:
     build: .
@@ -31,11 +31,20 @@ services:
       - INFRA_PICK_SLA_START=12:00
       - INFRA_PICK_SLA_END=16:00
       - INFRA_SLA_HOLIDAYS=2026-01-26,2026-08-15,2026-10-02,2026-12-25
+      - ASSET_DB_HOST=mysql
+      - ASSET_DB_PORT=3306
+      - ASSET_DB_USER=root
+      - ASSET_DB_PASSWORD=example
+      - ASSET_DB_NAME=asset_management
+      - ASSET_UPLOAD_DIR=/app/asset_uploads
+      - ASSET_BASE_PATH=/assets
+      - ASSET_PUBLIC_BASE_URL=https://labmate.bhasinpathlabs.com:4666/assets
     ports:
       - "3010:3010"
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
+      - ./asset_uploads:/app/asset_uploads
     restart: unless-stopped
   scheduler:
     build: .
@@ -68,9 +77,18 @@ services:
       - INFRA_PICK_SLA_START=12:00
       - INFRA_PICK_SLA_END=16:00
       - INFRA_SLA_HOLIDAYS=2026-01-26,2026-08-15,2026-10-02,2026-12-25
+      - ASSET_DB_HOST=mysql
+      - ASSET_DB_PORT=3306
+      - ASSET_DB_USER=root
+      - ASSET_DB_PASSWORD=example
+      - ASSET_DB_NAME=asset_management
+      - ASSET_UPLOAD_DIR=/app/asset_uploads
+      - ASSET_BASE_PATH=/assets
+      - ASSET_PUBLIC_BASE_URL=https://labmate.bhasinpathlabs.com:4666/assets
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
+      - ./asset_uploads:/app/asset_uploads
     restart: unless-stopped
   mysql:
     image: mysql:8
@@ -83,6 +101,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/asset_management.sql:/docker-entrypoint-initdb.d/asset_management.sql:ro
     restart: unless-stopped
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
