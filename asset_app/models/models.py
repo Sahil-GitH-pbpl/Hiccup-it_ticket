@@ -22,6 +22,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 IdType = BigInteger().with_variant(Integer, "sqlite")
 from .base import Base, Timestamped
 from asset_app.core.timezone import now_ist
+from app.core.config import get_settings as get_hiccup_settings
 
 
 class Role(Base, Timestamped):
@@ -33,6 +34,7 @@ class Role(Base, Timestamped):
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = {"schema": get_hiccup_settings().db_name}
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(150), nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -42,7 +44,7 @@ class User(Base):
         "role", String(50), nullable=False, server_default="employee"
     )
     role_id: Mapped[int] = mapped_column(
-        BigInteger, ForeignKey("roles.id"), nullable=False, server_default="7"
+        BigInteger, nullable=False, server_default="7"
     )
     status: Mapped[str] = mapped_column(
         Enum("Active", "Inactive", name="user_status"),
@@ -57,7 +59,10 @@ class User(Base):
     dob: Mapped[str | None] = mapped_column(String(10))
     designation: Mapped[str | None] = mapped_column(String(100))
     department_id: Mapped[int | None] = mapped_column(Integer)
-    role: Mapped[Role] = relationship(foreign_keys=[role_id])
+    # Users live in the shared DB; asset role definitions remain in the asset DB.
+    role: Mapped[Role] = relationship(
+        primaryjoin="foreign(User.role_id) == Role.id", viewonly=True
+    )
 
     @property
     def username(self) -> str:

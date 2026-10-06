@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-{% set _asset_role = (user.role if user is defined and user and user.role is defined else '') %}
+{% set _asset_role = asset_role or '' %}
 {% set _asset_page = request.query_params.get('page', 'Dashboard') %}
 <div id="app">
   <div class="app">
@@ -16,14 +16,24 @@
         <a href="/assets/?page=Dashboard" data-page="Dashboard" title="Dashboard" class="{{ 'active' if _asset_page == 'Dashboard' else '' }}"><span class="nav-full">Dashboard</span><span class="nav-short">DB</span></a>
         <a href="/assets/?page=Assets" data-page="Assets" title="Assets" class="{{ 'active' if _asset_page == 'Assets' else '' }}"><span class="nav-full">Assets</span><span class="nav-short">AS</span></a>
         <a href="/assets/?page=Service" data-page="Service" title="Service" class="{{ 'active' if _asset_page == 'Service' else '' }}"><span class="nav-full">Service</span><span class="nav-short">SV</span></a>
-        {% if is_admin_like %}
+        {% if _asset_role in ['Administrator', 'Asset Manager', 'Technician'] %}
         <a href="/assets/?page=PM" data-page="PM" title="PM" class="{{ 'active' if _asset_page == 'PM' else '' }}"><span class="nav-full">PM</span><span class="nav-short">PM</span></a>
         <a href="/assets/?page=Calibration" data-page="Calibration" title="Calibration" class="{{ 'active' if _asset_page == 'Calibration' else '' }}"><span class="nav-full">Calibration</span><span class="nav-short">CL</span></a>
+        {% endif %}
+        {% if _asset_role in ['Administrator', 'Asset Manager'] %}
         <a href="/assets/?page=Contracts" data-page="Contracts" title="Contracts" class="{{ 'active' if _asset_page == 'Contracts' else '' }}"><span class="nav-full">Contracts</span><span class="nav-short">CT</span></a>
         <a href="/assets/?page=Movements" data-page="Movements" title="Movements" class="{{ 'active' if _asset_page == 'Movements' else '' }}"><span class="nav-full">Movements</span><span class="nav-short">MV</span></a>
+        {% endif %}
+        {% if _asset_role == 'Administrator' %}
         <a href="/assets/?page=Approvals" data-page="Approvals" title="Approvals" class="{{ 'active' if _asset_page == 'Approvals' else '' }}"><span class="nav-full">Approvals</span><span class="nav-short">AP</span></a>
+        {% endif %}
+        {% if _asset_role in ['Administrator', 'Asset Manager', 'Technician'] %}
         <a href="/assets/?page=Reports" data-page="Reports" title="Reports" class="{{ 'active' if _asset_page == 'Reports' else '' }}"><span class="nav-full">Reports</span><span class="nav-short">RP</span></a>
+        {% endif %}
+        {% if _asset_role in ['Administrator', 'Asset Manager'] %}
         <a href="/assets/?page=Masters" data-page="Masters" title="Masters" class="{{ 'active' if _asset_page == 'Masters' else '' }}"><span class="nav-full">Masters</span><span class="nav-short">MS</span></a>
+        {% endif %}
+        {% if _asset_role == 'Administrator' %}
         <a href="/assets/?page=Users" data-page="Users" title="Users" class="{{ 'active' if _asset_page == 'Users' else '' }}"><span class="nav-full">Users</span><span class="nav-short">US</span></a>
         {% endif %}
       </nav>
@@ -50,6 +60,5 @@
 </script>
 <script src="/assets/static/js/app.js?v=20260904-role-ui" defer></script>
 {% endblock %}
-
 
 

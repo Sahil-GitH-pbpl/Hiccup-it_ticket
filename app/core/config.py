@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     jwt_secret: str = Field("supersecret", env="JWT_SECRET")
     jwt_algo: str = Field("HS256", env="JWT_ALGO")
     whatsapp_api_url: str = Field(
-        "http://10.1.1.44:3004/api/messages/send", env="WHATSAPP_API_URL"
+        "http://10.1.1.181:3004/api/messages/send", env="WHATSAPP_API_URL"
     )
     whatsapp_api_token: str = Field(
         "61e3f2cd978650537d9223e7", env="WHATSAPP_API_TOKEN"
@@ -40,8 +40,8 @@ class Settings(BaseSettings):
     # response_escalate_minutes: int = Field(4, env="RESPONSE_ESCALATE_MINUTES")
     session_secret: str = Field("change-this-session-secret", env="SESSION_SECRET")
     enable_infra_reminder: bool = Field(True, env="ENABLE_INFRA_REMINDER")
-    infra_pick_sla_start: str = Field("12:00", env="INFRA_PICK_SLA_START")
-    infra_pick_sla_end: str = Field("16:00", env="INFRA_PICK_SLA_END")
+    infra_pick_sla_start: str = Field("11:00", env="INFRA_PICK_SLA_START")
+    infra_pick_sla_end: str = Field("17:00", env="INFRA_PICK_SLA_END")
     infra_sla_holidays: str = Field("", env="INFRA_SLA_HOLIDAYS")
     local_reload: bool = Field(False, env="LOCAL_RELOAD")
 

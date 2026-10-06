@@ -83,7 +83,7 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
             status_code=status.HTTP_400_BAD_REQUEST, detail="Username and password required"
         )
     contact_digits = digits_only(username)
-    user = (
+    candidates = (
         db.query(Staff)
         .filter(
             func.lower(Staff.status) == "active",
@@ -93,12 +93,36 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
                 Staff.contact == contact_digits,
             )
         )
-        .first()
+        .order_by(Staff.id.asc())
+        .all()
     )
-    if not user:
+    if not candidates:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
+
+    direct_contact_match = next(
+        (
+            staff
+            for staff in candidates
+            if staff.contact in {username, contact_digits}
+        ),
+        None,
+    )
+    if direct_contact_match:
+        user = direct_contact_match
+    else:
+        matching_users = [
+            staff
+            for staff in candidates
+            if staff.password == password or matches_dob_password(password, staff.dob)
+        ]
+        if not matching_users:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+            )
+        user = matching_users[0]
+
     valid_password = user.password == password or matches_dob_password(password, user.dob)
     if not valid_password:
         raise HTTPException(
@@ -111,7 +135,10 @@ def login(payload: LoginRequest, response: Response, db: Session = Depends(get_d
     is_admin_like = hiccup_admin  # only hiccup admins get this flag
     is_infra_admin = infra_override
     # If infra-allowlisted, elevate role for token/claims
-    token_role = user.role
+    # The stored role belongs to Asset Management, not Hiccup/Infra privileges.
+    token_role = "staff_user" if user.role in {
+        "administrator", "technician", "asset_manager", "employee"
+    } else user.role
     token_designation = user.designation
     if infra_override:
         token_role = "admin"

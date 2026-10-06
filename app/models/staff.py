@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, TIMESTAMP, text
+from sqlalchemy import BigInteger, Column, Integer, String, TIMESTAMP, text
 
 from app.db.base import Base
 
@@ -11,7 +11,8 @@ class Staff(Base):
     password = Column(String(255), nullable=False)
     contact = Column(String(20), nullable=False, unique=True)
     departments = Column(String(50))
-    role = Column(String(50), nullable=False, default="staff")
+    role = Column(String(50), nullable=False, default="employee", server_default="employee")
+    role_id = Column(BigInteger, nullable=False, default=7, server_default="7")
     status = Column(String(10), nullable=False, server_default=text("'Active'"))
     last_updated = Column(
         TIMESTAMP,

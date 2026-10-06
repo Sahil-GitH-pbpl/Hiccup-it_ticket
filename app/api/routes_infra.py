@@ -381,7 +381,7 @@ def is_infra_sla_check_window(moment: Optional[datetime] = None) -> bool:
 def calculate_pick_sla_deadline(created_at: Optional[datetime]) -> datetime:
     """
     Infra pick SLA: every ticket gets 4 working hours to be picked.
-    Working window is configurable, default 12 PM to 4 PM.
+    Working window is configurable, default 11 AM to 5 PM.
 
     - Created before the window -> timer starts same working day at 12 PM.
     - Created during the window -> timer starts immediately.

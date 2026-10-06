@@ -55,6 +55,8 @@ from asset_app.models import (
 )
 from asset_app.services.alerts import scan_due_alerts as scan_asset_due_alerts
 from asset_app.services.seed import seed as seed_asset_data
+from asset_app.core.security import load_active_user as load_asset_user
+from asset_app.models import User as AssetUser
 
 import app.models  # ensure all models register before metadata creation
 
@@ -473,9 +475,16 @@ def create_app() -> FastAPI:
             except Exception:
                 return RedirectResponse(url="/login?next=/assets/")
         asset_dashboard = None
+        asset_role = None
         asset_db = AssetSessionLocal()
         try:
+            asset_user = load_asset_user(asset_db, user.user_id)
+            asset_role = asset_user.role.name
             asset_dashboard = _asset_dashboard_counts(asset_db)
+        except HTTPException as exc:
+            if exc.status_code == 401:
+                return RedirectResponse(url="/login?next=/assets/")
+            raise
         except SQLAlchemyError as exc:
             logging.getLogger(__name__).warning(
                 "Asset dashboard counts unavailable: %s",
@@ -490,6 +499,7 @@ def create_app() -> FastAPI:
                 "user": user,
                 "is_admin_like": is_admin_like,
                 "asset_dashboard": asset_dashboard,
+                "asset_role": asset_role,
             },
         )
 
@@ -497,7 +507,10 @@ def create_app() -> FastAPI:
     async def initialize_asset_management_module():
         try:
             ensure_asset_database_exists()
-            AssetBase.metadata.create_all(asset_engine)
+            AssetBase.metadata.create_all(
+                asset_engine,
+                tables=[t for t in AssetBase.metadata.sorted_tables if t is not AssetUser.__table__],
+            )
             db = AssetSessionLocal()
             try:
                 seed_asset_data(db)

@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from asset_app.db.session import get_db
 from asset_app.models import *
 from asset_app.schemas import *
-from asset_app.core.security import create_token, current_user, require_roles
+from asset_app.core.security import ROLE_CODES, create_token, current_user, load_active_user, require_roles
 from asset_app.core.config import settings
 from asset_app.core.timezone import now_ist
 from asset_app.services.workflows import *
@@ -200,6 +200,7 @@ def login(data: LoginInput, db: Session = Depends(get_db)):
     )
     if not user:
         raise HTTPException(401, "Incorrect username or DOB password")
+    user = load_active_user(db, user.id)
     return TokenOut(
         access_token=create_token(user), username=user.username, role=user.role.name
     )
@@ -300,14 +301,8 @@ def update_user_role(
         raise HTTPException(404, "User not found")
     if target.id == user.id and role.name != "Administrator":
         raise HTTPException(400, "You cannot remove your own Administrator role")
-    role_codes = {
-        1: "administrator",
-        2: "technician",
-        3: "asset_manager",
-        7: "employee",
-    }
     target.role_id = role.id
-    target.role_name = role_codes[role.id]
+    target.role_name = ROLE_CODES[role.id]
     db.add(
         AuditLog(
             entity_type="user",
