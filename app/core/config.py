@@ -44,6 +44,10 @@ class Settings(BaseSettings):
     infra_pick_sla_end: str = Field("17:00", env="INFRA_PICK_SLA_END")
     infra_sla_holidays: str = Field("", env="INFRA_SLA_HOLIDAYS")
     local_reload: bool = Field(False, env="LOCAL_RELOAD")
+    redis_url: str = Field("redis://redis:6379/0", env="REDIS_URL")
+    redis_enabled: bool = Field(False, env="REDIS_ENABLED")
+    cache_default_ttl_seconds: int = Field(300, env="CACHE_DEFAULT_TTL_SECONDS")
+    scheduler_lock_ttl_seconds: int = Field(55 * 60, env="SCHEDULER_LOCK_TTL_SECONDS")
 
     model_config = SettingsConfigDict(
         env_file=".env",

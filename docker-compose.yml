@@ -5,6 +5,7 @@ services:
     container_name: hiccup_backend
     depends_on:
       - mysql
+      - redis
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
@@ -39,6 +40,8 @@ services:
       - ASSET_UPLOAD_DIR=/app/asset_uploads
       - ASSET_BASE_PATH=/assets
       - ASSET_PUBLIC_BASE_URL=https://labmate.bhasinpathlabs.com:4666/assets
+      - REDIS_ENABLED=1
+      - REDIS_URL=redis://redis:6379/0
     ports:
       - "3010:3010"
     volumes:
@@ -51,6 +54,7 @@ services:
     container_name: hiccup_scheduler
     depends_on:
       - mysql
+      - redis
     command: ["python", "-m", "app.core.scheduler_runner"]
     environment:
       - DB_HOST=mysql
@@ -85,6 +89,8 @@ services:
       - ASSET_UPLOAD_DIR=/app/asset_uploads
       - ASSET_BASE_PATH=/assets
       - ASSET_PUBLIC_BASE_URL=https://labmate.bhasinpathlabs.com:4666/assets
+      - REDIS_ENABLED=1
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./logs:/app/logs
       - ./uploads:/app/uploads
@@ -103,6 +109,14 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - ./db/asset_management.sql:/docker-entrypoint-initdb.d/asset_management.sql:ro
     restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    container_name: hiccup_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: hiccup_phpmyadmin
@@ -118,3 +132,4 @@ services:
     restart: unless-stopped
 volumes:
   mysql_data:
+  redis_data:

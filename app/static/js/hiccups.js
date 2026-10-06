@@ -1,3 +1,8 @@
+(() => {
+window.__hiccupsPageController?.abort?.();
+const hiccupsPageController = new AbortController();
+window.__hiccupsPageController = hiccupsPageController;
+const hiccupsPageSignal = hiccupsPageController.signal;
 let myHiccupsData = [];
 const statusFilter = document.getElementById('filter-status');
 const typeFilter = document.getElementById('filter-type');
@@ -1705,7 +1710,7 @@ resetFilters?.addEventListener('click', () => {
     paginationState.against = 1;
     loadMyHiccups();
     closeFilterDrawer();
-});
+}, { signal: hiccupsPageSignal });
 
 mgmtResetFilters?.addEventListener('click', () => {
     if (mgmtStatusFilter) mgmtStatusFilter.value = '';
@@ -1724,7 +1729,7 @@ mgmtResetFilters?.addEventListener('click', () => {
     }
     loadMyHiccups();
     closeFilterDrawer();
-});
+}, { signal: hiccupsPageSignal });
 
 function toggleHiccupTab(target) {
     const raisedSection = document.getElementById('raised-by-section');
@@ -1757,8 +1762,8 @@ function setupHiccupTabs() {
     if (!raisedTab && !againstTab) {
         return;
     }
-    raisedTab?.addEventListener('click', () => toggleHiccupTab('raised'));
-    againstTab?.addEventListener('click', () => toggleHiccupTab('against'));
+    raisedTab?.addEventListener('click', () => toggleHiccupTab('raised'), { signal: hiccupsPageSignal });
+    againstTab?.addEventListener('click', () => toggleHiccupTab('against'), { signal: hiccupsPageSignal });
     toggleHiccupTab('raised');
 }
 
@@ -1767,7 +1772,7 @@ function setupDensityControls() {
     document.querySelectorAll('[data-density-toggle]').forEach((btn) => {
         btn.addEventListener('click', () => {
             toggleDensityMode();
-        });
+        }, { signal: hiccupsPageSignal });
     });
 }
 
@@ -3160,7 +3165,7 @@ document.addEventListener('click', async (event) => {
             group.querySelector('.mgmt-toggle')?.setAttribute('aria-expanded', 'false');
         });
     }
-});
+}, { signal: hiccupsPageSignal });
 
 document.addEventListener('change', async (event) => {
     const pageSizeSelect = event.target.closest('[data-page-size-target]');
@@ -3178,7 +3183,7 @@ document.addEventListener('change', async (event) => {
     paginationState.management = 1;
     paginationState.assigned = 1;
     await loadMyHiccups();
-});
+}, { signal: hiccupsPageSignal });
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && activeFilterDrawerId) {
@@ -3186,11 +3191,11 @@ document.addEventListener('keydown', (event) => {
         return;
     }
     handleManagementShortcutKey(event);
-});
+}, { signal: hiccupsPageSignal });
 
 document.getElementById('mgmt-shortcut-help-toggle')?.addEventListener('click', () => {
     toggleManagementShortcutHelp();
-});
+}, { signal: hiccupsPageSignal });
 
 window.addEventListener('popstate', () => {
     if (assignedViewMode) {
@@ -3199,7 +3204,7 @@ window.addEventListener('popstate', () => {
         paginationState.management = getUrlPageParam(1);
     }
     loadMyHiccups();
-});
+}, { signal: hiccupsPageSignal });
 
 document.addEventListener('DOMContentLoaded', () => {
     setupDensityControls();
@@ -3208,4 +3213,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof loadMyHiccups === 'function') {
         loadMyHiccups();
     }
-});
+}, { signal: hiccupsPageSignal });
+})();

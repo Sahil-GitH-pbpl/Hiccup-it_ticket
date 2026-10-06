@@ -395,6 +395,27 @@
 <!-- JS WITH DEBUG -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const feedbackParams = new URLSearchParams(window.location.search);
+    const infraMessage = feedbackParams.get('infra_message');
+    const infraError = feedbackParams.get('infra_error');
+    if (infraMessage || infraError) {
+        const icon = infraError ? 'error' : 'success';
+        const title = infraError || infraMessage;
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon,
+                title,
+                timer: 1600,
+                showConfirmButton: false,
+            });
+        } else {
+            alert(title);
+        }
+        feedbackParams.delete('infra_message');
+        feedbackParams.delete('infra_error');
+        const cleanQuery = feedbackParams.toString();
+        window.history.replaceState({}, '', `${window.location.pathname}${cleanQuery ? `?${cleanQuery}` : ''}`);
+    }
 
     // Auto-submit filters
     const filterForm = document.getElementById('filterForm');

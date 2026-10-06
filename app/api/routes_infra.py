@@ -5,6 +5,7 @@ import time
 import logging
 import threading
 import uuid
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import requests
 from fastapi import APIRouter, Depends, Form, Request, UploadFile, File, Query
@@ -22,6 +23,7 @@ from app.models.infra import InfraTicket, InfraTicketImage, InfraUpdate
 from app.models.hiccup import Hiccup, HiccupAuditLog
 from app.models.staff import Staff
 from app.services.notification_service import enqueue_creation_notification
+from app.services.whatsapp_outbox import send_whatsapp_async_or_queue
 from app.utils.id_generator import generate_hiccup_id
 from app.utils.time_utils import now_local, now_local_naive
 
@@ -39,12 +41,29 @@ def get_db():
         db.close()
 
 
-def _infra_redirect_url(return_to: Optional[str] = None) -> str:
+def _infra_redirect_url(
+    return_to: Optional[str] = None,
+    *,
+    message: Optional[str] = None,
+    error: Optional[str] = None,
+) -> str:
     if return_to:
         candidate = return_to.strip()
         if candidate.startswith("/infra/all"):
-            return candidate
-    return "/infra/all"
+            base = candidate
+        else:
+            base = "/infra/all"
+    else:
+        base = "/infra/all"
+    if not message and not error:
+        return base
+    parts = urlsplit(base)
+    query = dict(parse_qsl(parts.query, keep_blank_values=True))
+    if message:
+        query["infra_message"] = message
+    if error:
+        query["infra_error"] = error
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 UPLOAD_DIR = Path("uploads/infra")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -194,29 +213,36 @@ def _build_ticket_message(ticket: InfraTicket) -> str:
 
 def notify_new_ticket_async(ticket: InfraTicket):
     """
-    Fire-and-forget WhatsApp alert for new tickets.
+    Queue WhatsApp alert for new tickets. User flow should not wait for WA API.
     """
     if not WHATSAPP_GROUP_TARGET:
         logger.warning("WA notify skipped: WHATSAPP_GROUP_TARGET missing")
         return
+    try:
+        msg = _build_ticket_message(ticket)
+        send_whatsapp_async_or_queue(
+            WHATSAPP_GROUP_TARGET,
+            msg,
+            context=f"infra:create:{ticket.ticket_id}",
+        )
+        logger.info("InfraAlert immediate-send/queue scheduled | ticket_id=%s", ticket.ticket_id)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("InfraAlert schedule failed for ticket_id=%s: %s", ticket.ticket_id, exc)
 
-    def _worker():
-        try:
-            msg = _build_ticket_message(ticket)
-            logger.info(
-                "InfraAlert -> sending WA for ticket_id=%s | msg_len=%s",
-                ticket.ticket_id,
-                len(msg),
-            )
-            status, resp = send_whatsapp_to_number(WHATSAPP_GROUP_TARGET, msg)
-            if status in (200, 201):
-                logger.info("InfraAlert sent | status=%s | resp=%s", status, (resp[:300] if resp else ""))
-            else:
-                logger.error("InfraAlert failed | status=%s | resp=%s", status, (resp[:500] if resp else ""))
-        except Exception as e:
-            logger.exception("InfraAlert exception: %s", e)
 
-    threading.Thread(target=_worker, daemon=True).start()
+def _queue_infra_whatsapp(
+    db: Session,
+    *,
+    target: str | None,
+    message: str,
+    context: str,
+    ticket_id: int,
+) -> None:
+    """Queue WA without blocking the infra action success flow."""
+    if not target:
+        return
+    send_whatsapp_async_or_queue(target, message, context=context)
+    logger.info("Infra WhatsApp immediate-send/queue scheduled | ticket_id=%s context=%s target=%s", ticket_id, context, target)
 
 
 def _build_pick_reminder_message(ticket: InfraTicket) -> str:
@@ -1317,18 +1343,17 @@ def pick_ticket(
     db.commit()
 
     if ticket.contact:
-        msg = _build_pick_confirmation_message(ticket)
-        status, resp = send_whatsapp_to_number(ticket.contact, msg)
-        if status in (200, 201):
-            logger.info("PickNotify sent to %s | ticket_id=%s", ticket.contact, ticket.ticket_id)
-        else:
-            logger.error(
-                "PickNotify failed | ticket_id=%s status=%s resp=%s",
-                ticket.ticket_id,
-                status,
-                (resp[:300] if resp else ""),
-            )
-    return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
+        _queue_infra_whatsapp(
+            db,
+            target=ticket.contact,
+            message=_build_pick_confirmation_message(ticket),
+            context=f"infra:pick:{ticket.ticket_id}",
+            ticket_id=ticket.ticket_id,
+        )
+    return RedirectResponse(
+        url=_infra_redirect_url(return_to, message=f"Ticket #{ticket.ticket_id} picked successfully."),
+        status_code=303,
+    )
 
 def parse_predefined_to_hours(predefined):
     """Parse predefined time string to hours"""
@@ -1395,19 +1420,18 @@ def resolve_ticket(
         enqueue_creation_notification(generated_resolution_hiccup_id)
 
     if ticket.contact:
-        msg = _build_resolved_message(ticket)
-        status, resp = send_whatsapp_to_number(ticket.contact, msg)
-        if status in (200, 201):
-            logger.info("ResolveNotify sent | ticket_id=%s contact=%s", ticket.ticket_id, ticket.contact)
-        else:
-            logger.error(
-                "ResolveNotify failed | ticket_id=%s status=%s resp=%s",
-                ticket.ticket_id,
-                status,
-                (resp[:300] if resp else ""),
-            )
+        _queue_infra_whatsapp(
+            db,
+            target=ticket.contact,
+            message=_build_resolved_message(ticket),
+            context=f"infra:resolve:{ticket.ticket_id}",
+            ticket_id=ticket.ticket_id,
+        )
 
-    return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
+    return RedirectResponse(
+        url=_infra_redirect_url(return_to, message=f"Ticket #{ticket.ticket_id} resolved successfully."),
+        status_code=303,
+    )
 
 
 # -------------------------------------------------------------
@@ -1453,16 +1477,15 @@ def mark_invalid(
     db.commit()
 
     if ticket.contact:
-        msg = _build_invalid_message(ticket)
-        status, resp = send_whatsapp_to_number(ticket.contact, msg)
-        if status in (200, 201):
-            logger.info("InvalidNotify sent | ticket_id=%s contact=%s", ticket.ticket_id, ticket.contact)
-        else:
-            logger.error(
-                "InvalidNotify failed | ticket_id=%s status=%s resp=%s",
-                ticket.ticket_id,
-                status,
-                (resp[:300] if resp else ""),
-            )
+        _queue_infra_whatsapp(
+            db,
+            target=ticket.contact,
+            message=_build_invalid_message(ticket),
+            context=f"infra:invalid:{ticket.ticket_id}",
+            ticket_id=ticket.ticket_id,
+        )
 
-    return RedirectResponse(url=_infra_redirect_url(return_to), status_code=303)
+    return RedirectResponse(
+        url=_infra_redirect_url(return_to, message=f"Ticket #{ticket.ticket_id} marked silly/invalid successfully."),
+        status_code=303,
+    )

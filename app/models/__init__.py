@@ -3,3 +3,4 @@ from app.models.escalation import NCEscalationForm
 from app.models.infra import InfraTicket, InfraTicketImage, InfraUpdate
 from app.models.hiccup import Hiccup, HiccupAuditLog
 from app.models.staff import Staff
+from app.models.whatsapp_outbox import WhatsAppOutbox

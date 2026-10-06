@@ -279,7 +279,8 @@
     const src = script.getAttribute("src");
     if (!src) return Promise.resolve();
     const normalized = normalizePath(src);
-    if (loadedPjaxScripts.has(normalized)) return Promise.resolve();
+    const shouldReload = normalized === "/static/js/hiccups.js";
+    if (!shouldReload && loadedPjaxScripts.has(normalized)) return Promise.resolve();
 
     return new Promise((resolve, reject) => {
       const nextScript = document.createElement("script");
@@ -287,7 +288,7 @@
       nextScript.dataset.pjaxScript = "true";
       nextScript.async = false;
       nextScript.onload = () => {
-        loadedPjaxScripts.add(normalized);
+        if (!shouldReload) loadedPjaxScripts.add(normalized);
         resolve();
       };
       nextScript.onerror = reject;

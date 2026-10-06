@@ -32,6 +32,7 @@ from app.core.security import (
     is_allowlisted_hiccup_admin,
 )
 from app.core.config import get_settings
+from app.core.cache import cache_get_json, cache_set_json, redis_lock
 from app.core.templating import CompatJinja2Templates
 from urllib.parse import quote_plus
 import json
@@ -57,6 +58,7 @@ from asset_app.services.alerts import scan_due_alerts as scan_asset_due_alerts
 from asset_app.services.seed import seed as seed_asset_data
 from asset_app.core.security import load_active_user as load_asset_user
 from asset_app.models import User as AssetUser
+from app.services.whatsapp_outbox import ensure_whatsapp_outbox_table, process_whatsapp_outbox
 
 import app.models  # ensure all models register before metadata creation
 
@@ -313,6 +315,10 @@ asset_templates = CompatJinja2Templates(
 
 
 def _asset_dashboard_counts(db: Session):
+    cache_key = f"asset:dashboard:counts:{date.today().isoformat()}:v1"
+    cached = cache_get_json(cache_key)
+    if cached is not None:
+        return cached
     repeat = db.scalar(
         select(func.count()).select_from(
             select(ServiceTicket.asset_id)
@@ -321,7 +327,7 @@ def _asset_dashboard_counts(db: Session):
             .subquery()
         )
     )
-    return {
+    payload = {
         "total_assets": db.scalar(select(func.count()).select_from(Asset)) or 0,
         "open_tickets": db.scalar(
             select(func.count())
@@ -349,6 +355,8 @@ def _asset_dashboard_counts(db: Session):
         )
         or 0,
     }
+    cache_set_json(cache_key, payload, ttl_seconds=60)
+    return payload
 
 
 def get_db():
@@ -506,6 +514,39 @@ def create_app() -> FastAPI:
     @app.on_event("startup")
     async def initialize_asset_management_module():
         try:
+            ensure_whatsapp_outbox_table()
+        except SQLAlchemyError as exc:
+            logging.getLogger(__name__).warning(
+                "WhatsApp outbox table unavailable; queued WhatsApp retries will wait until DB is reachable: %s",
+                exc,
+            )
+
+        async def whatsapp_outbox_loop():
+            while True:
+                await asyncio.sleep(60)
+                with redis_lock("scheduler:whatsapp-outbox") as acquired:
+                    if not acquired:
+                        continue
+                    db = SessionLocal()
+                    try:
+                        stats = process_whatsapp_outbox(db)
+                        if stats["picked"]:
+                            logging.getLogger(__name__).info(
+                                "WhatsApp outbox processed by backend: %s",
+                                stats,
+                            )
+                    except Exception as exc:  # noqa: BLE001
+                        logging.getLogger(__name__).exception(
+                            "Backend WhatsApp outbox retry failed: %s",
+                            exc,
+                        )
+                        db.rollback()
+                    finally:
+                        db.close()
+
+        app.state.whatsapp_outbox_task = asyncio.create_task(whatsapp_outbox_loop())
+
+        try:
             ensure_asset_database_exists()
             AssetBase.metadata.create_all(
                 asset_engine,
@@ -537,6 +578,9 @@ def create_app() -> FastAPI:
 
     @app.on_event("shutdown")
     async def shutdown_asset_management_module():
+        whatsapp_task = getattr(app.state, "whatsapp_outbox_task", None)
+        if whatsapp_task:
+            whatsapp_task.cancel()
         task = getattr(app.state, "asset_alert_task", None)
         if task:
             task.cancel()

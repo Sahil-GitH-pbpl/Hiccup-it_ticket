@@ -16,6 +16,7 @@ from asset_app.core.security import ROLE_CODES, create_token, current_user, load
 from asset_app.core.config import settings
 from asset_app.core.timezone import now_ist
 from asset_app.services.workflows import *
+from app.core.cache import cache_delete_pattern, cache_get_json, cache_set_json
 
 api = APIRouter(prefix="/api")
 
@@ -334,13 +335,17 @@ def masters(master: str, db: Session = Depends(get_db), user=Depends(current_use
     model = mapping.get(master)
     if not model:
         raise HTTPException(404, "Unknown master")
+    cache_key = f"asset:masters:{master}:v1"
+    cached = cache_get_json(cache_key)
+    if cached is not None:
+        return cached
     order = (
         model.id
         if master in {"categories", "types"}
         else (Vendor.company_name if master == "vendors" else model.name)
     )
     rows = db.scalars(select(model).order_by(order)).all()
-    return [
+    payload = [
         (
             {
                 "id": x.id,
@@ -402,6 +407,8 @@ def masters(master: str, db: Session = Depends(get_db), user=Depends(current_use
         )
         for x in rows
     ]
+    cache_set_json(cache_key, payload, ttl_seconds=600)
+    return payload
 
 
 @api.get("/active-users")
@@ -481,6 +488,8 @@ def create_master(
         db.rollback()
         raise HTTPException(409, "A master with this name already exists")
     db.refresh(o)
+    cache_delete_pattern("asset:masters:*")
+    cache_delete_pattern("asset:dashboard:*")
     return {
         "id": o.id,
         "name": o.name,
@@ -538,6 +547,8 @@ def update_master(
     except IntegrityError:
         db.rollback()
         raise HTTPException(409, "Another master record already uses these values")
+    cache_delete_pattern("asset:masters:*")
+    cache_delete_pattern("asset:dashboard:*")
     return {"id": item.id, "name": getattr(item, "name", getattr(item, "company_name", None))}
 
 
@@ -570,6 +581,8 @@ def delete_master(
     except IntegrityError:
         db.rollback()
         raise HTTPException(409, "This master is in use and cannot be deleted")
+    cache_delete_pattern("asset:masters:*")
+    cache_delete_pattern("asset:dashboard:*")
 
 
 @api.post("/vendors")

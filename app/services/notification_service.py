@@ -12,6 +12,7 @@ from app.core.config import get_settings
 from app.db.session import SessionLocal
 from app.services.report_service import recent_stats
 from app.services.hiccup_service import mark_overdue_flags, trend_alerts
+from app.services.whatsapp_outbox import send_whatsapp_async_or_queue
 from app.models.department import Department
 from app.models.hiccup import Hiccup
 from app.models.staff import Staff
@@ -332,7 +333,13 @@ def notify_on_creation(db: Session, hiccup: Hiccup):
         "Copy-paste the text box, submit it, and you're done.",
     ]
 
-    send_bulk(_dedup_numbers(numbers), "\n".join(message_lines))
+    message = "\n".join(message_lines)
+    for number in _dedup_numbers(numbers):
+        send_whatsapp_async_or_queue(
+            number,
+            message,
+            context=f"hiccup:create:{hiccup.hiccup_id}",
+        )
 
 
 def enqueue_creation_notification(hiccup_id: str) -> None:
@@ -631,19 +638,14 @@ def send_response_reminders(db: Session):
                     f"- Outside office (internet): {external_url}",
                 ]
             )
-            sent = send_bulk(numbers, message)
-            if sent:
-                hiccup.escalate_msg_sent = True
-                logger.info(
-                    "Escalation notice sent for %s -> %s",
-                    hiccup.hiccup_id,
-                    numbers,
+            for number in _dedup_numbers(numbers):
+                send_whatsapp_async_or_queue(
+                    number,
+                    message,
+                    context=f"hiccup:escalate-reminder:{hiccup.hiccup_id}",
                 )
-            else:
-                logger.warning(
-                    "Escalation notice failed, will retry next run for %s",
-                    hiccup.hiccup_id,
-                )
+            hiccup.escalate_msg_sent = True
+            logger.info("Escalation notice queued for %s -> %s", hiccup.hiccup_id, numbers)
             if management_numbers:
                 mgmt_message = "\n".join(
                     [
@@ -670,19 +672,14 @@ def send_response_reminders(db: Session):
                     f"- Outside office (internet): {external_url}",
                 ]
             )
-            sent = send_bulk(numbers, message)
-            if sent:
-                hiccup.overdue_msg_sent = True
-                logger.info(
-                    "Overdue reminder sent for %s -> %s",
-                    hiccup.hiccup_id,
-                    staff.contact,
+            for number in _dedup_numbers(numbers):
+                send_whatsapp_async_or_queue(
+                    number,
+                    message,
+                    context=f"hiccup:overdue-reminder:{hiccup.hiccup_id}",
                 )
-            else:
-                logger.warning(
-                    "Overdue reminder failed, will retry next run for %s",
-                    hiccup.hiccup_id,
-                )
+            hiccup.overdue_msg_sent = True
+            logger.info("Overdue reminder queued for %s -> %s", hiccup.hiccup_id, staff.contact)
         elif age >= reminder_delta and not hiccup.reminder_sent:
             token = _build_response_token(staff, hiccup)
             internal_url, external_url = _build_response_urls(hiccup, token)
@@ -695,16 +692,11 @@ def send_response_reminders(db: Session):
                     f"- Outside office (internet): {external_url}",
                 ]
             )
-            sent = send_bulk(numbers, message)
-            if sent:
-                hiccup.reminder_sent = True
-                logger.info(
-                    "Reminder message sent for %s -> %s",
-                    hiccup.hiccup_id,
-                    staff.contact,
+            for number in _dedup_numbers(numbers):
+                send_whatsapp_async_or_queue(
+                    number,
+                    message,
+                    context=f"hiccup:response-reminder:{hiccup.hiccup_id}",
                 )
-            else:
-                logger.warning(
-                    "Reminder send failed, will retry next run for %s",
-                    hiccup.hiccup_id,
-                )
+            hiccup.reminder_sent = True
+            logger.info("Reminder message queued for %s -> %s", hiccup.hiccup_id, staff.contact)

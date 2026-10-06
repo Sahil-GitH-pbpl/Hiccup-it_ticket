@@ -7,6 +7,7 @@ from pytz import timezone
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
+from app.core.cache import redis_lock
 from app.db.session import SessionLocal
 from app.api.routes_infra import (
     _send_pick_reminders,
@@ -20,6 +21,7 @@ from app.services.notification_service import (
     send_hiccup_whatsapp_reports_separately,
     send_response_reminders,
 )
+from app.services.whatsapp_outbox import process_whatsapp_outbox
 from app.utils.time_utils import now_local
 
 logger = logging.getLogger(__name__)
@@ -39,6 +41,13 @@ def start_scheduler():
         return _scheduler_instance
 
     scheduler = get_scheduler()
+
+    def run_with_lock(job_name: str, func):
+        with redis_lock(f"scheduler:{job_name}") as acquired:
+            if not acquired:
+                logger.info("Skipping %s; another scheduler instance owns the Redis lock", job_name)
+                return
+            return func()
 
     def hourly_job():
         logger.info("Running hourly SLA check")
@@ -106,24 +115,48 @@ def start_scheduler():
         finally:
             db.close()
 
+    def whatsapp_outbox_job():
+        logger.info("Running WhatsApp outbox retry job")
+        db: Session = SessionLocal()
+        try:
+            stats = process_whatsapp_outbox(db)
+            if stats["picked"]:
+                logger.info("WhatsApp outbox processed: %s", stats)
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("WhatsApp outbox job failed: %s", exc)
+            db.rollback()
+        finally:
+            db.close()
+
     scheduler.add_job(
-        hourly_job, "interval", minutes=60, id="sla-check", replace_existing=True
+        lambda: run_with_lock("sla-check", hourly_job),
+        "interval",
+        minutes=60,
+        id="sla-check",
+        replace_existing=True,
     )
     scheduler.add_job(
-        infra_pick_sla_job,
+        lambda: run_with_lock("infra-pick-sla-auto-hiccup", infra_pick_sla_job),
         "interval",
         minutes=10,
         id="infra-pick-sla-auto-hiccup",
         replace_existing=True,
     )
     scheduler.add_job(
-        daily_summary_job,
+        lambda: run_with_lock("whatsapp-outbox", whatsapp_outbox_job),
+        "interval",
+        minutes=1,
+        id="whatsapp-outbox",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        lambda: run_with_lock("daily-summary", daily_summary_job),
         trigger=CronTrigger(hour=23, minute=59, timezone=timezone(settings.timezone)),
         id="daily-summary",
         replace_existing=True,
     )
     scheduler.add_job(
-        previous_day_hiccup_report_job,
+        lambda: run_with_lock("previous-day-hiccup-whatsapp-report", previous_day_hiccup_report_job),
         trigger=CronTrigger(hour=0, minute=2, timezone=timezone(settings.timezone)),
         id="previous-day-hiccup-whatsapp-report",
         replace_existing=True,

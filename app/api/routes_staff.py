@@ -8,6 +8,7 @@ from sqlalchemy import func, or_
 from app.db.session import MainSessionLocal
 from app.models.staff import Staff
 from app.models.department import Department
+from app.core.cache import cache_get_json, cache_set_json
 
 
 router = APIRouter(prefix="/api/staff", tags=["staff"])
@@ -87,5 +88,11 @@ def suggest_staff(q: str | None = None, limit: int = 10, db: Session = Depends(g
 
 @router.get("/departments", response_model=List[DepartmentSummary])
 def list_departments(db: Session = Depends(get_db)):
+    cache_key = "hiccup:staff:departments:v1"
+    cached = cache_get_json(cache_key)
+    if cached is not None:
+        return cached
     rows = db.query(Department.id, Department.name).order_by(Department.name).all()
-    return [{"id": dept_id, "name": dept_name} for dept_id, dept_name in rows]
+    payload = [{"id": dept_id, "name": dept_name} for dept_id, dept_name in rows]
+    cache_set_json(cache_key, payload, ttl_seconds=600)
+    return payload
