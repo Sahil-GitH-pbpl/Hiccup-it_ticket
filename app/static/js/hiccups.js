@@ -30,6 +30,35 @@ const listColumnCount = summaryColumnCount;
 const PAGE_SIZE_STORAGE_KEY = 'hiccupPageSize';
 const PAGE_SIZE_OPTIONS = [50, 100, 200];
 
+function hasPageElement(id) {
+    return Boolean(document.getElementById(id));
+}
+
+function getHiccupPageMode() {
+    const path = window.location.pathname || '';
+    const isAssignedPage =
+        path.includes('/assigned') ||
+        hasPageElement('pagination-assigned') ||
+        hasPageElement('assigned-nc-cards');
+    const isManagementPage =
+        !isAssignedPage &&
+        (path.includes('/management') ||
+            hasPageElement('pagination-management') ||
+            hasPageElement('management-focus-view'));
+
+    return {
+        assigned: isAssignedPage,
+        management: isManagementPage,
+    };
+}
+
+const hiccupPageMode = getHiccupPageMode();
+window.assignedView = hiccupPageMode.assigned;
+window.managementView = hiccupPageMode.management;
+if (!hiccupPageMode.assigned && !hiccupPageMode.management) {
+    window.managementActionsEnabled = false;
+}
+
 function getSavedPageSize() {
     const saved = Number(window.localStorage.getItem(PAGE_SIZE_STORAGE_KEY) || '');
     return PAGE_SIZE_OPTIONS.includes(saved) ? saved : 50;
@@ -46,7 +75,7 @@ const paginationState = {
     assigned: 1,
 };
 const showManagementActions = Boolean(window.managementActionsEnabled);
-const assignedViewMode = Boolean(window.assignedView);
+const assignedViewMode = hiccupPageMode.assigned;
 const bulkCloseEnabled = Boolean(showManagementActions && document.getElementById('bulk-close-bar'));
 const managementColumnCount = summaryColumnCount + (bulkCloseEnabled ? 1 : 0) + (showManagementActions ? actionsColumnCount : 0);
 const currentUserId = window.currentUserId || (window.currentUser && window.currentUser.user_id) || null;
@@ -3206,12 +3235,50 @@ window.addEventListener('popstate', () => {
     loadMyHiccups();
 }, { signal: hiccupsPageSignal });
 
-document.addEventListener('DOMContentLoaded', () => {
+let hiccupsPageInitialized = false;
+let hiccupsWaitingForDependencies = false;
+
+function areHiccupDependenciesReady() {
+    return typeof fetchJSON === 'function' && typeof showAlert === 'function';
+}
+
+function waitForHiccupDependencies() {
+    if (hiccupsWaitingForDependencies) {
+        return;
+    }
+    hiccupsWaitingForDependencies = true;
+    window.addEventListener(
+        'load',
+        () => {
+            hiccupsWaitingForDependencies = false;
+            initHiccupsPage();
+        },
+        { once: true, signal: hiccupsPageSignal }
+    );
+    window.setTimeout(() => {
+        hiccupsWaitingForDependencies = false;
+        initHiccupsPage();
+    }, 50);
+}
+
+function initHiccupsPage() {
+    if (hiccupsPageInitialized || !hasHiccupTables) {
+        return;
+    }
+    if (!areHiccupDependenciesReady()) {
+        waitForHiccupDependencies();
+        return;
+    }
+    hiccupsPageInitialized = true;
     setupDensityControls();
     setupHiccupTabs();
     hydrateManagementStateFromUrl();
     if (typeof loadMyHiccups === 'function') {
         loadMyHiccups();
     }
-}, { signal: hiccupsPageSignal });
+}
+
+document.addEventListener('DOMContentLoaded', initHiccupsPage, { signal: hiccupsPageSignal });
+window.addEventListener('pjax:navigation', initHiccupsPage, { signal: hiccupsPageSignal });
+initHiccupsPage();
 })();
